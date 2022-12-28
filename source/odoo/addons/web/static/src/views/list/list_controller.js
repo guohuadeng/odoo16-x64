@@ -16,7 +16,7 @@ import { ViewButton } from "@web/views/view_button/view_button";
 import { useViewButtons } from "@web/views/view_button/view_button_hook";
 import { ExportDataDialog } from "@web/views/view_dialogs/export_data_dialog";
 
-const { Component, onWillStart, useSubEnv, useEffect, useRef } = owl;
+import { Component, onWillStart, useSubEnv, useEffect, useRef } from "@odoo/owl";
 
 export class ListViewHeaderButton extends ViewButton {
     async onClick() {
@@ -86,7 +86,10 @@ export class ListController extends Component {
                 ? !fields.x_active.readonly
                 : false;
         useSubEnv({ model: this.model }); // do this in useModel?
-        useViewButtons(this.model, this.rootRef);
+        useViewButtons(this.model, this.rootRef, {
+            beforeExecuteAction: this.beforeExecuteActionButton.bind(this),
+            afterExecuteAction: this.afterExecuteActionButton.bind(this),
+        });
         useSetupView({
             rootRef: this.rootRef,
             beforeLeave: async () => {
@@ -94,14 +97,18 @@ export class ListController extends Component {
                 const editedRecord = list.editedRecord;
                 if (editedRecord) {
                     if (!(await list.unselectRecord(true))) {
-                        throw new Error("View can't be saved");
+                        return false;
                     }
                 }
             },
-            beforeUnload: () => {
+            beforeUnload: async (ev) => {
                 const editedRecord = this.model.root.editedRecord;
                 if (editedRecord) {
-                    return editedRecord.urgentSave();
+                    const isValid = await editedRecord.urgentSave();
+                    if (!isValid) {
+                        ev.preventDefault();
+                        ev.returnValue = "Unsaved changes";
+                    }
                 }
             },
             getLocalState: () => {
@@ -321,7 +328,7 @@ export class ListController extends Component {
             name: field.name || field.id,
             label: field.label || field.string,
             store: field.store,
-            type: field.field_type,
+            type: field.field_type || field.type,
         }));
         if (import_compat) {
             exportedFields.unshift({ name: "id", label: this.env._t("External ID") });
@@ -372,12 +379,11 @@ export class ListController extends Component {
      * @private
      */
     async onDirectExportData() {
-        const fields = await this.getExportedFields(this.model.root.resModel, true);
-        await this.downloadExport(
-            fields.filter((field) => this.model.root.activeFields[field.id]),
-            false,
-            "xlsx"
-        );
+        const fields = this.props.archInfo.columns
+            .filter((col) => col.type === "field")
+            .map((col) => this.props.fields[col.name])
+            .filter((field) => field.exportable !== false);
+        await this.downloadExport(fields, false, "xlsx");
     }
     /**
      * Called when clicking on 'Archive' or 'Unarchive' in the sidebar.
@@ -424,6 +430,7 @@ export class ListController extends Component {
             confirm: async () => {
                 const total = root.count;
                 const resIds = await this.model.root.deleteRecords();
+                this.model.notify();
                 if (
                     root.isDomainSelected &&
                     resIds.length === session.active_ids_limit &&
@@ -451,6 +458,10 @@ export class ListController extends Component {
             record.toggleSelection(false);
         });
     }
+
+    async beforeExecuteActionButton(clickParams) {}
+
+    async afterExecuteActionButton(clickParams) {}
 }
 
 ListController.template = `web.ListView`;

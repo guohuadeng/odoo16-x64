@@ -57,6 +57,7 @@ class Company(models.Model):
             return base64.b64encode(stream.getvalue())
 
     name = fields.Char(related='partner_id.name', string='Company Name', required=True, store=True, readonly=False)
+    active = fields.Boolean(default=True)
     sequence = fields.Integer(help='Used to order Companies in the company switcher', default=10)
     parent_id = fields.Many2one('res.company', string='Parent Company', index=True)
     child_ids = fields.One2many('res.company', 'parent_id', string='Child Companies')
@@ -256,6 +257,23 @@ class Company(models.Model):
         if company_address_fields_upd:
             self.invalidate_model(company_address_fields)
         return res
+
+    @api.constrains('active')
+    def _check_active(self):
+        for company in self:
+            if not company.active:
+                company_active_users = self.env['res.users'].search_count([
+                    ('company_id', '=', company.id),
+                    ('active', '=', True),
+                ])
+                if company_active_users:
+                    # You cannot disable companies with active users
+                    raise ValidationError(_(
+                        'The company %(company_name)s cannot be archived because it is still used '
+                        'as the default company of %(active_users)s users.',
+                        company_name=company.name,
+                        active_users=company_active_users,
+                    ))
 
     @api.constrains('parent_id')
     def _check_parent_id(self):

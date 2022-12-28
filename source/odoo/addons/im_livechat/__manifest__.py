@@ -50,7 +50,7 @@ Help your customers with this chat, and analyse their feedback.
             'im_livechat/static/src/components/*/*',
         ],
         'web.assets_frontend': [
-            ('include', 'mail.assets_public_livechat'),
+            ('include', 'im_livechat.assets_public_livechat'),
             'im_livechat/static/src/public/main.js',
             'im_livechat/static/src/services/*.js',
             'im_livechat/static/src/legacy/public_livechat_chatbot.js',
@@ -63,11 +63,8 @@ Help your customers with this chat, and analyse their feedback.
         ],
         'web.assets_backend': [
             'im_livechat/static/src/js/colors_reset_button/*',
-            'im_livechat/static/src/js/im_livechat_chatbot_form_view.js',
-            'im_livechat/static/src/js/im_livechat_chatbot_form_controller.js',
-            'im_livechat/static/src/js/im_livechat_chatbot_step_form_view_dialog.js',
-            'im_livechat/static/src/js/chatbot_script_answers_m2m_tags.js',
-            'im_livechat/static/src/js/chatbot_script_step_o2m.js',
+            'im_livechat/static/src/js/im_livechat_chatbot_steps_one2many.js',
+            'im_livechat/static/src/js/im_livechat_chatbot_script_answers_m2m.js',
             'im_livechat/static/src/components/*/*.js',
             'im_livechat/static/src/scss/im_livechat_history.scss',
             'im_livechat/static/src/scss/im_livechat_form.scss',
@@ -85,7 +82,7 @@ Help your customers with this chat, and analyse their feedback.
         'mail.assets_messaging': [
             'im_livechat/static/src/models/*.js',
         ],
-        'mail.assets_public_livechat': [
+        'im_livechat.assets_public_livechat': [
             ('include', 'mail.assets_core_messaging'),
             'im_livechat/static/src/legacy/models/*',
             'im_livechat/static/src/legacy/widgets/*',
@@ -108,10 +105,11 @@ Help your customers with this chat, and analyse their feedback.
             # Qweb2 lib
             'web/static/lib/qweb/qweb2.js',
             # Odoo JS Framework
-            'web/static/lib/owl/owl.js',
-            'web/static/src/owl2_compatibility/*.js',
             'web/static/src/legacy/js/promise_extension.js',
             'web/static/src/boot.js',
+            'web/static/lib/owl/owl.js',
+            'web/static/lib/owl/odoo_module.js',
+            'web/static/src/owl2_compatibility/*.js',
             'web/static/src/legacy/legacy_component.js',
             'web/static/src/core/browser/browser.js',
             'web/static/src/core/browser/feature_detection.js',
@@ -205,7 +203,7 @@ Help your customers with this chat, and analyse their feedback.
             'mail/static/src/utils/*.js',
             'mail/static/src/js/emojis.js',
             'mail/static/src/component_hooks/*.js',
-            ('include', 'mail.assets_public_livechat'),
+            ('include', 'im_livechat.assets_public_livechat'),
             'mail/static/src/services/messaging_service.js',
             # Framework JS
             'bus/static/src/*.js',

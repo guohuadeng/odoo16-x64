@@ -13,7 +13,6 @@ import { toStringExpression } from "@web/views/utils";
 import {
     copyAttributes,
     getModifier,
-    isAlwaysInvisible,
     isComponentNode,
     isTextNode,
     makeSeparator,
@@ -32,17 +31,14 @@ function appendAttf(el, attr, string) {
 function appendToExpr(expr, string) {
     const re = /{{.*}}/;
     const oldString = re.exec(expr);
-    if (oldString) {
-        string = `${oldString} ${string}`;
-    }
-    return `{{${string} }}`;
+    return oldString ? `${oldString} {{${string} }}` : `{{${string} }}`;
 }
 
 /**
  * @param {Record<string, any>} obj
  * @returns {string}
  */
-function objectToString(obj) {
+export function objectToString(obj) {
     return `{${Object.entries(obj)
         .map((t) => t.join(":"))
         .join(",")}}`;
@@ -53,6 +49,7 @@ export class FormCompiler extends ViewCompiler {
         this.encounteredFields = {};
         /** @type {Record<string, Element[]>} */
         this.labels = {};
+        this.noteBookId = 0;
         this.compilers.push(
             ...compilersRegistry.getAll(),
             { selector: "div[name='button_box']", fn: this.compileButtonBox },
@@ -73,13 +70,6 @@ export class FormCompiler extends ViewCompiler {
     }
 
     createLabelFromField(fieldId, fieldName, fieldString, label, params) {
-        const props = {
-            id: `'${fieldId}'`,
-            fieldName: `'${fieldName}'`,
-            record: `props.record`,
-            fieldInfo: `props.archInfo.fieldNodes['${fieldId}']`,
-            className: `"${label.className}"`,
-        };
         let labelText = label.textContent || fieldString;
         if (label.hasAttribute("data-no-label")) {
             labelText = toStringExpression("");
@@ -89,7 +79,11 @@ export class FormCompiler extends ViewCompiler {
                 : `props.record.fields['${fieldName}'].string`;
         }
         const formLabel = createElement("FormLabel", {
-            "t-props": objectToString(props),
+            id: `'${fieldId}'`,
+            fieldName: `'${fieldName}'`,
+            record: `props.record`,
+            fieldInfo: `props.archInfo.fieldNodes['${fieldId}']`,
+            className: `"${label.className}"`,
             string: labelText,
         });
         const condition = label.getAttribute("t-if");
@@ -138,16 +132,19 @@ export class FormCompiler extends ViewCompiler {
         let hasContent = false;
         for (const child of el.children) {
             const invisible = getModifier(child, "invisible");
-            if (isAlwaysInvisible(invisible, params)) {
+            if (this.isAlwaysInvisible(invisible, params)) {
                 continue;
             }
             hasContent = true;
+            let isVisibleExpr;
+            if (typeof invisible === "boolean") {
+                isVisibleExpr = `${invisible ? false : true}`;
+            } else {
+                isVisibleExpr = `!evalDomainFromRecord(props.record,${JSON.stringify(invisible)})`;
+            }
             const mainSlot = createElement("t", {
                 "t-set-slot": `slot_${slotId++}`,
-                isVisible:
-                    invisible !== false
-                        ? `!evalDomainFromRecord(props.record,${JSON.stringify(invisible)})`
-                        : true,
+                isVisible: isVisibleExpr,
             });
             if (child.tagName === "button" || child.children.tagName === "button") {
                 child.classList.add(
@@ -175,6 +172,13 @@ export class FormCompiler extends ViewCompiler {
         return hasContent ? buttonBox : null;
     }
 
+    compileButton(el, params) {
+        const compiled = super.compileButton(el, params);
+        compiled.setAttribute("disable", "props.disableViewButtons");
+        compiled.setAttribute("enable", "props.enableViewButtons");
+        return compiled;
+    }
+
     /**
      * @override
      */
@@ -187,13 +191,10 @@ export class FormCompiler extends ViewCompiler {
         const labelsForAttr = el.getAttribute("id") || fieldName;
         const labels = this.getLabels(labelsForAttr);
         const dynamicLabel = (label) => {
-            const formLabel = this.createLabelFromField(
-                fieldId,
-                fieldName,
-                fieldString,
-                label,
-                params
-            );
+            const formLabel = this.createLabelFromField(fieldId, fieldName, fieldString, label, {
+                ...params,
+                currentFieldArchNode: el,
+            });
             if (formLabel) {
                 label.replaceWith(formLabel);
             } else {
@@ -218,9 +219,11 @@ export class FormCompiler extends ViewCompiler {
         const displayClasses = sheetNode
             ? `d-flex {{ uiService.size < ${SIZES.XXL} ? "flex-column" : "flex-nowrap h-100" }}`
             : "d-block";
+        const stateClasses =
+            "{{ props.record.isDirty ? 'o_form_dirty' : !props.record.isVirtual ? 'o_form_saved' : '' }}";
         const form = createElement("div", {
             "t-att-class": "props.class",
-            "t-attf-class": `{{props.record.isInEdition ? 'o_form_editable' : 'o_form_readonly'}} ${displayClasses}`,
+            "t-attf-class": `{{props.record.isInEdition ? 'o_form_editable' : 'o_form_readonly'}} ${displayClasses} ${stateClasses}`,
         });
         if (!sheetNode) {
             for (const child of el.childNodes) {
@@ -289,7 +292,7 @@ export class FormCompiler extends ViewCompiler {
             }
 
             const invisible = getModifier(child, "invisible");
-            if (isAlwaysInvisible(invisible, params)) {
+            if (this.isAlwaysInvisible(invisible, params)) {
                 continue;
             }
 
@@ -307,7 +310,11 @@ export class FormCompiler extends ViewCompiler {
             }
 
             if (getTag(child, true) === "separator") {
-                forceNewline = true;
+                itemSpan = parseInt(formGroup.getAttribute("maxCols") || 2, 10);
+            }
+
+            if (child.matches("div[class='clearfix']:empty")) {
+                itemSpan = parseInt(formGroup.getAttribute("maxCols") || 2, 10);
             }
 
             let slotContent;
@@ -315,8 +322,8 @@ export class FormCompiler extends ViewCompiler {
                 const addLabel = child.hasAttribute("nolabel")
                     ? child.getAttribute("nolabel") !== "1"
                     : true;
-                slotContent = this.compileNode(child, params, false);
-                if (addLabel && !isOuterGroup && !isTextNode(slotContent)) {
+                slotContent = this.compileNode(child, { ...params, currentSlot: mainSlot }, false);
+                if (slotContent && addLabel && !isOuterGroup && !isTextNode(slotContent)) {
                     itemSpan = itemSpan === 1 ? itemSpan + 1 : itemSpan;
                     const fieldName = child.getAttribute("name");
                     const fieldId = slotContent.getAttribute("id") || fieldName;
@@ -329,39 +336,53 @@ export class FormCompiler extends ViewCompiler {
                             : `props.record.fields.${fieldName}.string`,
                         fieldInfo: `props.archInfo.fieldNodes[${fieldId}]`,
                     };
-                    // note: remove this oe_read/edit_only logic when form view
-                    // will always be in edit mode
-                    if (child.classList.contains("oe_read_only")) {
-                        props.className = `'oe_read_only'`;
-                    } else if (child.classList.contains("oe_edit_only")) {
-                        props.className = `'oe_edit_only'`;
-                    }
                     mainSlot.setAttribute("props", objectToString(props));
                     mainSlot.setAttribute("Component", "constructor.components.FormLabel");
                     mainSlot.setAttribute("subType", "'item_component'");
                 }
             } else {
-                if (child.classList.contains("o_td_label") || getTag(child, true) === "label") {
+                // TODO: When every apps will be revamp, we could remove the condition using 'o_td_label' in favor of 'o_wrap_label'
+                if (
+                    child.classList.contains("o_wrap_label") ||
+                    child.classList.contains("o_td_label") ||
+                    getTag(child, true) === "label"
+                ) {
                     mainSlot.setAttribute("subType", "'label'");
-                    child.classList.remove("o_td_label");
+                    child.classList.remove("o_wrap_label");
                 }
-                slotContent = this.compileNode(child, params, false);
+                slotContent = this.compileNode(child, { ...params, currentSlot: mainSlot }, false);
             }
 
             if (slotContent && !isTextNode(slotContent)) {
-                if (invisible !== false) {
-                    mainSlot.setAttribute(
-                        "isVisible",
-                        `!evalDomainFromRecord(props.record,${JSON.stringify(invisible)})`
-                    );
+                let isVisibleExpr;
+                if (typeof invisible === "boolean") {
+                    isVisibleExpr = `${invisible ? false : true}`;
+                } else {
+                    isVisibleExpr = `!evalDomainFromRecord(props.record,${JSON.stringify(
+                        invisible
+                    )})`;
                 }
+                mainSlot.setAttribute("isVisible", isVisibleExpr);
                 if (itemSpan > 0) {
                     mainSlot.setAttribute("itemSpan", `${itemSpan}`);
                 }
 
                 const groupClassExpr = `scope && scope.className`;
                 if (isComponentNode(slotContent)) {
-                    if (getTag(child, true) !== "button") {
+                    if (getTag(slotContent) === "FormLabel") {
+                        mainSlot.prepend(
+                            createElement("t", {
+                                "t-set": "addClass",
+                                "t-value": groupClassExpr,
+                            })
+                        );
+                        combineAttributes(
+                            slotContent,
+                            "className",
+                            `(addClass ? " " + addClass : "")`,
+                            `+`
+                        );
+                    } else if (getTag(child, true) !== "button") {
                         if (slotContent.hasAttribute("class")) {
                             mainSlot.prepend(
                                 createElement("t", {
@@ -422,9 +443,6 @@ export class FormCompiler extends ViewCompiler {
             const slot = createElement("t", {
                 "t-set-slot": `button_${slotId++}`,
                 isVisible: button.getAttribute("t-if") || true,
-                displayInReadOnly:
-                    button.hasAttribute("className") &&
-                    button.getAttribute("className").includes("oe_read_only"),
             });
             append(slot, button);
             append(statusBarButtons, slot);
@@ -471,6 +489,7 @@ export class FormCompiler extends ViewCompiler {
      * @returns {Element}
      */
     compileNotebook(el, params) {
+        const noteBookId = this.noteBookId++;
         const noteBook = createElement("Notebook");
         const pageAnchors = [...document.querySelectorAll("[href^=\\#]")]
             .map((a) => CSS.escape(a.getAttribute("href").substring(1)))
@@ -482,12 +501,21 @@ export class FormCompiler extends ViewCompiler {
             el.removeAttribute("class");
         }
 
+        noteBook.setAttribute(
+            "defaultPage",
+            `props.record.isNew ? undefined : props.activeNotebookPages[${noteBookId}]`
+        );
+        noteBook.setAttribute(
+            "onPageUpdate",
+            `(page) => this.props.onNotebookPageChange(${noteBookId}, page)`
+        );
+
         for (const child of el.children) {
             if (getTag(child, true) !== "page") {
                 continue;
             }
             const invisible = getModifier(child, "invisible");
-            if (isAlwaysInvisible(invisible, params)) {
+            if (this.isAlwaysInvisible(invisible, params)) {
                 continue;
             }
 
@@ -503,9 +531,15 @@ export class FormCompiler extends ViewCompiler {
             pageSlot.setAttribute("t-set-slot", pageId);
             pageSlot.setAttribute("title", pageTitle);
             pageSlot.setAttribute("name", pageNodeName);
+            if (child.className) {
+                pageSlot.setAttribute("className", `"${child.className}"`);
+            }
 
             if (child.getAttribute("autofocus") === "autofocus") {
-                noteBook.setAttribute("defaultPage", `"${pageId}"`);
+                noteBook.setAttribute(
+                    "defaultPage",
+                    `props.record.isNew ? "${pageId}" : (props.activeNotebookPages[${noteBookId}] || "${pageId}")`
+                );
             }
 
             for (const anchor of child.querySelectorAll("[href^=\\#]")) {
@@ -520,15 +554,15 @@ export class FormCompiler extends ViewCompiler {
             }
 
             let isVisible;
-            if (invisible === false) {
-                isVisible = "true";
+            if (typeof invisible === "boolean") {
+                isVisible = `${!invisible}`;
             } else {
                 isVisible = `!evalDomainFromRecord(props.record,${JSON.stringify(invisible)})`;
             }
             pageSlot.setAttribute("isVisible", isVisible);
 
             for (const contents of child.children) {
-                append(pageSlot, this.compileNode(contents, params));
+                append(pageSlot, this.compileNode(contents, { ...params, currentSlot: pageSlot }));
             }
         }
 

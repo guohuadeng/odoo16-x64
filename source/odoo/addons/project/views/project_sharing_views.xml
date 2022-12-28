@@ -85,11 +85,11 @@
                                 </div>
                             </div>
                             <div class="o_kanban_record_body">
-                                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" context="{'project_id': project_id}"/>
                                 <div t-if="record.date_deadline.raw_value" name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}">
                                     <field name="date_deadline" widget="remaining_days"/>
                                 </div>
-                                <div t-if="record.displayed_image_id.value">
+                                <div t-if="record.displayed_image_id.value" groups="base.group_user">
                                     <field name="displayed_image_id" widget="attachment_image"/>
                                 </div>
                             </div>
@@ -207,7 +207,7 @@
                             <field name="allow_subtasks" invisible="1" />
                             <field name="partner_id" options="{'no_open': True, 'no_create': True, 'no_edit': True}"/>
                             <field name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}"/>
-                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True, 'no_edit_color': True}"/>
+                            <field name="tag_ids" context="{'project_id': project_id}" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True, 'no_edit_color': True}"/>
                         </group>
                     </group>
                     <notebook>

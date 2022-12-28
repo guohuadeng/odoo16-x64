@@ -11,7 +11,7 @@ import { Many2XAutocomplete, useOpenMany2XRecord } from "@web/views/fields/relat
 import { isMobileOS } from "@web/core/browser/feature_detection";
 import * as BarcodeScanner from "@web/webclient/barcode/barcode_scanner";
 
-const { Component, onWillUpdateProps, useState } = owl;
+import { Component, onWillUpdateProps, useState } from "@odoo/owl";
 
 class CreateConfirmationDialog extends Component {
     get title() {
@@ -51,18 +51,10 @@ export class Many2OneField extends Component {
             this.autocompleteContainerRef.el.querySelector("input").focus();
         };
 
-        const computeActiveActions = (props) => {
-            this.state.activeActions = {
-                canCreate: props.canCreate,
-                canCreateEdit: props.canCreateEdit,
-                canWrite: props.canWrite,
-            };
-        };
-
         this.state = useState({
             isFloating: !this.props.value,
         });
-        computeActiveActions(this.props);
+        this.computeActiveActions(this.props);
 
         this.openMany2X = useOpenMany2XRecord({
             resModel: this.relation,
@@ -102,7 +94,7 @@ export class Many2OneField extends Component {
 
         onWillUpdateProps(async (nextProps) => {
             this.state.isFloating = !nextProps.value;
-            computeActiveActions(nextProps);
+            this.computeActiveActions(nextProps);
         });
     }
 
@@ -149,7 +141,14 @@ export class Many2OneField extends Component {
             nameCreateField: this.props.nameCreateField,
             setInputFloats: this.setFloating,
             autocomplete_container: this.autocompleteContainerRef,
-        }
+        };
+    }
+    computeActiveActions(props) {
+        this.state.activeActions = {
+            create: props.canCreate,
+            createEdit: props.canCreateEdit,
+            write: props.canWrite,
+        };
     }
     getDomain() {
         return this.domain.toList(this.context);
@@ -188,7 +187,11 @@ export class Many2OneField extends Component {
         }
     }
     onExternalBtnClick() {
-        this.openDialog(this.resId);
+        if (this.props.openTarget === "current") {
+            this.openAction();
+        } else {
+            this.openDialog(this.resId);
+        }
     }
     async onBarcodeBtnClick() {
         const barcode = await BarcodeScanner.scanBarcode();
@@ -229,7 +232,7 @@ export class Many2OneField extends Component {
             searchInput.value = barcode;
             searchInput.dispatchEvent(new Event("input"));
             if (this.env.isSmall) {
-                searchInput.click();
+                searchInput.dispatchEvent(new Event("barcode-search"));
             }
         }
     }
@@ -259,6 +262,7 @@ Many2OneField.props = {
     relation: { type: String, optional: true },
     string: { type: String, optional: true },
     canScanBarcode: { type: Boolean, optional: true },
+    openTarget: { type: String, validate: (v) => ["current", "new"].includes(v), optional: true },
 };
 Many2OneField.defaultProps = {
     canOpen: true,
@@ -270,6 +274,7 @@ Many2OneField.defaultProps = {
     searchLimit: 7,
     string: "",
     canScanBarcode: false,
+    openTarget: "current",
 };
 
 Many2OneField.displayName = _lt("Many2one");
@@ -295,8 +300,11 @@ Many2OneField.extractProps = ({ attrs, field }) => {
         string: attrs.string || field.string,
         createNameField: attrs.options.create_name_field,
         canScanBarcode: canScanBarcode,
+        openTarget: attrs.open_target,
     };
 };
 
 registry.category("fields").add("many2one", Many2OneField);
+// the two following lines are there to prevent the fallback on legacy widgets
 registry.category("fields").add("list.many2one", Many2OneField);
+registry.category("fields").add("kanban.many2one", Many2OneField);

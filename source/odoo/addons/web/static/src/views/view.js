@@ -12,7 +12,7 @@ import { WithSearch } from "@web/search/with_search/with_search";
 import { OnboardingBanner } from "@web/views/onboarding_banner";
 import { useActionLinks } from "@web/views/view_hook";
 
-const { Component, markRaw, onWillUpdateProps, onWillStart, toRaw, useSubEnv } = owl;
+import { Component, markRaw, onWillUpdateProps, onWillStart, toRaw, useSubEnv, reactive } from "@odoo/owl";
 const viewRegistry = registry.category("views");
 
 /** @typedef {Object} Config
@@ -41,18 +41,22 @@ export function getDefaultConfig() {
         actionId: false,
         actionType: false,
         actionFlags: {},
-        breadcrumbs: [
+        breadcrumbs: reactive([
             {
                 get name() {
                     return displayName;
                 },
             },
-        ],
+        ]),
+        disableSearchBarAutofocus: false,
         getDisplayName: () => displayName,
         historyBack: () => {},
         pagerProps: {},
         setDisplayName: (newDisplayName) => {
             displayName = newDisplayName;
+            // This is a hack to force the reactivity when a new displayName is set
+            config.breadcrumbs.push(undefined);
+            config.breadcrumbs.pop();
         },
         viewSwitcherEntries: [],
         views: [],
@@ -100,7 +104,6 @@ export function getDefaultConfig() {
  */
 
 export class ViewNotFoundError extends Error {}
-export class LegacyFormViewInDialogError extends Error {}
 
 const STANDARD_PROPS = [
     "resModel",
@@ -269,10 +272,6 @@ export class View extends Component {
             } else {
                 subType = null;
             }
-        }
-
-        if (descr.type === "form" && descr.isLegacy && this.env.inDialog) {
-            throw new LegacyFormViewInDialogError();
         }
 
         Object.assign(this.env.config, {

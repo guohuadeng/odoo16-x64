@@ -2,7 +2,7 @@
 
 import { throttleForAnimation } from "./utils/timing";
 
-const { onWillUnmount, useEffect, useExternalListener, useRef } = owl;
+import { onWillUnmount, useEffect, useExternalListener, useRef } from "@odoo/owl";
 
 /**
  * @typedef {{
@@ -139,11 +139,11 @@ function getBestPosition(reference, popper, { container, margin, position }) {
 
             // Abort if outside container boundaries
             const directionOverflow =
-                Math.ceil(directionValue) < Math.ceil(directionMin) ||
-                Math.ceil(directionValue + directionSize) > Math.ceil(directionMax);
+                Math.ceil(directionValue) < Math.floor(directionMin) ||
+                Math.floor(directionValue + directionSize) > Math.ceil(directionMax);
             const variantOverflow =
-                Math.ceil(variantValue) < Math.ceil(variantMin) ||
-                Math.ceil(variantValue + variantSize) > Math.ceil(variantMax);
+                Math.ceil(variantValue) < Math.floor(variantMin) ||
+                Math.floor(variantValue + variantSize) > Math.ceil(variantMax);
             if (directionOverflow || variantOverflow) {
                 return null;
             }
@@ -193,7 +193,7 @@ function getBestPosition(reference, popper, { container, margin, position }) {
  * @param {HTMLElement} popper
  * @param {Options} options
  */
-function reposition(reference, popper, options) {
+export function reposition(reference, popper, options) {
     options = {
         container: document.documentElement,
         ...options,

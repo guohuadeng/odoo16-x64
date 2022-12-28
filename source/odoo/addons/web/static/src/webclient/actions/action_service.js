@@ -15,7 +15,7 @@ import { ActionDialog } from "./action_dialog";
 import { CallbackRecorder } from "./action_hook";
 import { ReportAction } from "./reports/report_action";
 
-const { Component, markup, onMounted, onWillUnmount, onError, useChildSubEnv, xml } = owl;
+import { Component, markup, onMounted, onWillUnmount, onError, useChildSubEnv, xml, reactive } from "@odoo/owl";
 
 const actionHandlersRegistry = registry.category("action_handlers");
 const actionRegistry = registry.category("actions");
@@ -215,7 +215,7 @@ function makeActionManager(env) {
             action.target = action.target || "current";
         }
         if (action.type === "ir.actions.act_window") {
-            action.views = [...action.views]; // manipulate a copy to keep cached action unmodified
+            action.views = [...action.views.map((v) => [v[0], v[1] === "tree" ? "list" : v[1]])]; // manipulate a copy to keep cached action unmodified
             action.controllers = {};
             const target = action.target;
             if (target !== "inline" && !(target === "new" && action.views[0][1] === "form")) {
@@ -312,6 +312,9 @@ function makeActionManager(env) {
                 // the session storage
                 const storedAction = browser.sessionStorage.getItem("current_action");
                 const lastAction = JSON.parse(storedAction || "{}");
+                if (lastAction.help) {
+                    lastAction.help = markup(lastAction.help);
+                }
                 if (lastAction.res_model === state.model) {
                     if (lastAction.context) {
                         // If this method is called because of a company switch, the
@@ -449,6 +452,13 @@ function makeActionManager(env) {
         if (view.type === "form") {
             if (action.target === "new") {
                 viewProps.mode = "edit";
+                if (!viewProps.onSave) {
+                    viewProps.onSave = (record, params) => {
+                        if (params && params.closable) {
+                            doAction({ type: "ir.actions.act_window_close" });
+                        }
+                    };
+                }
             } else if (context.form_view_initial_mode) {
                 viewProps.mode = context.form_view_initial_mode;
             }
@@ -575,13 +585,20 @@ function makeActionManager(env) {
         }
         const nextStack = controllerStack.slice(0, index).concat(controllerArray);
         // Compute breadcrumbs
-        controller.config.breadcrumbs = action.target === "new" ? [] : _getBreadcrumbs(nextStack);
+        controller.config.breadcrumbs = reactive(
+            action.target === "new" ? [] : _getBreadcrumbs(nextStack)
+        );
         controller.config.getDisplayName = () => controller.displayName;
         controller.config.setDisplayName = (displayName) => {
             controller.displayName = displayName;
             if (controller === _getCurrentController()) {
                 // if not mounted yet, will be done in "mounted"
                 env.services.title.setParts({ action: controller.displayName });
+            }
+            if (action.target !== "new") {
+                // This is a hack to force the reactivity when a new displayName is set
+                controller.config.breadcrumbs.push(undefined);
+                controller.config.breadcrumbs.pop();
             }
         };
         controller.config.historyBack = () => {
@@ -847,8 +864,7 @@ function makeActionManager(env) {
         const { views: viewDescriptions } = await keepLast.add(prom);
         const domParser = new DOMParser();
         const views = [];
-        for (let [, type] of action.views) {
-            type = type === "tree" ? "list" : type;
+        for (const [, type] of action.views) {
             if (type !== "search") {
                 const arch = viewDescriptions[type].arch;
                 const archDoc = domParser.parseFromString(arch, "text/xml").documentElement;

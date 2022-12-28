@@ -28,13 +28,16 @@ class LivechatController(http.Controller):
 
     @http.route('/im_livechat/load_templates', type='json', auth='none', cors="*")
     def load_templates(self, **kwargs):
-        templates = [
+        templates = self._livechat_templates_get()
+        return [tools.file_open(tmpl, 'rb').read() for tmpl in templates]
+
+    def _livechat_templates_get(self):
+        return [
             'im_livechat/static/src/legacy/widgets/feedback/feedback.xml',
             'im_livechat/static/src/legacy/widgets/public_livechat_window/public_livechat_window.xml',
             'im_livechat/static/src/legacy/widgets/public_livechat_view/public_livechat_view.xml',
             'im_livechat/static/src/legacy/public_livechat_chatbot.xml',
         ]
-        return [tools.file_open(tmpl, 'rb').read() for tmpl in templates]
 
     @http.route('/im_livechat/support/<int:channel_id>', type='http', auth='public')
     def support_page(self, channel_id, **kwargs):
@@ -104,13 +107,13 @@ class LivechatController(http.Controller):
             ]))
 
         return request.env['ir.binary']._get_image_stream_from(
-            operator if is_livechat_member else None,
+            operator if is_livechat_member else request.env['res.partner'],
             field_name='avatar_128',
             placeholder='mail/static/src/img/smiley/avatar.jpg',
         ).get_response()
 
     @http.route('/im_livechat/get_session', type="json", auth='public', cors="*")
-    def get_session(self, channel_id, anonymous_name, previous_operator_id=None, chatbot_script_id=None, **kwargs):
+    def get_session(self, channel_id, anonymous_name, previous_operator_id=None, chatbot_script_id=None, persisted=True, **kwargs):
         user_id = None
         country_id = None
         # if the user is identifiy (eg: portal user on the frontend), don't use the anonymous name. The user will be added to session.
@@ -138,7 +141,9 @@ class LivechatController(http.Controller):
             previous_operator_id=previous_operator_id,
             chatbot_script=chatbot_script,
             user_id=user_id,
-            country_id=country_id)
+            country_id=country_id,
+            persisted=persisted
+        )
 
     @http.route('/im_livechat/feedback', type='json', auth='public', cors="*")
     def feedback(self, uuid, rate, reason=None, **kwargs):

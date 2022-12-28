@@ -637,6 +637,9 @@ var NumericField = InputField.extend({
         const kbdEvt = ev.originalEvent;
         if (kbdEvt && utils.isNumpadDecimalSeparatorKey(kbdEvt)) {
             const inputField = this.$input[0];
+            if (inputField.type === 'number') {
+                return this._super(...arguments);
+            }
             const curVal = inputField.value;
             const from = inputField.selectionStart;
             const to = inputField.selectionEnd;
@@ -733,46 +736,6 @@ var FieldChar = InputField.extend(TranslatableFieldMixin, DynamicPlaceholderFiel
             value = value.trim();
         }
         return this._super(value, options);
-    },
-});
-
-var LinkButton = AbstractField.extend({
-    events: _.extend({}, AbstractField.prototype.events, {
-        'click': '_onClick'
-    }),
-    //--------------------------------------------------------------------------
-    // Private
-    //--------------------------------------------------------------------------
-
-    /**
-     * Display button
-     * @override
-     * @private
-     */
-    _render: function () {
-        if (this.value) {
-            var className = this.attrs.icon || 'fa-globe';
-
-            this.$el.html("<span role='img'/>");
-            this.$el.addClass("fa "+ className);
-            this.$el.attr('title', this.value);
-            this.$el.attr('aria-label', this.value);
-        }
-    },
-
-    //--------------------------------------------------------------------------
-    // Handlers
-    //--------------------------------------------------------------------------
-
-    /**
-     * Open link button
-     *
-     * @private
-     * @param {MouseEvent} event
-     */
-    _onClick: function (event) {
-        event.stopPropagation();
-        window.open(this.value, '_blank');
     },
 });
 
@@ -4345,7 +4308,6 @@ return {
     FieldBoolean: FieldBoolean,
     BooleanToggle: BooleanToggle,
     FieldChar: FieldChar,
-    LinkButton: LinkButton,
     FieldDate: FieldDate,
     FieldDateTime: FieldDateTime,
     FieldDateRange: FieldDateRange,

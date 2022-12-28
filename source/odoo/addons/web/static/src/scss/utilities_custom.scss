@@ -56,6 +56,12 @@ $utilities: () !default;
 $utilities: map-merge(
     $utilities,
     (
+        "display": map-merge(
+            map-get($utilities, "display"),
+            (
+                values: join(map-get(map-get($utilities, "display"), "values"), contents),
+            ),
+        ),
         "position": map-merge(
             map-get($utilities, "position"),
             (
@@ -66,6 +72,26 @@ $utilities: map-merge(
             map-get($utilities, "opacity"),
             (
                 values: $utilities-opacity,
+            ),
+        ),
+        "background-color": map-merge(
+            map-get($utilities, "background-color"),
+            (
+                values: map-merge(
+                    map-get(map-get($utilities, "background-color"), "values"),
+                    (
+                        "view": $o-view-background-color,
+                    )
+                )
+            )
+        ),
+        "border-color":  map-merge(
+            map-get($utilities, "border-color"),
+            (
+                values: map-merge(
+                    map-get(map-get($utilities, "border-color"), "values"),
+                    ("transparent": transparent),
+                ),
             ),
         ),
         "rounded-top": (
@@ -92,12 +118,14 @@ $utilities: map-merge(
             map-get($utilities, "width"),
             (
                 responsive: true,
+                values: $utilities-sizes,
             ),
         ),
         "height": map-merge(
             map-get($utilities, "height"),
             (
                 responsive: true,
+                values: $utilities-sizes,
             ),
         ),
         "max-width": map-merge(

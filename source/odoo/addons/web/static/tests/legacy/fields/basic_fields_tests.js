@@ -16,8 +16,9 @@ const legacyViewRegistry = require('web.view_registry');
 const  makeTestEnvironment = require("web.test_env");
 const { makeLegacyCommandService } = require("@web/legacy/utils");
 const { registry } = require("@web/core/registry");
-const { getFixture, legacyExtraNextTick, triggerHotkey, nextTick, click } = require("@web/../tests/helpers/utils");
+const { getFixture, legacyExtraNextTick, triggerHotkey, nextTick, click, patchWithCleanup } = require("@web/../tests/helpers/utils");
 const { createWebClient, doAction } = require('@web/../tests/webclient/helpers');
+const { registerCleanup } = require("@web/../tests/helpers/cleanup");
 
 var createView = testUtils.createView;
 var patchDate = testUtils.mock.patchDate;
@@ -561,6 +562,9 @@ QUnit.module('Legacy basic_fields', {
     QUnit.test('use toggle_button in list view', async function (assert) {
         assert.expect(6);
 
+        field_registry.add("toggle_button", basicFields.FieldToggleBoolean);
+        registerCleanup(() => delete field_registry.map.toggle_button);
+
         var list = await createView({
             View: ListView,
             model: 'partner',
@@ -594,6 +598,9 @@ QUnit.module('Legacy basic_fields', {
 
     QUnit.test('toggle_button in form view (edit mode)', async function (assert) {
         assert.expect(6);
+
+        field_registry.add("toggle_button", basicFields.FieldToggleBoolean);
+        registerCleanup(() => delete field_registry.map.toggle_button);
 
         var form = await createView({
             View: FormView,
@@ -638,6 +645,9 @@ QUnit.module('Legacy basic_fields', {
     QUnit.test('toggle_button in form view (readonly mode)', async function (assert) {
         assert.expect(4);
 
+        field_registry.add("toggle_button", basicFields.FieldToggleBoolean);
+        registerCleanup(() => delete field_registry.map.toggle_button);
+
         var form = await createView({
             View: FormView,
             model: 'partner',
@@ -670,6 +680,9 @@ QUnit.module('Legacy basic_fields', {
 
     QUnit.test('toggle_button in form view with readonly modifiers', async function (assert) {
         assert.expect(3);
+
+        field_registry.add("toggle_button", basicFields.FieldToggleBoolean);
+        registerCleanup(() => delete field_registry.map.toggle_button);
 
         const form = await createView({
             View: FormView,
@@ -772,6 +785,44 @@ QUnit.module('Legacy basic_fields', {
         percentageInput.dispatchEvent(new KeyboardEvent('keydown', { code: 'NumpadDecimal', key: ',' }));
         await testUtils.nextTick();
         assert.ok(percentageInput.querySelector('input.o_input').value.endsWith('🇧🇪🇧🇪'));
+
+        form.destroy();
+    });
+
+    QUnit.test('numeric field: field with type `number` and with keydown on numpad decimal key', async function (assert) {
+        assert.expect(2);
+
+        patchWithCleanup(basicFields.NumericField.constructor.prototype, {
+           _onKeydown(ev) {
+                const res = this._super(...arguments);
+
+                // This _onKeydown handler must not prevent default
+                // a keydown event for NumericField with type=number
+                assert.ok(!ev.defaultPrevented);
+                return res;
+            },
+        });
+
+        this.data.partner.fields.float_field = { string: "Float", type: 'float' };
+        this.data.partner.records[0].float_field = 123;
+
+        const form = await createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: `
+                <form string="Partners">
+                    <field name="float_field" options="{'type': 'number'}"/>
+                </form>
+            `,
+            res_id: 1,
+        });
+
+        await testUtilsDom.click(form.el.querySelector('.o_form_button_edit'));
+        const floatField = form.el.querySelector('.o_input[name="float_field"]');
+        assert.strictEqual(floatField.type, 'number')
+
+        floatField.dispatchEvent(new KeyboardEvent('keydown', { code: 'NumpadDecimal', key: '.' }));
 
         form.destroy();
     });
@@ -1698,7 +1749,7 @@ QUnit.module('Legacy basic_fields', {
     });
 
     QUnit.test('html field translatable', async function (assert) {
-        assert.expect(6);
+        assert.expect(8);
 
         this.data.partner.fields.foo.translate = true;
 
@@ -1726,7 +1777,7 @@ QUnit.module('Legacy basic_fields', {
                     return Promise.resolve([
                         [{lang: "en_US", source: "first paragraph", value: "first paragraph"},
                             {lang: "en_US", source: "second paragraph", value: "second paragraph"},
-                            {lang: "fr_BE", source: "first paragraph", value: "premier paragraphe"},
+                            {lang: "fr_BE", source: "first paragraph", value: ""},
                             {lang: "fr_BE", source: "second paragraph", value: "deuxième paragraphe"}],
                         {translation_type: "char", translation_show_source: true},
                     ]);
@@ -1735,7 +1786,13 @@ QUnit.module('Legacy basic_fields', {
                     return Promise.resolve([["en_US", "English"], ["fr_BE", "French (Belgium)"]]);
                 }
                 if (route === "/web/dataset/call_kw/partner/update_field_translations") {
-                    assert.deepEqual(args.args, [[1], "foo", {"en_US": {"first paragraph": "first paragraph modified"}}], "the new translation value should be written");
+                    assert.deepEqual(args.args, [[1], "foo", {
+                        "en_US": {"first paragraph": "first paragraph modified"},
+                        "fr_BE": {
+                            "first paragraph": "premier paragraphe modifié",
+                            "deuxième paragraphe": "deuxième paragraphe modifié",
+                        },
+                    }], "the new translation value should be written");
                     return Promise.resolve();
                 }
                 return this._super.apply(this, arguments);
@@ -1756,11 +1813,24 @@ QUnit.module('Legacy basic_fields', {
         assert.containsN($('.modal .o_translation_dialog'), '.translation', 4,
             'four rows should be visible');
 
-        var $enField = $('.modal .o_translation_dialog .translation:first() input');
-        assert.strictEqual($enField.val(), 'first paragraph',
+        const $translations = $('.modal .o_translation_dialog .translation input');
+        const enField1 = $translations[0];
+        assert.strictEqual(enField1.value, 'first paragraph',
             'first part of english translation should be filled');
 
-        await testUtils.fields.editInput($enField, "first paragraph modified");
+        await testUtils.fields.editInput(enField1, "first paragraph modified");
+
+        const frField1 = $translations[2];
+        assert.strictEqual(frField1.value, '',
+            'first part of french translation should not be filled');
+
+        await testUtils.fields.editInput(frField1, "premier paragraphe modifié");
+
+        const frField2 = $translations[3];
+        assert.strictEqual(frField2.value, 'deuxième paragraphe',
+            'second part of french translation should be filled');
+
+        await testUtils.fields.editInput(frField2, "deuxième paragraphe modifié");
         await testUtils.dom.click($('.modal button.btn-primary'));  // save
         await testUtils.nextTick();
 
@@ -9238,14 +9308,14 @@ QUnit.module('Legacy basic_fields', {
         });
 
         assert.containsN(list, '.o_field_badge[name="foo"]', 5);
-        assert.containsOnce(list, '.o_field_badge[name="foo"].bg-danger.bg-opacity-50');
-        assert.containsOnce(list, '.o_field_badge[name="foo"].bg-warning.bg-opacity-50');
+        assert.containsOnce(list, '.o_field_badge[name="foo"].text-bg-danger.bg-opacity-50');
+        assert.containsOnce(list, '.o_field_badge[name="foo"].text-bg-warning.bg-opacity-50');
 
         await list.reload();
 
         assert.containsN(list, '.o_field_badge[name="foo"]', 5);
-        assert.containsOnce(list, '.o_field_badge[name="foo"].bg-danger.bg-opacity-50');
-        assert.containsOnce(list, '.o_field_badge[name="foo"].bg-warning.bg-opacity-50');
+        assert.containsOnce(list, '.o_field_badge[name="foo"].text-bg-danger.bg-opacity-50');
+        assert.containsOnce(list, '.o_field_badge[name="foo"].text-bg-warning.bg-opacity-50');
 
         list.destroy();
     });

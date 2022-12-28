@@ -139,6 +139,7 @@ def init_logger():
         'ofxparse',# ofxparse importing ABC from collections
         'astroid',  # deprecated imp module (fixed in 2.5.1)
         'requests_toolbelt', # importing ABC from collections (fixed in 0.9)
+        'firebase_admin', # deprecated method_whitelist
     ]:
         warnings.filterwarnings('ignore', category=DeprecationWarning, module=module)
 
@@ -256,7 +257,7 @@ def showwarning_with_traceback(message, category, filename, lineno, file=None, l
     if category is BytesWarning and message.args[0] in IGNORE:
         return
 
-    # find the stack frame maching (filename, lineno)
+    # find the stack frame matching (filename, lineno)
     filtered = []
     for frame in traceback.extract_stack():
         if 'importlib' not in frame.filename:

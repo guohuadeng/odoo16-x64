@@ -82,9 +82,9 @@ class SaleOrder(models.Model):
             coupon.points -= changes
         # Remove any rewards
         self.order_line.filtered(lambda l: l.is_reward_line).unlink()
-        self.coupon_point_ids.coupon_id.filtered(
+        self.coupon_point_ids.coupon_id.sudo().filtered(
             lambda c: not c.program_id.is_nominative and c.order_id in self and not c.use_count)\
-            .sudo().unlink()
+            .unlink()
         self.coupon_point_ids.unlink()
         return res
 
@@ -146,6 +146,7 @@ class SaleOrder(models.Model):
             'points_cost': cost,
             'reward_identifier_code': _generate_random_reward_code(),
             'product_uom': product.uom_id.id,
+            'sequence': max(self.order_line.filtered(lambda x: not x.is_reward_line).mapped('sequence')) + 1,
             'tax_id': [(Command.CLEAR, 0, 0)] + [(Command.LINK, tax.id, False) for tax in taxes]
         }]
 
@@ -280,6 +281,7 @@ class SaleOrder(models.Model):
         discountable = 0
         discountable_per_tax = defaultdict(int)
         reward_applies_on = reward.discount_applicability
+        sequence = max(self.order_line.filtered(lambda x: not x.is_reward_line).mapped('sequence')) + 1
         if reward_applies_on == 'order':
             discountable, discountable_per_tax = self._discountable_order(reward)
         elif reward_applies_on == 'specific':
@@ -319,6 +321,7 @@ class SaleOrder(models.Model):
                 'coupon_id': coupon.id,
                 'points_cost': point_cost,
                 'reward_identifier_code': reward_code,
+                'sequence': sequence,
             }]
         discount_factor = min(1, (max_discount / discountable)) if discountable else 1
         mapped_taxes = {tax: self.fiscal_position_id.map_tax(tax) for tax in discountable_per_tax}
@@ -336,6 +339,7 @@ class SaleOrder(models.Model):
             'coupon_id': coupon.id,
             'points_cost': 0,
             'reward_identifier_code': reward_code,
+            'sequence': sequence,
             'tax_id': [(Command.CLEAR, 0, 0)] + [(Command.LINK, tax.id, False) for tax in mapped_taxes[tax]]
         } for tax, price in discountable_per_tax.items() if price}
         # We only assign the point cost to one line to avoid counting the cost multiple times
@@ -360,7 +364,7 @@ class SaleOrder(models.Model):
         self.ensure_one()
         return [('active', '=', True), ('program_id.sale_ok', '=', True),
                 ('company_id', 'in', (self.company_id.id, False)),
-                '|', ('program_id.date_to', '=', False), ('program_id.date_to', '<=', fields.Date.context_today(self))]
+                '|', ('program_id.date_to', '=', False), ('program_id.date_to', '>=', fields.Date.context_today(self))]
 
     def _get_applicable_program_points(self, domain=None):
         """

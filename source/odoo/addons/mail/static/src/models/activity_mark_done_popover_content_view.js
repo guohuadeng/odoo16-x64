@@ -6,6 +6,7 @@ import { clear } from '@mail/model/model_field_command';
 
 registerModel({
     name: 'ActivityMarkDonePopoverContentView',
+    identifyingMode: 'xor',
     recordMethods: {
         /**
          * Handles blur on this feedback textarea.
@@ -26,27 +27,39 @@ registerModel({
          * Handles click on this "Done" button.
          */
         async onClickDone() {
-            const { chatter } = this.activityViewOwner.activityBoxView;
-            await this.activityViewOwner.activity.markAsDone({
+            const chatter = this.activityViewOwner && this.activityViewOwner.activityBoxView.chatter;
+            const webRecord = this.webRecord;
+            const thread = this.activity.thread;
+            await this.activity.markAsDone({
                 feedback: this.feedbackTextareaRef.el.value,
             });
-            if (!chatter.exists() || !chatter.component) {
-                return;
+            if (chatter && chatter.exists() && chatter.component) {
+                chatter.reloadParentView();
             }
-            chatter.reloadParentView();
+            if (webRecord) {
+                webRecord.model.load({ resId: thread.id });
+            }
         },
         /**
          * Handles click on this "Done & Schedule Next" button.
          */
         async onClickDoneAndScheduleNext() {
-            const { chatter } = this.activityViewOwner.activityBoxView;
-            await this.activityViewOwner.activity.markAsDoneAndScheduleNext({
-                feedback: this.feedbackTextareaRef.el.value,
-            });
-            if (!chatter.exists() || !chatter.component) {
-                return;
+            const chatter = this.activityViewOwner && this.activityViewOwner.activityBoxView.chatter;
+            const webRecord = this.webRecord;
+            const thread = this.activity.thread;
+            const activityListViewOwner = this.activityListViewItemOwner && this.activityListViewItemOwner.activityListViewOwner;
+            const activity = this.activity;
+            const feedback = this.feedbackTextareaRef.el.value;
+            if (activityListViewOwner && activityListViewOwner.exists()) {
+                activityListViewOwner.popoverViewOwner.delete();
             }
-            chatter.reloadParentView();
+            await activity.markAsDoneAndScheduleNext({ feedback });
+            if (chatter && chatter.exists() && chatter.component) {
+                chatter.reloadParentView();
+            }
+            if (webRecord) {
+                webRecord.model.load({ resId: thread.id });
+            }
         },
         /**
          * Handles keydown on this activity mark done.
@@ -60,7 +73,7 @@ registerModel({
          * @private
          */
         _backupFeedback() {
-            this.activityViewOwner.activity.update({
+            this.activity.update({
                 feedbackBackup: this.feedbackTextareaRef.el.value,
             });
         },
@@ -69,13 +82,36 @@ registerModel({
          */
         _close() {
             this._backupFeedback();
-            this.activityViewOwner.update({ markDonePopoverView: clear() });
+            if (this.activityViewOwner) {
+                this.activityViewOwner.update({ markDonePopoverView: clear() });
+                return;
+            }
+            if (this.activityListViewItemOwner) {
+                this.activityListViewItemOwner.update({ markDoneView: clear() });
+                return;
+            }
         },
     },
     fields: {
+        activity: one('Activity', {
+            compute() {
+                if (this.activityListViewItemOwner) {
+                    return this.activityListViewItemOwner.activity;
+                }
+                if (this.activityViewOwner) {
+                    return this.activityViewOwner.activity;
+                }
+                return clear();
+            },
+            required: true,
+        }),
+        activityListViewItemOwner: one('ActivityListViewItem', {
+            identifying: true,
+            inverse: 'markDoneView',
+        }),
         activityViewOwner: one('ActivityView', {
             compute() {
-                if (this.popoverViewOwner.activityViewOwnerAsMarkDone) {
+                if (this.popoverViewOwner && this.popoverViewOwner.activityViewOwnerAsMarkDone) {
                     return this.popoverViewOwner.activityViewOwnerAsMarkDone;
                 }
                 return clear();
@@ -83,18 +119,30 @@ registerModel({
         }),
         component: attr(),
         feedbackTextareaRef: attr(),
+        hasHeader: attr({
+            compute() {
+                return Boolean(this.popoverViewOwner);
+            },
+        }),
         headerText: attr({
             compute() {
                 if (this.activityViewOwner) {
                     return this.activityViewOwner.markDoneText;
                 }
-                return clear();
+                return this.env._t("Mark Done");
             },
-            default: '',
         }),
         popoverViewOwner: one('PopoverView', {
             identifying: true,
             inverse: 'activityMarkDonePopoverContentView',
+        }),
+        webRecord: attr({
+            compute() {
+                if (this.activityListViewItemOwner) {
+                    return this.activityListViewItemOwner.webRecord;
+                }
+                return clear();
+            },
         }),
     },
 });

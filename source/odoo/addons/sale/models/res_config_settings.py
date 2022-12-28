@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 
 
 class ResConfigSettings(models.TransientModel):
@@ -32,13 +32,6 @@ class ResConfigSettings(models.TransientModel):
              "payment provider.\nThis mode is advised if you issue the final invoice at the order "
              "and not after the delivery.",
         config_parameter='sale.automatic_invoice',
-    )
-    confirmation_mail_template_id = fields.Many2one(
-        comodel_name='mail.template',
-        string='Confirmation Email Template',
-        domain="[('model', '=', 'sale.order')]",
-        config_parameter='sale.default_confirmation_template',
-        help="Email sent to the customer once the order is paid."
     )
     deposit_default_product_id = fields.Many2one(
         'product.product',
@@ -93,7 +86,7 @@ class ResConfigSettings(models.TransientModel):
         if self.quotation_validity_days <= 0:
             self.quotation_validity_days = self.env['res.company'].default_get(['quotation_validity_days'])['quotation_validity_days']
             return {
-                'warning': {'title': "Warning", 'message': "Quotation Validity is required and must be greater than 0."},
+                'warning': {'title': _("Warning"), 'message': _("Quotation Validity is required and must be greater than 0.")},
             }
 
     #=== CRUD METHODS ===#

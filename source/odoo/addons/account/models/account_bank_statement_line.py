@@ -1,7 +1,6 @@
 from odoo import api, Command, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import html2plaintext
-from odoo.osv.expression import get_unaccent_wrapper
 
 from odoo.addons.base.models.res_bank import sanitize_account_number
 
@@ -29,16 +28,16 @@ class AccountBankStatementLine(models.Model):
         # statement is completed. It is only possible if we know the journal that is used, so it can only be done
         # in a view in which the journal is already set and so is single journal view.
         if'journal_id' in defaults:
-            last_line = self.search([('journal_id', '=', defaults.get('journal_id'))], limit=1)
+            last_line = self.search([
+                ('journal_id', '=', defaults.get('journal_id')),
+                ('state', '=', 'posted'),
+            ], limit=1)
             statement = last_line.statement_id
             if statement and not statement.is_complete:
-                defaults.setdefault(
-                    'statement_id', statement.id
-                )
-                if statement.date:
-                    defaults.setdefault(
-                        'date', statement.date
-                    )
+                defaults.setdefault('statement_id', statement.id)
+                defaults.setdefault('date', statement.date)
+            elif last_line and not statement:
+                defaults.setdefault('date', last_line.date)
 
         return defaults
 
@@ -156,15 +155,19 @@ class AccountBankStatementLine(models.Model):
         # that the running balance is always relative to the latest statement. In this way we do not need to calculate
         # the running balance for all statement lines every time.
         # If there are statements inside the computed range, their balance_start has priority over calculated balance.
+        # we have to compute running balance for draft lines because they are visible and also
+        # the user can split on that lines, but their balance should be the same as previous posted line
+        # we do the same for the canceled lines, in order to keep using them as anchor points
 
         self.statement_id.flush_model(['balance_start', 'first_line_index'])
-        self.flush_model(['internal_index', 'date', 'journal_id', 'statement_id', 'amount'])
+        self.flush_model(['internal_index', 'date', 'journal_id', 'statement_id', 'amount', 'state'])
         record_by_id = {x.id: x for x in self}
 
         for journal in self.journal_id:
-            journal_lines = self.filtered(lambda line: line.journal_id == journal).sorted('internal_index')
-            max_index = max(journal_lines.mapped('internal_index'))
-            min_index = min(journal_lines.mapped('internal_index'))
+            journal_lines_indexes = self.filtered(lambda line: line.journal_id == journal)\
+                .sorted('internal_index')\
+                .mapped('internal_index')
+            min_index, max_index = journal_lines_indexes[0], journal_lines_indexes[-1]
 
             # Find the oldest index for each journal.
             self._cr.execute(
@@ -194,7 +197,8 @@ class AccountBankStatementLine(models.Model):
                         st_line.id,
                         st_line.amount,
                         st.first_line_index = st_line.internal_index AS is_anchor,
-                        st.balance_start
+                        st.balance_start,
+                        move.state
                     FROM account_bank_statement_line st_line
                     JOIN account_move move ON move.statement_line_id = st_line.id
                     LEFT JOIN account_bank_statement st ON st.id = st_line.statement_id
@@ -206,10 +210,11 @@ class AccountBankStatementLine(models.Model):
                 """,
                 [max_index, journal.id] + extra_params,
             )
-            for st_line_id, amount, is_anchor, balance_start in self._cr.fetchall():
+            for st_line_id, amount, is_anchor, balance_start, state in self._cr.fetchall():
                 if is_anchor:
                     current_running_balance = balance_start
-                current_running_balance += amount
+                if state == 'posted':
+                    current_running_balance += amount
                 if record_by_id.get(st_line_id):
                     record_by_id[st_line_id].running_balance = current_running_balance
 
@@ -363,6 +368,23 @@ class AccountBankStatementLine(models.Model):
         res = super().unlink()
         moves.unlink()
         return res
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        # Add latest running_balance in the read_group
+        result = super(AccountBankStatementLine, self).read_group(
+            domain, fields, groupby, offset=offset,
+            limit=limit, orderby=orderby, lazy=lazy)
+        show_running_balance = False
+        # We loop over the content of groupby because the groupby date is in the form of "date:granularity"
+        for el in groupby:
+            if (el == 'statement_id' or el == 'journal_id' or el.startswith('date')) and 'running_balance' in fields:
+                show_running_balance = True
+                break
+        if show_running_balance:
+            for group_line in result:
+                group_line['running_balance'] = self.search(group_line.get('__domain'), limit=1).running_balance or 0.0
+        return result
 
     # -------------------------------------------------------------------------
     # ACTION METHODS
@@ -615,41 +637,6 @@ class AccountBankStatementLine(models.Model):
             partner = rec_model._get_partner_from_mapping(self)
             if partner and rec_model._is_applicable_for(self, partner):
                 return partner
-
-        # Retrieve the partner from statement line text values.
-        st_line_text_values = self._get_st_line_strings_for_matching()
-        unaccent = get_unaccent_wrapper(self._cr)
-        sub_queries = []
-        params = []
-        for text_value in st_line_text_values:
-            if not text_value:
-                continue
-
-            # Find a partner having a name contained inside the statement line values.
-            # Take care a partner could contain some special characters in its name that needs to be escaped.
-            sub_queries.append(rf'''
-                {unaccent("%s")} ~* ('^' || (
-                   SELECT STRING_AGG(CONCAT('(?=.*\m', chunk[1], '\M)'), '')
-                   FROM regexp_matches({unaccent('name')}, '\w{{3,}}', 'g') AS chunk
-                ))
-            ''')
-            params.append(text_value)
-
-        if sub_queries:
-            self.env['res.partner'].flush_model(['company_id', 'name'])
-            self._cr.execute(
-                '''
-                    SELECT id
-                    FROM res_partner
-                    WHERE (company_id IS NULL OR company_id = %s)
-                        AND name IS NOT NULL
-                        AND (''' + ') OR ('.join(sub_queries) + ''')
-                ''',
-                [self.company_id.id] + params,
-            )
-            rows = self._cr.fetchall()
-            if len(rows) == 1:
-                return self.env['res.partner'].browse(rows[0][0])
 
         return self.env['res.partner']
 

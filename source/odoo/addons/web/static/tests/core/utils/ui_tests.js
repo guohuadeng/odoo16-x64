@@ -3,7 +3,7 @@
 import { dragAndDrop, getFixture, mount, nextTick } from "@web/../tests/helpers/utils";
 import { useSortable } from "@web/core/utils/sortable";
 
-const { Component, reactive, useRef, useState, xml } = owl;
+import { Component, reactive, useRef, useState, xml } from "@odoo/owl";
 
 let target;
 QUnit.module("UI", ({ beforeEach }) => {
@@ -95,22 +95,22 @@ QUnit.module("UI", ({ beforeEach }) => {
                 useSortable({
                     ref: useRef("root"),
                     elements: ".item",
-                    onStart(group, element) {
+                    onDragStart({ element, group }) {
                         assert.step("start");
                         assert.notOk(group);
                         assert.strictEqual(element.innerText, "1");
                     },
-                    onElementEnter(element) {
+                    onElementEnter({ element }) {
                         assert.step("elemententer");
                         assert.strictEqual(element.innerText, "2");
                     },
-                    onStop(group, element) {
+                    onDragEnd({ element, group }) {
                         assert.step("stop");
                         assert.notOk(group);
                         assert.strictEqual(element.innerText, "1");
                         assert.containsN(target, ".item", 4);
                     },
-                    onDrop({ group, element, previous, next, parent }) {
+                    onDrop({ element, group, previous, next, parent }) {
                         assert.step("drop");
                         assert.notOk(group);
                         assert.strictEqual(element.innerText, "1");
@@ -151,21 +151,21 @@ QUnit.module("UI", ({ beforeEach }) => {
                     elements: ".item",
                     groups: ".list",
                     connectGroups: true,
-                    onStart(group, element) {
+                    onDragStart({ element, group }) {
                         assert.step("start");
                         assert.hasClass(group, "list2");
                         assert.strictEqual(element.innerText, "2 1");
                     },
-                    onGroupEnter(group) {
+                    onGroupEnter({ group }) {
                         assert.step("groupenter");
                         assert.hasClass(group, "list1");
                     },
-                    onStop(group, element) {
+                    onDragEnd({ element, group }) {
                         assert.step("stop");
                         assert.hasClass(group, "list2");
                         assert.strictEqual(element.innerText, "2 1");
                     },
-                    onDrop({ group, element, previous, next, parent }) {
+                    onDrop({ element, group, previous, next, parent }) {
                         assert.step("drop");
                         assert.hasClass(group, "list2");
                         assert.strictEqual(element.innerText, "2 1");
@@ -209,7 +209,7 @@ QUnit.module("UI", ({ beforeEach }) => {
                     ref: useRef("root"),
                     elements: ".item",
                     enable: () => this.state.enableSortable,
-                    onStart() {
+                    onDragStart() {
                         assert.step("start");
                     },
                 });
@@ -251,7 +251,7 @@ QUnit.module("UI", ({ beforeEach }) => {
                 useSortable({
                     ref: useRef("root"),
                     elements: ".item",
-                    onStart() {
+                    onDragStart() {
                         throw new Error("Shouldn't start the sortable feature.");
                     },
                 });
@@ -284,7 +284,7 @@ QUnit.module("UI", ({ beforeEach }) => {
                     ref: useRef("root"),
                     elements: ".item",
                     ignore: ".ignored",
-                    onStart() {
+                    onDragStart() {
                         assert.step("drag");
                     },
                 });

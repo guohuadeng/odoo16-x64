@@ -234,7 +234,29 @@ class SaleOrderLine(models.Model):
 
     def _timesheet_create_project(self):
         project = super()._timesheet_create_project()
-        project.write({'allow_timesheets': True})
+        project_uom = project.timesheet_encode_uom_id
+        uom_ids = set(project_uom + self.order_id.order_line.mapped('product_uom'))
+        uom_unit = self.env.ref('uom.product_uom_unit')
+        uom_hour = self.env.ref('uom.product_uom_hour')
+
+        uom_per_id = {}
+        for uom in uom_ids:
+            if uom == uom_unit:
+                uom = uom_hour
+            if uom.category_id == project_uom.category_id:
+                uom_per_id[uom.id] = uom
+
+        allocated_hours = 0.0
+        for line in self.order_id.order_line:
+            product_type = line.product_id.service_tracking
+            if line.is_service and (product_type == 'task_in_project' or product_type == 'project_only'):
+                if uom_per_id.get(line.product_uom.id) or line.product_uom.id == uom_unit.id:
+                    allocated_hours += line.product_uom_qty * uom_per_id.get(line.product_uom.id, project_uom).factor_inv * uom_hour.factor
+
+        project.write({
+            'allocated_hours': allocated_hours,
+            'allow_timesheets': True,
+        })
         return project
 
     def _timesheet_create_project_prepare_values(self):
@@ -271,7 +293,13 @@ class SaleOrderLine(models.Model):
         mapping = lines_by_timesheet.sudo()._get_delivered_quantity_by_analytic(domain)
 
         for line in lines_by_timesheet:
-            line.qty_to_invoice = mapping.get(line.id, 0.0)
+            qty_to_invoice = mapping.get(line.id, 0.0)
+            if qty_to_invoice:
+                line.qty_to_invoice = qty_to_invoice
+            else:
+                prev_inv_status = line.invoice_status
+                line.qty_to_invoice = qty_to_invoice
+                line.invoice_status = prev_inv_status
 
     def _get_action_per_item(self):
         """ Get action per Sales Order Item

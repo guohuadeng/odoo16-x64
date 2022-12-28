@@ -6,7 +6,6 @@ import { Many2ManyTagsField } from "@web/views/fields/many2many_tags/many2many_t
 import {
     click,
     clickDropdown,
-    clickEdit,
     clickOpenedDropdownItem,
     clickSave,
     editInput,
@@ -104,12 +103,15 @@ QUnit.module("Fields", (hooks) => {
         };
 
         setupViewRegistries();
+        patchWithCleanup(browser, {
+            setTimeout: (fn) => Promise.resolve().then(fn),
+        });
     });
 
     QUnit.module("Many2ManyTagsField");
 
     QUnit.test("Many2ManyTagsField with and without color", async function (assert) {
-        assert.expect(4);
+        assert.expect(12);
 
         serverData.models.partner.fields.partner_ids = {
             string: "Partner",
@@ -143,8 +145,18 @@ QUnit.module("Fields", (hooks) => {
             },
         });
 
+        // Add a tag to first field
+        assert.containsNone(target, "[name=partner_ids] .o_tag");
         await selectDropdownItem(target, "partner_ids", "first record");
+        assert.containsOnce(target, "[name=partner_ids] .o_tag");
 
+        // Show the color list
+        assert.containsNone(target, ".o_colorlist");
+        await click(target, "[name=partner_ids] .o_tag");
+        assert.containsOnce(target, ".o_colorlist");
+
+        // Add a tag to second field
+        assert.containsNone(target, "[name=timmy] .o_tag");
         await clickDropdown(target, "timmy");
         const autocomplete = target.querySelector("[name='timmy'] .o-autocomplete.dropdown");
         assert.strictEqual(
@@ -153,16 +165,22 @@ QUnit.module("Fields", (hooks) => {
             "autocomplete dropdown should have 3 entries (2 values + 'Search and Edit...')"
         );
         await clickOpenedDropdownItem(target, "timmy", "gold");
+        assert.containsOnce(target, "[name=timmy] .o_tag");
         assert.deepEqual(
             getNodesTextContent(
                 target.querySelectorAll(`.o_field_many2many_tags[name="timmy"] .badge`)
             ),
             ["gold"]
         );
+
+        // Show the color list
+        assert.containsNone(target, ".o_colorlist");
+        await click(target, "[name=timmy] .o_tag");
+        assert.containsNone(target, ".o_colorlist");
     });
 
     QUnit.test("Many2ManyTagsField with color: rendering and edition", async function (assert) {
-        assert.expect(28);
+        assert.expect(26);
 
         serverData.models.partner.records[0].timmy = [12, 14];
         serverData.models.partner_type.records.push({ id: 13, display_name: "red", color: 8 });
@@ -210,19 +228,6 @@ QUnit.module("Fields", (hooks) => {
             target.querySelector(".badge"),
             "o_tag_color_2",
             "should have correctly set the color"
-        );
-
-        await clickEdit(target);
-
-        assert.containsN(
-            target,
-            ".o_field_many2many_tags .badge",
-            2,
-            "should still contain 2 tags in edit mode"
-        );
-        assert.ok(
-            target.querySelector(".o_tag_color_2 .o_tag_badge_text").textContent === "gold",
-            'first tag should still contain "gold" and be color 2 in edit mode'
         );
         assert.containsN(
             target,
@@ -274,7 +279,7 @@ QUnit.module("Fields", (hooks) => {
             `should not contain tag 'silver' anymore but found: ${textContent}`
         );
         // save the record (should do the write RPC with the correct commands)
-        await click(target.querySelector(".o_form_button_save"));
+        await clickSave(target);
 
         // checkbox 'Hide in Kanban'
         const badgeElement = target.querySelectorAll(".o_field_many2many_tags .badge")[1]; // selects 'red' tag
@@ -426,8 +431,6 @@ QUnit.module("Fields", (hooks) => {
             "should have fetched and rendered gold partner tag"
         );
 
-        await clickEdit(target);
-
         await clickDropdown(target, "timmy");
 
         const autocompleteDropdown = target.querySelector(".o-autocomplete--dropdown-menu");
@@ -540,7 +543,6 @@ QUnit.module("Fields", (hooks) => {
         );
 
         // Update the color in edit => write on save with rest of the record
-        await clickEdit(target);
         await click(badgeNode);
         await click(target, '.o_colorlist button[data-color="6"]');
         await nextTick();
@@ -727,7 +729,6 @@ QUnit.module("Fields", (hooks) => {
             resId: 1,
         });
 
-        await clickEdit(target);
         assert.containsOnce(target, ".o_field_many2many_tags .badge", "should contain one tag");
 
         // update foo, which will trigger an onchange and update timmy
@@ -840,8 +841,6 @@ QUnit.module("Fields", (hooks) => {
             resId: 1,
         });
 
-        await clickEdit(target);
-
         assert.strictEqual(
             target.querySelectorAll(".o_field_many2many_tags .badge").length,
             1,
@@ -909,12 +908,10 @@ QUnit.module("Fields", (hooks) => {
             null,
             "new"
         );
-        await selectDropdownItem(target, "timmy", `Create "new"`);
-
+        await clickOpenedDropdownItem(target, "timmy", `Create "new"`);
         assert.containsOnce(target, ".o_field_many2many_tags .badge");
 
-        await click(target.querySelector(".o_form_button_save"));
-
+        await clickSave(target);
         assert.strictEqual(
             target.querySelector(".o_field_many2many_tags").textContent.trim(),
             "new"
@@ -986,7 +983,6 @@ QUnit.module("Fields", (hooks) => {
             resId: 1,
         });
 
-        await clickEdit(target);
         assert.deepEqual(
             getNodesTextContent(target.querySelectorAll(".o_data_cell")),
             ["second recordaaa"],
@@ -1027,7 +1023,6 @@ QUnit.module("Fields", (hooks) => {
         });
 
         assert.verifySteps(["world"]);
-        await clickEdit(target);
         await selectDropdownItem(target, "timmy", "silver");
         assert.verifySteps(["world"]);
     });
@@ -1056,7 +1051,6 @@ QUnit.module("Fields", (hooks) => {
                 </form>`,
         });
 
-        await clickEdit(target);
         await selectDropdownItem(target, "timmy", "Search More...");
 
         assert.ok(target.querySelector(".o_dialog"), "should have open the modal");
@@ -1113,7 +1107,6 @@ QUnit.module("Fields", (hooks) => {
                     </form>`,
             });
 
-            await clickEdit(target);
             await selectDropdownItem(target, "timmy", "Search More...");
 
             // -1 for the one that is already on the form & +1 for the select all,
@@ -1172,7 +1165,6 @@ QUnit.module("Fields", (hooks) => {
                     }
                 },
             });
-            await clickEdit(target);
 
             await editInput(target, `div[name="timmy"] input`, "Ralts");
             await nameSearchProm;
@@ -1244,8 +1236,6 @@ QUnit.module("Fields", (hooks) => {
                 },
             });
 
-            await clickEdit(target);
-
             await editInput(target, ".o_field_widget input", "hello");
             await nameSearchProm;
             await nextTick();
@@ -1300,8 +1290,6 @@ QUnit.module("Fields", (hooks) => {
                 }
             },
         });
-
-        await clickEdit(target);
 
         // turtle_bar is true -> create and delete actions are available
         assert.containsOnce(
@@ -1457,7 +1445,7 @@ QUnit.module("Fields", (hooks) => {
         // try to quick create a record
         await triggerEvent(target, ".o_field_many2many_tags input", "focus");
         await editInput(target, ".o_field_many2many_tags input", "new partner");
-        await selectDropdownItem(target, "timmy", `Create "new partner"`);
+        await clickOpenedDropdownItem(target, "timmy", `Create "new partner"`);
 
         // as the quick create failed, a dialog should be open to 'slow create' the record
         assert.containsOnce(target, ".modal .o_form_view");
@@ -1585,12 +1573,16 @@ QUnit.module("Fields", (hooks) => {
             target.querySelector(".o_field_widget[name='timmy'] input").placeholder,
             "Placeholder"
         );
+
+        await selectDropdownItem(target, "timmy", "gold");
+
+        assert.strictEqual(
+            target.querySelector(".o_field_widget[name='timmy'] input").placeholder,
+            ""
+        );
     });
 
     QUnit.test("Many2ManyTagsField supports 'create' props to be a Boolean", async (assert) => {
-        patchWithCleanup(browser, {
-            setTimeout: (fn) => Promise.resolve().then(fn),
-        });
         await makeView({
             type: "form",
             resModel: "partner",
@@ -1631,9 +1623,6 @@ QUnit.module("Fields", (hooks) => {
         serverData.views = {
             "partner_type,false,form": `<form><field name="name"/><field name="color"/></form>`,
         };
-        patchWithCleanup(browser, {
-            setTimeout: (fn) => Promise.resolve().then(fn),
-        });
         await makeView({
             type: "form",
             resModel: "partner",
@@ -1663,9 +1652,6 @@ QUnit.module("Fields", (hooks) => {
     });
 
     QUnit.test("Many2ManyTagsField with option 'no_create' set to true", async (assert) => {
-        patchWithCleanup(browser, {
-            setTimeout: (fn) => Promise.resolve().then(fn),
-        });
         await makeView({
             type: "form",
             resModel: "partner",
@@ -1679,9 +1665,6 @@ QUnit.module("Fields", (hooks) => {
     });
 
     QUnit.test("Many2ManyTagsField with attribute 'can_create' set to false", async (assert) => {
-        patchWithCleanup(browser, {
-            setTimeout: (fn) => Promise.resolve().then(fn),
-        });
         await makeView({
             type: "form",
             resModel: "partner",
@@ -1691,5 +1674,70 @@ QUnit.module("Fields", (hooks) => {
 
         await editInput(target, ".o_field_many2many_tags .o-autocomplete--input", "new tag");
         assert.containsNone(target, ".o-autocomplete.dropdown li.o_m2o_dropdown_option");
+    });
+
+    QUnit.test("Many2ManyTagsField with arch context in form view", async (assert) => {
+        await makeView({
+            type: "form",
+            resModel: "partner",
+            serverData,
+            arch: `<form><field name="timmy" widget="many2many_tags" context="{ 'append_coucou': True }"/></form>`,
+            async mockRPC(route, args, performRPC) {
+                const result = await performRPC(route, args);
+                if (args.method === "read") {
+                    if (args.kwargs.context.append_coucou) {
+                        assert.step("read with context given");
+                        result[0].display_name += " coucou";
+                    }
+                }
+                if (args.method === "name_search") {
+                    if (args.kwargs.context.append_coucou) {
+                        assert.step("name search with context given");
+                        for (const res of result) {
+                            res[1] += " coucou";
+                        }
+                    }
+                }
+                return result;
+            },
+        });
+
+        await selectDropdownItem(target, "timmy", "gold coucou");
+
+        assert.verifySteps(["name search with context given", "read with context given"]);
+        assert.strictEqual(target.querySelector(".o_field_tags").innerText, "gold coucou");
+    });
+
+    QUnit.test("Many2ManyTagsField with arch context in list view", async (assert) => {
+        await makeView({
+            type: "list",
+            resModel: "partner",
+            serverData,
+            arch: `<list editable="top"><field name="timmy" widget="many2many_tags" context="{ 'append_coucou': True }"/></list>`,
+            async mockRPC(route, args, performRPC) {
+                const result = await performRPC(route, args);
+                if (args.method === "read") {
+                    if (args.kwargs.context.append_coucou) {
+                        assert.step("read with context given");
+                        result[0].display_name += " coucou";
+                    }
+                }
+                if (args.method === "name_search") {
+                    if (args.kwargs.context.append_coucou) {
+                        assert.step("name search with context given");
+                        for (const res of result) {
+                            res[1] += " coucou";
+                        }
+                    }
+                }
+                return result;
+            },
+        });
+
+        await click(target.querySelector("[name=timmy]"));
+        await selectDropdownItem(target, "timmy", "gold coucou");
+
+        assert.verifySteps(["name search with context given", "read with context given"]);
+        assert.strictEqual(target.querySelector(".o_field_tags").innerText, "gold coucou");
     });
 });

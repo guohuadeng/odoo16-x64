@@ -55,9 +55,9 @@ QUnit.module('hr', {}, function () {
             views: [[false, 'list']],
         });
 
-        assert.strictEqual(document.querySelector('.o_data_cell span:not(.o_m2o_avatar)').innerText, 'Mario');
-        assert.strictEqual(document.querySelectorAll('.o_data_cell span:not(.o_m2o_avatar)')[1].innerText, 'Luigi');
-        assert.strictEqual(document.querySelectorAll('.o_data_cell span:not(.o_m2o_avatar)')[2].innerText, 'Mario');
+        assert.strictEqual(document.querySelector('.o_data_cell span:not(.o_m2o_avatar) span').innerText, 'Mario');
+        assert.strictEqual(document.querySelectorAll('.o_data_cell span:not(.o_m2o_avatar) span')[1].innerText, 'Luigi');
+        assert.strictEqual(document.querySelectorAll('.o_data_cell span:not(.o_m2o_avatar) span')[2].innerText, 'Mario');
 
         // click on first employee
         await afterNextRender(() =>
@@ -183,7 +183,7 @@ QUnit.module('hr', {}, function () {
             res_id: m2xHrAvatarUserId1,
             views: [[false, 'form']],
         });
-        assert.strictEqual(document.querySelector('.o_field_widget[name=employee_id]').innerText.trim(), 'Mario');
+        assert.strictEqual(document.querySelector('.o_field_widget[name=employee_id] input').value.trim(), 'Mario');
 
         await dom.click(document.querySelector('.o_m2o_avatar > img'));
 

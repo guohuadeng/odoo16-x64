@@ -4,7 +4,7 @@ import { registerModel } from '@mail/model/model_core';
 import { attr, one } from '@mail/model/model_field';
 import { clear } from '@mail/model/model_field_command';
 
-import { get_cookie, set_cookie, unaccent } from 'web.utils';
+import {getCookie, deleteCookie} from 'web.utils.cookies';
 
 registerModel({
     name: 'LivechatButtonView',
@@ -106,18 +106,18 @@ registerModel({
         },
         closeChat() {
             this.messaging.publicLivechatGlobal.update({ chatWindow: clear() });
-            set_cookie('im_livechat_session', "", -1); // remove cookie
+            deleteCookie('im_livechat_session');
         },
         /**
          * Called when the visitor leaves the livechat chatter the first time (first click on X button)
          * this will deactivate the mail_channel, notify operator that visitor has left the channel.
          */
         leaveSession() {
-            const cookie = get_cookie('im_livechat_session');
+            const cookie = getCookie('im_livechat_session');
             if (cookie) {
                 const channel = JSON.parse(cookie);
                 this.messaging.rpc({ route: '/im_livechat/visitor_leave_session', params: { uuid: channel.uuid } });
-                set_cookie('im_livechat_session', "", -1); // remove cookie
+                deleteCookie('im_livechat_session');
             }
         },
         openChat() {
@@ -130,9 +130,7 @@ registerModel({
         async openChatWindow() {
             this.messaging.publicLivechatGlobal.update({ chatWindow: {} });
             await this.messaging.publicLivechatGlobal.chatWindow.widget.appendTo($('body'));
-            const cssProps = { bottom: 0 };
-            cssProps[this.messaging.locale.textDirection === 'rtl' ? 'left' : 'right'] = 0;
-            this.messaging.publicLivechatGlobal.chatWindow.widget.$el.css(cssProps);
+            this.messaging.publicLivechatGlobal.chatWindow.widget.adjustPosition();
             this.widget.$el.hide();
             this._openChatWindowChatbot();
         },
@@ -140,19 +138,28 @@ registerModel({
          * @param {Object} message
          */
         async sendMessage(message) {
+            if (this.messaging.publicLivechatGlobal.publicLivechat.isTemporary) {
+                await this.messaging.publicLivechatGlobal.publicLivechat.createLivechatChannel();
+                if (!this.messaging.publicLivechatGlobal.publicLivechat.operator) {
+                    return;
+                }
+            }
             await this._sendMessageChatbotBefore();
             await this._sendMessage(message);
             this._sendMessageChatbotAfter();
         },
         start() {
-            this.widget.$el.text(this.buttonText);
+            if (!this.messaging.publicLivechatGlobal.hasWebsiteLivechatFeature) {
+                this.widget.$el.text(this.buttonText);
+            }
+            this.update({ isWidgetMounted: true });
             if (this.messaging.publicLivechatGlobal.history) {
                 for (const m of this.messaging.publicLivechatGlobal.history) {
                     this.addMessage(m);
                 }
                 this.openChat();
             } else if (!this.messaging.device.isSmall && this.messaging.publicLivechatGlobal.rule.action === 'auto_popup') {
-                const autoPopupCookie = get_cookie('im_livechat_auto_popup');
+                const autoPopupCookie = getCookie('im_livechat_auto_popup');
                 if (!autoPopupCookie || JSON.parse(autoPopupCookie)) {
                     this.update({
                         autoOpenChatTimeout: setTimeout(
@@ -168,7 +175,6 @@ registerModel({
             if (this.buttonTextColor) {
                 this.widget.$el.css('color', this.buttonTextColor);
             }
-    
             // If website_event_track installed, put the livechat banner above the PWA banner.
             const pwaBannerHeight = $('.o_pwa_install_banner').outerHeight(true);
             if (pwaBannerHeight) {
@@ -182,7 +188,7 @@ registerModel({
             if (this.isOpeningChat) {
                 return;
             }
-            const cookie = get_cookie('im_livechat_session');
+            const cookie = getCookie('im_livechat_session');
             let def;
             this.update({ isOpeningChat: true });
             clearTimeout(this.autoOpenChatTimeout);
@@ -193,7 +199,10 @@ registerModel({
                 this.messaging.publicLivechatGlobal.update({ messages: clear() });
                 def = this.messaging.rpc({
                     route: '/im_livechat/get_session',
-                    params: this.widget._prepareGetSessionParameters(),
+                    params: {
+                        ...this.widget._prepareGetSessionParameters(),
+                        persisted: false,
+                    },
                 }, { silent: true });
             }
             def.then((livechatData) => {
@@ -222,15 +231,7 @@ registerModel({
                             this.widget._sendWelcomeMessage();
                         }
                         this.messaging.publicLivechatGlobal.chatWindow.renderMessages();
-                        this.messaging.publicLivechatGlobal.update({ notificationHandler: {} });
-
-                        set_cookie('im_livechat_session', unaccent(JSON.stringify(this.messaging.publicLivechatGlobal.publicLivechat.widget.toData()), true), 60 * 60);
-                        set_cookie('im_livechat_auto_popup', JSON.stringify(false), 60 * 60);
-                        if (this.messaging.publicLivechatGlobal.publicLivechat.operator) {
-                            const operatorPidId = this.messaging.publicLivechatGlobal.publicLivechat.operator.id;
-                            const oneWeek = 7 * 24 * 60 * 60;
-                            set_cookie('im_livechat_previous_operator_pid', operatorPidId, oneWeek);
-                        }
+                        this.messaging.publicLivechatGlobal.publicLivechat.updateSessionCookie();
                     });
                 }
             }).then(() => {
@@ -433,6 +434,9 @@ registerModel({
             default: false,
         }),
         isTypingTimeout: attr(),
+        isWidgetMounted: attr({
+            default: false,
+        }),
         openChatDebounced: attr({
             compute() {
                 return _.debounce(this._openChat, 200, true);
@@ -444,9 +448,6 @@ registerModel({
         }),
         serverUrl: attr({
             compute() {
-                if (this.messaging.publicLivechatGlobal.chatbot.isActive) {
-                    return this.messaging.publicLivechatGlobal.chatbot.serverUrl;
-                }
                 return this.messaging.publicLivechatGlobal.serverUrl;
             },
         }),

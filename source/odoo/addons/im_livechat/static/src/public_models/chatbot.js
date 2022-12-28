@@ -120,7 +120,7 @@ registerModel({
          *     -> enable the input and let the user type
          *
          * - Otherwise
-         *   - if the the step is of type 'question_selection' and we are still waiting for the user to
+         *   - if the step is of type 'question_selection' and we are still waiting for the user to
          *     select one of the options
          *     -> don't do anything, wait for the user to click one of the options
          *   - otherwise
@@ -233,6 +233,9 @@ registerModel({
             this.messaging.publicLivechatGlobal.livechatButtonView.update({
                 isTypingTimeout: setTimeout(
                     () => {
+                        if (!this.messaging.publicLivechatGlobal.chatWindow || !this.messaging.publicLivechatGlobal.chatWindow.exists()) {
+                            return;
+                        }
                         this.messaging.publicLivechatGlobal.chatWindow.widget.$('.o_mail_thread_content').append(
                             $(qweb.render('im_livechat.legacy.chatbot.is_typing_message', {
                                 'chatbotImageSrc': `/im_livechat/operator/${
@@ -253,6 +256,9 @@ registerModel({
          * This will receive the next step and call step processing.
          */
         async triggerNextStep() {
+            if (!this.messaging.publicLivechatGlobal.chatWindow || !this.messaging.publicLivechatGlobal.chatWindow.exists()) {
+                return;
+            }
             let triggerNextStep = true;
             if (
                 this.currentStep &&
@@ -361,7 +367,7 @@ registerModel({
         data: attr({
             compute() {
                 if (this.messaging.publicLivechatGlobal.isTestChatbot) {
-                    return this.messaging.publicLivechatGlobal.testChatbotData.chatbot;
+                    return this.messaging.publicLivechatGlobal.testChatbotData;
                 }
                 if (this.state === 'init') {
                     return this.messaging.publicLivechatGlobal.rule.chatbot;
@@ -398,6 +404,13 @@ registerModel({
              * display that restart button.
              */
             compute() {
+                const { publicLivechat } = this.messaging.publicLivechatGlobal;
+                if (publicLivechat && !publicLivechat.operator) {
+                    return false;
+                }
+                if (publicLivechat && !publicLivechat.data.chatbot_script_id) {
+                    return false;
+                }
                 return Boolean(
                     !this.currentStep ||
                     (

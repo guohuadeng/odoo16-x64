@@ -2,7 +2,7 @@
 
 import { Popover } from "./popover";
 
-const { Component, onMounted, onWillUnmount, useExternalListener, useState, xml } = owl;
+import { Component, onMounted, onWillUnmount, useExternalListener, useState, xml } from "@odoo/owl";
 
 class PopoverController extends Component {
     setup() {
@@ -21,9 +21,11 @@ class PopoverController extends Component {
 
     get popoverProps() {
         return {
+            id: this.props.id,
             target: this.target,
             position: this.props.position,
             popoverClass: this.props.popoverClass,
+            onPositioned: this.props.onPositioned,
         };
     }
 
@@ -42,7 +44,8 @@ class PopoverController extends Component {
         }
     }
     onClickAway(ev) {
-        if (this.target.contains(ev.target) || ev.target.closest(".o_popover")) {
+        if (this.target.contains(ev.target)
+            || ev.target.closest(`.o_popover[popover-id="${this.props.id}"]`)) {
             return;
         }
         if (this.props.preventClose && this.props.preventClose(ev)) {

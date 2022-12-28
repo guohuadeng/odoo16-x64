@@ -96,9 +96,9 @@ class AccountEdiFormat(models.Model):
             errors.append(_("%s must have a country", seller.display_name))
 
         # <1.1.1.2>
-        if not seller.vat:
+        if not invoice.company_id.vat:
             errors.append(_("%s must have a VAT number", seller.display_name))
-        elif len(seller.vat) > 30:
+        if seller.vat and len(seller.vat) > 30:
             errors.append(_("The maximum length for VAT number is 30. %s have a VAT number too long: %s.", seller.display_name, seller.vat))
 
         # <1.2.1.2>
@@ -207,9 +207,6 @@ class AccountEdiFormat(models.Model):
         if not buyer.city:
             errors.append(_("%s must have a city.", buyer.display_name))
 
-        if any(line.quantity < 0 for line in invoice.invoice_line_ids):
-            errors.append(_("All quantities should be positive."))
-
         for tax_line in invoice.line_ids.filtered(lambda line: line.tax_line_id):
             if not tax_line.tax_line_id.l10n_it_kind_exoneration and tax_line.tax_line_id.amount == 0:
                 errors.append(_("%s has an amount of 0.0, you must indicate the kind of exoneration.", tax_line.name))
@@ -231,38 +228,52 @@ class AccountEdiFormat(models.Model):
         return bool(invoice_lines_tags & vj3_lines_tags)
 
     def _l10n_it_document_type_mapping(self):
+        """ Returns a dictionary with the required features for every TDxx FatturaPA document type """
         return {
-            'TD01': dict(move_types=['out_invoice'], import_type='in_invoice'),
-            'TD02': dict(move_types=['out_invoice'], import_type='in_invoice', downpayment=True),
-            'TD04': dict(move_types=['out_refund'], import_type='in_refund'),
-            'TD07': dict(move_types=['out_invoice'], import_type='in_invoice', simplified=True),
-            'TD08': dict(move_types=['out_refund'], import_type='in_refund', simplified=True),
-            'TD09': dict(move_types=['out_invoice'], import_type='in_invoice', simplified=True),
-            'TD17': dict(move_types=['in_invoice', 'in_refund'], import_type='out_invoice', self_invoice=True, services_or_goods="service"),
-            'TD18': dict(move_types=['in_invoice', 'in_refund'], import_type='out_invoice', self_invoice=True, services_or_goods="consu", partner_in_eu=True),
-            'TD19': dict(move_types=['in_invoice', 'in_refund'], import_type='out_invoice', self_invoice=True, services_or_goods="consu", goods_in_italy=True),
+            'TD01': dict(move_types=['out_invoice'], import_type='in_invoice', self_invoice=False, simplified=False, downpayment=False),
+            'TD02': dict(move_types=['out_invoice'], import_type='in_invoice', self_invoice=False, simplified=False, downpayment=True),
+            'TD04': dict(move_types=['out_refund'], import_type='in_refund', self_invoice=False, simplified=False),
+            'TD07': dict(move_types=['out_invoice'], import_type='in_invoice', self_invoice=False, simplified=True),
+            'TD08': dict(move_types=['out_refund'], import_type='in_refund', self_invoice=False, simplified=True),
+            'TD09': dict(move_types=['out_invoice'], import_type='in_invoice', self_invoice=False, simplified=True),
+            'TD28': dict(move_types=['in_invoice', 'in_refund'], import_type='in_invoice', simplified=False, self_invoice=True, partner_country_code="SM"),
+            'TD17': dict(move_types=['in_invoice', 'in_refund'], import_type='in_invoice', simplified=False, self_invoice=True, services_or_goods="service"),
+            'TD18': dict(move_types=['in_invoice', 'in_refund'], import_type='in_invoice', simplified=False, self_invoice=True, services_or_goods="consu", goods_in_italy=False, partner_in_eu=True),
+            'TD19': dict(move_types=['in_invoice', 'in_refund'], import_type='in_invoice', simplified=False, self_invoice=True, services_or_goods="consu", goods_in_italy=True),
+        }
+
+    def _l10n_it_get_invoice_features_for_document_type_selection(self, invoice):
+        """ Returns a dictionary of features to be compared with the TDxx FatturaPA
+            document type requirements. """
+        services_or_goods = self._l10n_it_edi_services_or_goods(invoice)
+        return {
+            'move_types': invoice.move_type,
+            'partner_in_eu': self._l10n_it_edi_partner_in_eu(invoice.commercial_partner_id),
+            'partner_country_code': invoice.commercial_partner_id.country_id.code,
+            'simplified': self._l10n_it_edi_is_simplified(invoice),
+            'self_invoice': self._l10n_it_edi_is_self_invoice(invoice),
+            'downpayment': invoice._is_downpayment(),
+            'services_or_goods': services_or_goods,
+            'goods_in_italy': services_or_goods == 'consu' and self._l10n_it_goods_in_italy(invoice),
         }
 
     def _l10n_it_get_document_type(self, invoice):
-        is_simplified = self._l10n_it_edi_is_simplified(invoice)
-        is_self_invoice = self._l10n_it_edi_is_self_invoice(invoice)
-        services_or_goods = self._l10n_it_edi_services_or_goods(invoice)
-        goods_in_italy = services_or_goods == 'consu' and self._l10n_it_goods_in_italy(invoice)
-        partner_in_eu = self._l10n_it_edi_partner_in_eu(invoice.commercial_partner_id)
-        for code, infos in self._l10n_it_document_type_mapping().items():
-            info_services_or_goods = infos.get('services_or_goods', "both")
-            info_partner_in_eu = infos.get('partner_in_eu', False)
-            if all([
-                invoice.move_type in infos.get('move_types', False),
-                invoice._is_downpayment() == infos.get('downpayment', False),
-                is_self_invoice == infos.get('self_invoice', False),
-                is_simplified == infos.get('simplified', False),
-                info_services_or_goods in ("both", services_or_goods),
-                info_partner_in_eu in (False, partner_in_eu),
-                goods_in_italy == infos.get('goods_in_italy', False),
-            ]):
+        """ Compare the features of the invoice to the requirements of each TDxx FatturaPA
+            document type until you find a valid one. """
+        invoice_features = self._l10n_it_get_invoice_features_for_document_type_selection(invoice)
+        for code, document_type_features in self._l10n_it_document_type_mapping().items():
+            comparisons = []
+            for key, invoice_feature in invoice_features.items():
+                if key not in document_type_features:
+                    continue
+                document_type_feature = document_type_features.get(key)
+                if isinstance(document_type_feature, (tuple, list)):
+                    comparisons.append(invoice_feature in document_type_feature)
+                else:
+                    comparisons.append(invoice_feature == document_type_feature)
+            if all(comparisons):
                 return code
-        return None
+        return False
 
     def _l10n_it_is_simplified_document_type(self, document_type):
         return self._l10n_it_document_type_mapping().get(document_type, {}).get('simplified', False)
@@ -333,7 +344,7 @@ class AccountEdiFormat(models.Model):
                     _logger.error('Error while receiving file from SdiCoop: %s', e)
 
     def _check_filename_is_fattura_pa(self, filename):
-        return re.search("([A-Z]{2}[A-Za-z0-9]{2,28}_[A-Za-z0-9]{0,5}.(xml.p7m|xml))", filename)
+        return re.search("[A-Z]{2}[A-Za-z0-9]{2,28}_[A-Za-z0-9]{0,5}.((?i:xml.p7m|xml))", filename)
 
     def _is_fattura_pa(self, filename, tree):
         return self.code == 'fattura_pa' and self._check_filename_is_fattura_pa(filename)
@@ -793,19 +804,20 @@ class AccountEdiFormat(models.Model):
             return super()._is_compatible_with_journal(journal)
         return journal.type in ('sale', 'purchase') and journal.country_code == 'IT'
 
-    def _is_required_for_invoice(self, invoice):
+    def _get_move_applicability(self, move):
         # OVERRIDE
         self.ensure_one()
         if self.code != 'fattura_pa':
-            return super()._is_required_for_invoice(invoice)
+            return super()._get_move_applicability(move)
 
-        is_self_invoice = self._l10n_it_edi_is_self_invoice(invoice)
-        return (
-            (invoice.is_sale_document() or (is_self_invoice and invoice.is_purchase_document()))
-            and invoice.country_code == 'IT'
-        )
+        is_it_purchase_document = self._l10n_it_edi_is_self_invoice(move) and move.is_purchase_document()
+        if move.country_code == 'IT' and (move.is_sale_document() or is_it_purchase_document):
+            return {
+                'post': self._post_fattura_pa,
+                'post_batching': lambda move: (move.move_type, bool(move.l10n_it_edi_transaction)),
+            }
 
-    def _export_as_xml(self, invoice):
+    def _l10n_it_edi_export_invoice_as_xml(self, invoice):
         ''' Create the xml file content.
         :return: The XML content as str.
         '''
@@ -819,12 +831,6 @@ class AccountEdiFormat(models.Model):
                 is a domestic invoice with a total amount of less than or equal to 400€ and the customer's address is incomplete."
             ))
         return content
-
-    def _get_invoice_edi_content(self, move):
-        #OVERRIDE
-        if self.code != 'fattura_pa':
-            return super()._get_invoice_edi_content(move)
-        return self._export_as_xml(move)
 
     def _check_move_configuration(self, move):
         # OVERRIDE
@@ -843,20 +849,6 @@ class AccountEdiFormat(models.Model):
         self.ensure_one()
         return self.code == 'fattura_pa' or super()._needs_web_services()
 
-    def _support_batching(self, move=None, state=None, company=None):
-        # OVERRIDE
-        if self.code == 'fattura_pa':
-            return state == 'to_send' and move.is_invoice()
-
-        return super()._support_batching(move=move, state=state, company=company)
-
-    def _get_batch_key(self, move, state):
-        # OVERRIDE
-        if self.code != 'fattura_pa':
-            return super()._get_batch_key(move, state)
-
-        return move.move_type, bool(move.l10n_it_edi_transaction)
-
     def _l10n_it_post_invoices_step_1(self, invoices):
         ''' Send the invoices to the proxy.
         '''
@@ -864,7 +856,7 @@ class AccountEdiFormat(models.Model):
 
         to_send = {}
         for invoice in invoices:
-            xml = "<?xml version='1.0' encoding='UTF-8'?>" + str(self._export_as_xml(invoice))
+            xml = "<?xml version='1.0' encoding='UTF-8'?>" + str(self._l10n_it_edi_export_invoice_as_xml(invoice))
             filename = self._l10n_it_edi_generate_electronic_invoice_filename(invoice)
             attachment = self.env['ir.attachment'].create({
                 'name': filename,
@@ -1030,12 +1022,12 @@ class AccountEdiFormat(models.Model):
 
         return to_return
 
-    def _post_fattura_pa(self, invoices):
+    def _post_fattura_pa(self, invoice):
         # OVERRIDE
-        if not invoices[0].l10n_it_edi_transaction:
-            return self._l10n_it_post_invoices_step_1(invoices)
+        if not invoice.l10n_it_edi_transaction:
+            return self._l10n_it_post_invoices_step_1(invoice)
         else:
-            return self._l10n_it_post_invoices_step_2(invoices)
+            return self._l10n_it_post_invoices_step_2(invoice)
 
     def _post_invoice_edi(self, invoices):
         # OVERRIDE

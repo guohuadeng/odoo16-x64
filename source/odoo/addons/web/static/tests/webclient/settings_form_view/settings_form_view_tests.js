@@ -14,6 +14,7 @@ import { makeView, setupViewRegistries } from "@web/../tests/views/helpers";
 import { createWebClient, doAction } from "@web/../tests/webclient/helpers";
 import { registry } from "@web/core/registry";
 import { SettingsFormCompiler } from "@web/webclient/settings_form_view/settings_form_compiler";
+import { registerCleanup } from "../../helpers/cleanup";
 
 let target;
 let serverData;
@@ -468,6 +469,85 @@ QUnit.module("SettingsFormView", (hooks) => {
         }
     );
 
+    QUnit.test("settings views does not read existing id when reload", async function (assert) {
+        serverData.actions = {
+            1: {
+                id: 1,
+                name: "Settings view",
+                res_model: "res.config.settings",
+                type: "ir.actions.act_window",
+                views: [[1, "form"]],
+            },
+            4: {
+                id: 4,
+                name: "Other action",
+                res_model: "task",
+                target: "new",
+                type: "ir.actions.act_window",
+                views: [["view_ref", "form"]],
+            },
+        };
+
+        serverData.views = {
+            "res.config.settings,1,form": `
+                    <form string="Settings" js_class="base_settings">
+                        <div class="settings">
+                            <div class="app_settings_block" string="CRM" data-key="crm">
+                                <div class="row mt16 o_settings_container">
+                                    <div class="col-12 col-lg-6 o_setting_box">
+                                        <div class="o_setting_left_pane">
+                                            <field name="foo"/>
+                                        </div>
+                                        <div class="o_setting_right_pane">
+                                            <span class="o_form_label">Foo</span>
+                                            <div class="text-muted">this is foo</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button name="4" string="Execute action" type="action"/>
+                            </div>
+                        </div>
+                    </form>`,
+            "task,view_ref,form": `
+                    <form>
+                        <field name="display_name"/>
+                    </form>`,
+            "res.config.settings,false,search": "<search></search>",
+            "task,false,search": "<search></search>",
+        };
+
+        const mockRPC = (route, args) => {
+            if (args.method) {
+                assert.step(args.method);
+            }
+        };
+
+        const webClient = await createWebClient({ serverData, mockRPC });
+
+        await doAction(webClient, 1);
+
+        assert.verifySteps([
+            "get_views", // initial setting action
+            "onchange", // this is a setting view => new record transient record
+        ]);
+
+        await click(target.querySelector("button[name='4']"));
+
+        assert.verifySteps([
+            "create", // settings: create the record before doing the action
+            "read", // settings: read the created record
+            "get_views", // dialog: get views
+            "onchange", // dialog: onchange
+        ]);
+
+        await click(target, ".modal button.btn.btn-primary.o_form_button_save");
+        assert.verifySteps([
+            "create", // dialog: create the record before doing back to the settings
+            "read", // dialog: read the created record
+            "onchange", // settings: when we come back, we want to restart from scratch
+        ]);
+    });
+
     QUnit.test("Auto save: don't save on closing tab/browser", async function (assert) {
         assert.expect(3);
 
@@ -505,6 +585,34 @@ QUnit.module("SettingsFormView", (hooks) => {
 
         window.dispatchEvent(new Event("beforeunload"));
         await nextTick();
+    });
+
+    QUnit.test("correctly copy attributes to compiled labels", async function (assert) {
+        await makeView({
+            type: "form",
+            resModel: "res.config.settings",
+            serverData,
+            arch: `
+                <form string="Settings" js_class="base_settings">
+                        <div class="settings">
+                            <div class="app_settings_block" string="CRM" data-key="crm">
+                                <div class="row mt16 o_settings_container">
+                                    <div class="col-12 col-lg-6 o_setting_box">
+                                        <div class="o_setting_left_pane">
+                                            <label for="foo" string="Label Before" class="a"/>
+                                            <field name="foo" class="b"/>
+                                            <label for="foo" string="Label After" class="c"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>`,
+        });
+
+        assert.hasClass(target.querySelectorAll(".o_form_label")[0], "a");
+        assert.hasClass(target.querySelector(".o_field_widget.o_field_boolean"), "b");
+        assert.hasClass(target.querySelectorAll(".o_form_label")[1], "c");
     });
 
     QUnit.test("settings views does not write the id on the url", async function (assert) {
@@ -819,7 +927,7 @@ QUnit.module("SettingsFormView", (hooks) => {
         assert.verifySteps([
             "create",
             "read",
-            'action executed {"name":"execute","type":"object","resModel":"res.config.settings","resId":1,"resIds":[1],"context":{"lang":"en","uid":7,"tz":"taht"},"buttonContext":{}}',
+            'action executed {"name":"execute","type":"object","resModel":"res.config.settings","resIds":[1],"context":{"lang":"en","uid":7,"tz":"taht"},"buttonContext":{}}',
         ]);
     });
 
@@ -858,7 +966,7 @@ QUnit.module("SettingsFormView", (hooks) => {
         assert.verifySteps([
             "create",
             "read",
-            'action executed {"context":{"lang":"en","uid":7,"tz":"taht"},"type":"object","name":"mymethod","resModel":"res.config.settings","resId":1,"resIds":[1],"buttonContext":{}}',
+            'action executed {"context":{"lang":"en","uid":7,"tz":"taht"},"type":"object","name":"mymethod","resModel":"res.config.settings","resIds":[1],"buttonContext":{}}',
         ]);
     });
 
@@ -1426,7 +1534,7 @@ QUnit.module("SettingsFormView", (hooks) => {
         <div class="o_setting_container">
             <SettingsPage slots="{NoContentHelper:props.slots.NoContentHelper}" initialTab="props.initialApp" t-slot-scope="settings" modules="[{&quot;key&quot;:&quot;crm&quot;,&quot;string&quot;:&quot;CRM&quot;,&quot;imgurl&quot;:&quot;/crm/static/description/icon.png&quot;,&quot;isVisible&quot;:false}]" class="'settings'">
                 <SettingsApp t-props="{&quot;key&quot;:&quot;crm&quot;,&quot;string&quot;:&quot;CRM&quot;,&quot;imgurl&quot;:&quot;/crm/static/description/icon.png&quot;,&quot;isVisible&quot;:false}" selectedTab="settings.selectedTab" class="'app_settings_block'">
-                    <FormLabel t-props="{id:'display_name',fieldName:'display_name',record:props.record,fieldInfo:props.archInfo.fieldNodes['display_name'],className:&quot;highhopes&quot;}" string="\`My&quot; little '  Label\`"/>
+                    <FormLabel id="'display_name'" fieldName="'display_name'" record="props.record" fieldInfo="props.archInfo.fieldNodes['display_name']" className="&quot;highhopes&quot;" string="\`My&quot; little '  Label\`"/>
                     <Field id="'display_name'" name="'display_name'" record="props.record" fieldInfo="props.archInfo.fieldNodes['display_name']"/>
                 </SettingsApp>
             </SettingsPage>
@@ -1484,5 +1592,106 @@ QUnit.module("SettingsFormView", (hooks) => {
             compiled.querySelector("Setting div.o_setting_right_pane div.text-muted").innerHTML,
             expectedCompiled
         );
+    });
+
+    QUnit.test("settings form doesn't autofocus", async (assert) => {
+        serverData.models["res.config.settings"].fields.textField = { type: "char" };
+
+        const onFocusIn = (ev) => {
+            assert.step(`focusin: ${ev.target.outerHTML}`);
+        };
+        document.addEventListener("focusin", onFocusIn);
+        registerCleanup(() => {
+            document.removeEventListener("focusin", onFocusIn);
+        });
+
+        await makeView({
+            type: "form",
+            resModel: "res.config.settings",
+            serverData,
+            arch: `
+            <form string="Settings" class="oe_form_configuration o_base_settings" js_class="base_settings">
+            <div class="o_setting_container">
+                <div class="settings">
+                    <div class="app_settings_block" string="CRM" data-key="crm">
+                        <h2>Title of group Bar</h2>
+                        <div class="row mt16 o_settings_container">
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="textField"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>`,
+        });
+
+        assert.containsOnce(target, "[name='textField'] input");
+        assert.verifySteps([
+            `focusin: <input type="text" class="o_searchview_input" accesskey="Q" placeholder="Search..." role="searchbox">`,
+        ]);
+    });
+
+    QUnit.test("settings form keeps scrolling by app", async (assert) => {
+        const oldHeight = target.style.getPropertyValue("height");
+        target.style.setProperty("height", "200px");
+        registerCleanup(() => {
+            target.style.setProperty("height", oldHeight);
+        });
+
+        await makeView({
+            type: "form",
+            resModel: "res.config.settings",
+            serverData,
+            arch: `
+            <form string="Settings" class="oe_form_configuration o_base_settings" js_class="base_settings">
+            <div class="o_setting_container">
+                <div class="settings">
+                    <div class="app_settings_block" string="CRM" data-key="crm">
+                        <h2>Title of group Bar</h2>
+                        <div class="row mt16 o_settings_container">
+                                <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+                                <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+                                <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+                                <div id="deepDivCrm" />
+                        </div>
+                    </div>
+
+                    <div class="app_settings_block" string="OtherApp" data-key="otherapp">
+                        <h2>Title of group Other</h2>
+                        <div class="row mt16 o_settings_container">
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+                                <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+                                <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+                                <div id="deepDivOther" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>`,
+        });
+
+        // constrain o_content to have height for its children to be scrollable
+        target.querySelector(".o_content").style.setProperty("height", "200px");
+
+        const scrollingEl = target.querySelector(".settings");
+        assert.strictEqual(scrollingEl.scrollTop, 0);
+
+        await click(target.querySelector(".settings_tab [data-key='otherapp']"));
+        assert.strictEqual(scrollingEl.scrollTop, 0);
+        target.querySelector("#deepDivOther").scrollIntoView();
+
+        const scrollTop = scrollingEl.scrollTop;
+        assert.ok(scrollTop > 0);
+
+        await click(target.querySelector(".settings_tab [data-key='crm']"));
+        assert.strictEqual(scrollingEl.scrollTop, 0);
+
+        await click(target.querySelector(".settings_tab [data-key='otherapp']"));
+        assert.strictEqual(scrollingEl.scrollTop, scrollTop);
     });
 });

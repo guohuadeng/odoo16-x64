@@ -85,7 +85,8 @@ class configmanager(object):
         # Not exposed in the configuration file.
         self.blacklist_for_save = set([
             'publisher_warranty_url', 'load_language', 'root_path',
-            'init', 'save', 'config', 'update', 'stop_after_init', 'dev_mode', 'shell_interface'
+            'init', 'save', 'config', 'update', 'stop_after_init', 'dev_mode', 'shell_interface',
+            'longpolling_port',
         ])
 
         # dictionary mapping option destination (keys in self.options) to MyOptions.
@@ -135,7 +136,7 @@ class configmanager(object):
                               "Keep empty to listen on all interfaces (0.0.0.0)")
         group.add_option("-p", "--http-port", dest="http_port", my_default=8069,
                          help="Listen port for the main HTTP service", type="int", metavar="PORT")
-        group.add_option("--longpolling-port", dest="longpolling_port", my_default=None,
+        group.add_option("--longpolling-port", dest="longpolling_port", my_default=0,
                          help="Deprecated alias to the gevent-port option", type="int", metavar="PORT")
         group.add_option("--gevent-port", dest="gevent_port", my_default=8072,
                          help="Listen port for the gevent worker", type="int", metavar="PORT")
@@ -342,8 +343,8 @@ class configmanager(object):
                              help="Maximum allowed Real time per cron job. (default: --limit-time-real). "
                                   "Set to 0 for no limit. ",
                              type="int")
-            group.add_option("--limit-request", dest="limit_request", my_default=8192,
-                             help="Maximum number of request to be processed per worker (default 8192).",
+            group.add_option("--limit-request", dest="limit_request", my_default=2**16,
+                             help="Maximum number of request to be processed per worker (default 65536).",
                              type="int")
             parser.add_option_group(group)
 

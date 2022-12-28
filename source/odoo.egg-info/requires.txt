@@ -1,12 +1,17 @@
 Jinja2
+MarkupSafe
+PyPDF2
 babel>=1.0
+chardet
+cryptography
 decorator
 docutils
 gevent
+greenlet
 idna
 libsass
 lxml
-mock
+num2words
 ofxparse
 passlib
 pillow
@@ -15,7 +20,6 @@ psutil
 psycopg2>=2.2
 pydot
 pyopenssl
-pypdf2
 pyserial
 python-dateutil
 python-stdnum
@@ -24,14 +28,13 @@ pyusb>=1.0.0b1
 qrcode
 reportlab
 requests
+urllib3
 vobject
 werkzeug
+xlrd
 xlsxwriter
 xlwt
 zeep
-
-[SSL]
-pyopenssl
 
 [ldap]
 python-ldap

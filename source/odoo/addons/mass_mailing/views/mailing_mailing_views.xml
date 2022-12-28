@@ -249,10 +249,7 @@
                                     <div class="o_view_nocontent oe_read_only" attrs="{'invisible': ['|', ('is_body_empty', '=', False), ('state', 'in', ('sending', 'done'))]}">
                                         <div class="o_nocontent_help">
                                             <p class="o_view_nocontent_smiling_face">
-                                                No template picked yet.
-                                            </p>
-                                            <p>
-                                                Start editing your mailing to design something awesome.
+                                                This mailing has no selected design (yet!).
                                             </p>
                                         </div>
                                     </div>
@@ -444,7 +441,10 @@
                     <xpath expr="//div[hasclass('oe_chatter')]" position="move"/>
                 </xpath>
                 <xpath expr="//div[hasclass('oe_chatter')]" position="attributes">
-                    <attribute name="class" remove="o-aside"/>
+                    <attribute name="class" remove="o-aside" add="o-full-width" separator=" "/>
+                </xpath>
+                <xpath expr="//notebook/page[@name='mail_body']//field[@name='body_arch']" position="attributes">
+                    <attribute name="iframeHtmlClass">o_mass_mailing_iframe</attribute>
                 </xpath>
                 <xpath expr="//notebook/page[@name='mail_body']" position="after">
                     <!-- test_01_mass_mailing_editor_tour -->
@@ -459,10 +459,7 @@
                             <div class="o_view_nocontent oe_read_only" attrs="{'invisible': ['|', ('is_body_empty', '=', False), ('state', 'in', ('sending', 'done'))]}">
                                 <div class="o_nocontent_help">
                                     <p class="o_view_nocontent_smiling_face">
-                                        No template picked yet.
-                                    </p>
-                                    <p>
-                                        Start editing your mailing to design something awesome.
+                                        This mailing has no selected design (yet!).
                                     </p>
                                 </div>
                             </div>
@@ -537,8 +534,8 @@
                                     </div>
                                     <div class="o_kanban_record_body" t-if="!selection_mode" attrs="{'invisible': [('sent_date', '=', False), ('schedule_date', '=', False), ('state', '!=', 'in_queue')]}">
                                         <div>
-                                            <span attrs="{'invisible': [('sent_date', '=', False)]}"><b><field name="delivered"/> / <field name="expected"/></b> Delivered to</span>
-                                            <span attrs="{'invisible': [('sent_date', '!=', False)]}"><b><field name='total'/></b></span>
+                                            <span attrs="{'invisible': [('sent_date', '=', False)]}" class="me-1"><b><field name="delivered"/> / <field name="expected"/></b> Delivered to</span>
+                                            <span attrs="{'invisible': [('sent_date', '!=', False)]}" class="me-1"><b><field name='total'/></b></span>
                                             <field name='mailing_model_id' attrs="{'invisible': [('mailing_model_name','=','mailing.list')]}"/>
                                             <span attrs="{'invisible': [('mailing_model_name','!=','mailing.list')]}">Mailing Contact</span>
                                         </div>
@@ -569,7 +566,7 @@
                                         </span>
                                         <span attrs="{'invisible': ['|', '|', ('sent_date', '!=', False), ('schedule_date', '!=', False), ('state', '=', 'in_queue')]}"
                                             class="clearfix">
-                                            <b><field name='total'/></b>
+                                            <b><field name='total' class="me-1"/></b>
                                             <field name='mailing_model_id' attrs="{'invisible': [('mailing_model_name','=','mailing.list')]}"/>
                                             <span attrs="{'invisible': [('mailing_model_name','!=','mailing.list')]}">Mailing Contact</span>
                                         </span>

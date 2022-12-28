@@ -48,8 +48,6 @@ import dateutil.relativedelta
 import psycopg2
 import psycopg2.extensions
 from psycopg2.extras import Json
-from lxml import etree
-from lxml.builder import E
 
 import odoo
 from . import SUPERUSER_ID
@@ -545,7 +543,6 @@ class BaseModel(metaclass=MetaModel):
     """field to use for active records, automatically set to either ``"active"``
     or ``"x_active"``.
     """
-    _date_name = 'date'         #: field to use for default calendar view
     _fold_name = 'fold'         #: field to determine folded groups in kanban views
 
     _translate = True           # False disables translations export for this model (Old API)
@@ -625,7 +622,6 @@ class BaseModel(metaclass=MetaModel):
         This "registry" class carries inferred model metadata, and inherits (in
         the Python sense) from all classes that define the model, and possibly
         other registry classes.
-
         """
         if getattr(cls, '_constraints', None):
             _logger.warning("Model attribute '_constraints' is no longer supported, "
@@ -937,10 +933,10 @@ class BaseModel(metaclass=MetaModel):
     def _export_rows(self, fields, *, _is_toplevel_call=True):
         """ Export fields of the records in ``self``.
 
-            :param fields: list of lists of fields to traverse
-            :param bool _is_toplevel_call:
-                used when recursing, avoid using when calling from outside
-            :return: list of lists of corresponding values
+        :param list fields: list of lists of fields to traverse
+        :param bool _is_toplevel_call:
+            used when recursing, avoid using when calling from outside
+        :return: list of lists of corresponding values
         """
         import_compatible = self.env.context.get('import_compat', True)
         lines = []
@@ -1052,10 +1048,11 @@ class BaseModel(metaclass=MetaModel):
     def export_data(self, fields_to_export):
         """ Export fields for selected objects
 
-            :param fields_to_export: list of fields
-            :rtype: dictionary with a *datas* matrix
+        This method is used when exporting data via client menu
 
-            This method is used when exporting data via client menu
+        :param list fields_to_export: list of fields
+        :returns: dictionary with a *datas* matrix
+        :rtype: dict
         """
         if not (self.env.is_admin() or self.env.user.has_group('base.group_allow_export')):
             raise UserError(_("You don't have the rights to export data. Please contact an Administrator."))
@@ -1457,13 +1454,6 @@ class BaseModel(metaclass=MetaModel):
         # if self._rec_name is set, it belongs to self._fields
         return self._rec_name or 'id'
 
-    #
-    # Override this method if you need a window title that depends on the context
-    #
-    @api.model
-    def view_header_get(self, view_id=None, view_type='form'):
-        return False
-
     @api.model
     def user_has_groups(self, groups):
         """Return true if the user is member of at least one of the groups in
@@ -1509,475 +1499,6 @@ class BaseModel(metaclass=MetaModel):
                     return True
 
         return not has_groups
-
-    @api.model
-    def _get_default_form_view(self):
-        """ Generates a default single-line form view using all fields
-        of the current model.
-
-        :returns: a form view as an lxml document
-        :rtype: etree._Element
-        """
-        group = E.group(col="4")
-        for fname, field in self._fields.items():
-            if field.automatic:
-                continue
-            elif field.type in ('one2many', 'many2many', 'text', 'html'):
-                group.append(E.newline())
-                group.append(E.field(name=fname, colspan="4"))
-                group.append(E.newline())
-            else:
-                group.append(E.field(name=fname))
-        group.append(E.separator())
-        return E.form(E.sheet(group, string=self._description))
-
-    @api.model
-    def _get_default_search_view(self):
-        """ Generates a single-field search view, based on _rec_name.
-
-        :returns: a tree view as an lxml document
-        :rtype: etree._Element
-        """
-        element = E.field(name=self._rec_name_fallback())
-        return E.search(element, string=self._description)
-
-    @api.model
-    def _get_default_tree_view(self):
-        """ Generates a single-field tree view, based on _rec_name.
-
-        :returns: a tree view as an lxml document
-        :rtype: etree._Element
-        """
-        element = E.field(name=self._rec_name_fallback())
-        return E.tree(element, string=self._description)
-
-    @api.model
-    def _get_default_pivot_view(self):
-        """ Generates an empty pivot view.
-
-        :returns: a pivot view as an lxml document
-        :rtype: etree._Element
-        """
-        return E.pivot(string=self._description)
-
-    @api.model
-    def _get_default_kanban_view(self):
-        """ Generates a single-field kanban view, based on _rec_name.
-
-        :returns: a kanban view as an lxml document
-        :rtype: etree._Element
-        """
-
-        field = E.field(name=self._rec_name_fallback())
-        content_div = E.div(field, {'class': "o_kanban_card_content"})
-        card_div = E.div(content_div, {'t-attf-class': "oe_kanban_card oe_kanban_global_click"})
-        kanban_box = E.t(card_div, {'t-name': "kanban-box"})
-        templates = E.templates(kanban_box)
-        return E.kanban(templates, string=self._description)
-
-    @api.model
-    def _get_default_graph_view(self):
-        """ Generates a single-field graph view, based on _rec_name.
-
-        :returns: a graph view as an lxml document
-        :rtype: etree._Element
-        """
-        element = E.field(name=self._rec_name_fallback())
-        return E.graph(element, string=self._description)
-
-    @api.model
-    def _get_default_calendar_view(self):
-        """ Generates a default calendar view by trying to infer
-        calendar fields from a number of pre-set attribute names
-
-        :returns: a calendar view
-        :rtype: etree._Element
-        """
-        def set_first_of(seq, in_, to):
-            """Sets the first value of ``seq`` also found in ``in_`` to
-            the ``to`` attribute of the ``view`` being closed over.
-
-            Returns whether it's found a suitable value (and set it on
-            the attribute) or not
-            """
-            for item in seq:
-                if item in in_:
-                    view.set(to, item)
-                    return True
-            return False
-
-        view = E.calendar(string=self._description)
-        view.append(E.field(name=self._rec_name_fallback()))
-
-        if not set_first_of([self._date_name, 'date', 'date_start', 'x_date', 'x_date_start'],
-                            self._fields, 'date_start'):
-            raise UserError(_("Insufficient fields for Calendar View!"))
-
-        set_first_of(["user_id", "partner_id", "x_user_id", "x_partner_id"],
-                     self._fields, 'color')
-
-        if not set_first_of(["date_stop", "date_end", "x_date_stop", "x_date_end"],
-                            self._fields, 'date_stop'):
-            if not set_first_of(["date_delay", "planned_hours", "x_date_delay", "x_planned_hours"],
-                                self._fields, 'date_delay'):
-                raise UserError(_(
-                    "Insufficient fields to generate a Calendar View for %s, missing a date_stop or a date_delay",
-                    self._name
-                ))
-
-        return view
-
-    @api.model
-    def get_views(self, views, options=None):
-        """ Returns the fields_views of given views, along with the fields of
-        the current model, and optionally its filters for the given action.
-
-        :param views: list of [view_id, view_type]
-        :param dict options: a dict optional boolean flags, set to enable:
-
-            ``toolbar``
-                includes contextual actions when loading fields_views
-            ``load_filters``
-                returns the model's filters
-            ``action_id``
-                id of the action to get the filters, otherwise loads the global
-                filters or the model
-
-        :return: dictionary with fields_views, fields and optionally filters
-        """
-        options = options or {}
-        result = {}
-
-        result['views'] = {
-            v_type: self.get_view(
-                v_id, v_type if v_type != 'list' else 'tree',
-                **options
-            )
-            for [v_id, v_type] in views
-        }
-
-        models = {}
-        for view in result['views'].values():
-            for model, model_fields in view.pop('models').items():
-                models.setdefault(model, set()).update(model_fields)
-
-        result['models'] = {}
-
-        for model, model_fields in models.items():
-            result['models'][model] = self.env[model].fields_get(
-                allfields=model_fields, attributes=self._get_view_field_attributes()
-            )
-
-        # Add related action information if asked
-        if options.get('toolbar'):
-            for view in result['views'].values():
-                view['toolbar'] = {}
-
-            bindings = self.env['ir.actions.actions'].get_bindings(self._name)
-            for action_type, key in (('report', 'print'), ('action', 'action')):
-                for action in bindings.get(action_type, []):
-                    view_types = (
-                        action['binding_view_types'].split(',')
-                        if action.get('binding_view_types')
-                        else result['views'].keys()
-                    )
-                    for view_type in view_types:
-                        view_type = view_type if view_type != 'tree' else 'list'
-                        if view_type in result['views']:
-                            result['views'][view_type]['toolbar'].setdefault(key, []).append(action)
-
-        if options.get('load_filters') and 'search' in result['views']:
-            result['views']['search']['filters'] = self.env['ir.filters'].get_filters(
-                self._name, options.get('action_id')
-            )
-
-        return result
-
-    @api.model
-    def _get_view(self, view_id=None, view_type='form', **options):
-        """_get_view([view_id | view_type='form'])
-
-        Get the model view combined architecture (the view along all its inheriting views).
-
-        :param int view_id: id of the view or None
-        :param str view_type: type of the view to return if view_id is None ('form', 'tree', ...)
-        :param dict options: bool options to return additional features:
-            - bool mobile: true if the web client is currently using the responsive mobile view
-              (to use kanban views instead of list views for x2many fields)
-        :return: architecture of the view as an etree node, and the browse record of the view used
-        :rtype: tuple
-        :raise AttributeError:
-
-            * if no view exists for that model, and no method `_get_default_[view_type]_view` exists for the view type
-
-        """
-        View = self.env['ir.ui.view'].sudo()
-
-        # try to find a view_id if none provided
-        if not view_id:
-            # <view_type>_view_ref in context can be used to override the default view
-            view_ref_key = view_type + '_view_ref'
-            view_ref = self._context.get(view_ref_key)
-            if view_ref:
-                if '.' in view_ref:
-                    module, view_ref = view_ref.split('.', 1)
-                    query = "SELECT res_id FROM ir_model_data WHERE model='ir.ui.view' AND module=%s AND name=%s"
-                    self._cr.execute(query, (module, view_ref))
-                    view_ref_res = self._cr.fetchone()
-                    if view_ref_res:
-                        view_id = view_ref_res[0]
-                else:
-                    _logger.warning('%r requires a fully-qualified external id (got: %r for model %s). '
-                        'Please use the complete `module.view_id` form instead.', view_ref_key, view_ref,
-                        self._name)
-
-            if not view_id:
-                # otherwise try to find the lowest priority matching ir.ui.view
-                view_id = View.default_view(self._name, view_type)
-
-        if view_id:
-            # read the view with inherited views applied
-            view = View.browse(view_id)
-            arch = view._get_combined_arch()
-        else:
-            # fallback on default views methods if no ir.ui.view could be found
-            view = View.browse()
-            try:
-                arch = getattr(self, '_get_default_%s_view' % view_type)()
-            except AttributeError:
-                raise UserError(_("No default view of type '%s' could be found !", view_type))
-        return arch, view
-
-    @api.model
-    def _get_view_cache_key(self, view_id=None, view_type='form', **options):
-        """ Get the key to use for caching `_get_view_cache`.
-
-        This method is meant to be overriden by models needing additional keys.
-
-        :param int view_id: id of the view or None
-        :param str view_type: type of the view to return if view_id is None ('form', 'tree', ...)
-        :param dict options: bool options to return additional features:
-            - bool mobile: true if the web client is currently using the responsive mobile view
-              (to use kanban views instead of list views for x2many fields)
-        :return: a cache key
-        :rtype: tuple
-        """
-        return (view_id, view_type, options.get('mobile'), self.env.lang) + tuple(
-            (key, value) for key, value in self.env.context.items() if key.endswith('_view_ref')
-        )
-
-    @api.model
-    @ormcache('self._get_view_cache_key(view_id, view_type, **options)')
-    def _get_view_cache(self, view_id=None, view_type='form', **options):
-        """ Get the view information ready to be cached
-
-        The cached view includes the postprocessed view, including inherited views, for all groups.
-        The blocks restricted to groups must therefore be removed after calling this method
-        for users not part of the given groups.
-
-        :param int view_id: id of the view or None
-        :param str view_type: type of the view to return if view_id is None ('form', 'tree', ...)
-        :param dict options: boolean options to return additional features:
-            - bool mobile: true if the web client is currently using the responsive mobile view
-              (to use kanban views instead of list views for x2many fields)
-        :return: a dictionnary including
-            - string arch: the architecture of the view (including inherited views, postprocessed, for all groups)
-            - int id: the view id
-            - string model: the view model
-            - dict models: the fields of the models used in the view (including sub-views)
-        :rtype: dict
-        """
-        # Get the view arch and all other attributes describing the composition of the view
-        arch, view = self._get_view(view_id, view_type, **options)
-
-        # Apply post processing, groups and modifiers etc...
-        arch, models = view.postprocess_and_fields(arch, model=self._name, **options)
-        models = self._get_view_fields(view_type or view.type, models)
-        result = {
-            'arch': arch,
-            # TODO: only `web_studio` seems to require this. I guess this is acceptable to keep it.
-            'id': view.id,
-            # TODO: only `web_studio` seems to require this. But this one on the other hand should be eliminated:
-            # you just called `get_views` for that model, so obviously the web client already knows the model.
-            'model': self._name,
-            # Set a frozendict and tuple for the field list to make sure the value in cache cannot be updated.
-            'models': frozendict({model: tuple(fields) for model, fields in models.items()}),
-        }
-
-        return frozendict(result)
-
-    @api.model
-    def get_view(self, view_id=None, view_type='form', **options):
-        """ get_view([view_id | view_type='form'])
-
-        Get the detailed composition of the requested view like model, view architecture
-
-        :param int view_id: id of the view or None
-        :param str view_type: type of the view to return if view_id is None ('form', 'tree', ...)
-        :param dict options: boolean options to return additional features:
-            - bool mobile: true if the web client is currently using the responsive mobile view
-            (to use kanban views instead of list views for x2many fields)
-        :return: composition of the requested view (including inherited views and extensions)
-        :rtype: dict
-        :raise AttributeError:
-
-            * if the inherited view has unknown position to work with other than 'before', 'after', 'inside', 'replace'
-            * if some tag other than 'position' is found in parent view
-
-        :raise Invalid ArchitectureError: if there is view type other than form, tree, calendar, search etc... defined on the structure
-        """
-        self.check_access_rights('read')
-
-        result = dict(self._get_view_cache(view_id, view_type, **options))
-
-        node = etree.fromstring(result['arch'])
-        node = self.env['ir.ui.view']._postprocess_access_rights(node)
-        node = self.env['ir.ui.view']._postprocess_context_dependent(node)
-        result['arch'] = etree.tostring(node, encoding="unicode").replace('\t', '')
-
-        return result
-
-    @api.model
-    def _get_view_fields(self, view_type, models):
-        """ Returns the field names required by the web client to load the views according to the view type.
-
-        The method is meant to be overridden by modules extending web client features and requiring additional
-        fields.
-
-        :param string view_type: type of the view
-        :param dict models: dict holding the models and fields used in the view architecture.
-        :return: dict holding the models and field required by the web client given the view type.
-        :rtype: list
-        """
-        if view_type in ('kanban', 'tree', 'form'):
-            for model_fields in models.values():
-                model_fields.update({'id', self.CONCURRENCY_CHECK_FIELD})
-        elif view_type == 'search':
-            models[self._name] = list(self._fields.keys())
-        elif view_type == 'graph':
-            models[self._name].union(fname for fname, field in self._fields.items() if field.type in ('integer', 'float'))
-        elif view_type == 'pivot':
-            models[self._name].union(fname for fname, field in self._fields.items() if field.groupable)
-        return models
-
-    @api.model
-    def _get_view_field_attributes(self):
-        """ Returns the field attributes required by the web client to load the views.
-
-        The method is meant to be overridden by modules extending web client features and requiring additional
-        field attributes.
-
-        :return: string list of field attribute names
-        :rtype: list
-        """
-        return [
-            'context', 'currency_field', 'definition_record', 'digits', 'domain', 'group_operator', 'groups', 'help',
-            'name', 'readonly', 'related', 'relation', 'relation_field', 'required', 'searchable', 'selection', 'size',
-            'sortable', 'store', 'string', 'translate', 'trim', 'type',
-        ]
-
-    @api.model
-    def load_views(self, views, options=None):
-        warnings.warn(
-            '`load_views` method is deprecated, use `get_views` instead',
-            DeprecationWarning, stacklevel=2,
-        )
-        return self.get_views(views, options=options)
-
-    @api.model
-    def _fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
-        warnings.warn(
-            'Method `_fields_view_get` is deprecated, use `_get_view` instead',
-            DeprecationWarning, stacklevel=2,
-        )
-        arch, view = self._get_view(view_id, view_type, toolbar=toolbar, submenu=submenu)
-        result = {
-            'arch': etree.tostring(arch, encoding='unicode'),
-            'model': self._name,
-            'field_parent': False,
-        }
-        if view:
-            result['name'] = view.name
-            result['type'] = view.type
-            result['view_id'] = view.id
-            result['field_parent'] = view.field_parent
-            result['base_model'] = view.model
-        else:
-            result['type'] = view_type
-            result['name'] = 'default'
-        return result
-
-    @api.model
-    def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
-        """
-        .. deprecated:: saas-15.4
-
-            Use :meth:`~odoo.models.Model.get_view()` instead.
-        """
-        warnings.warn(
-            'Method `fields_view_get` is deprecated, use `get_view` instead',
-            DeprecationWarning, stacklevel=2,
-        )
-        result = self.get_views([(view_id, view_type)], {'toolbar': toolbar, 'submenu': submenu})['views'][view_type]
-        node = etree.fromstring(result['arch'])
-        view_fields = set(el.get('name') for el in node.xpath('.//field[not(ancestor::field)]'))
-        result['fields'] = self.fields_get(view_fields)
-        result.pop('models', None)
-        if 'id' in result:
-            view = self.env['ir.ui.view'].sudo().browse(result.pop('id'))
-            result['name'] = view.name
-            result['type'] = view.type
-            result['view_id'] = view.id
-            result['field_parent'] = view.field_parent
-            result['base_model'] = view.model
-        else:
-            result['type'] = view_type
-            result['name'] = 'default'
-            result['field_parent'] = False
-        return result
-
-    def get_formview_id(self, access_uid=None):
-        """ Return a view id to open the document ``self`` with. This method is
-            meant to be overridden in addons that want to give specific view ids
-            for example.
-
-            Optional access_uid holds the user that would access the form view
-            id different from the current environment user.
-        """
-        return False
-
-    def get_formview_action(self, access_uid=None):
-        """ Return an action to open the document ``self``. This method is meant
-            to be overridden in addons that want to give specific view ids for
-            example.
-
-        An optional access_uid holds the user that will access the document
-        that could be different from the current user. """
-        view_id = self.sudo().get_formview_id(access_uid=access_uid)
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': self._name,
-            'view_type': 'form',
-            'view_mode': 'form',
-            'views': [(view_id, 'form')],
-            'target': 'current',
-            'res_id': self.id,
-            'context': dict(self._context),
-        }
-
-    def _get_access_action(self, access_uid=None, force_website=False):
-        """ Return an action to open the document. This method is meant to be
-        overridden in addons that want to give specific access to the document.
-        By default, it opens the formview of the document.
-
-        :param integer access_uid: optional access_uid being the user that
-          accesses the document. May be different from the current user as we
-          may compute an access for someone else.
-        :param integer force_website: force frontend redirection if available
-          on self. Used in overrides, notably with portal / website addons.
-        """
-        self.ensure_one()
-        return self.get_formview_action(access_uid=access_uid)
 
     @api.model
     def search_count(self, domain, limit=None):
@@ -3131,7 +2652,10 @@ class BaseModel(metaclass=MetaModel):
                 # constraint exists but its definition may have changed
                 tools.drop_constraint(cr, self._table, conname)
 
-            if foreign_key_re.match(definition):
+            if not definition:
+                # virtual constraint (e.g. implemented by a custom index)
+                self.pool.post_init(tools.check_index_exist, cr, conname)
+            elif foreign_key_re.match(definition):
                 self.pool.post_init(tools.add_constraint, cr, self._table, conname, definition)
             else:
                 self.pool.post_constraint(tools.add_constraint, cr, self._table, conname, definition)
@@ -3341,19 +2865,6 @@ class BaseModel(metaclass=MetaModel):
         return res
 
     @api.model
-    def get_empty_list_help(self, help):
-        """ Hook method to customize the help message in empty list/kanban views.
-
-        By default, it returns the help received as parameter.
-
-        :param str help: ir.actions.act_window help content
-        :return: help message displayed when there is no result to display
-          in a list/kanban view (by default, it returns the action help)
-        :rtype: str
-        """
-        return help
-
-    @api.model
     def check_field_access_rights(self, operation, fields):
         """Check the user access rights on the given fields.
 
@@ -3548,16 +3059,15 @@ class BaseModel(metaclass=MetaModel):
             new_translations = old_translations
             for lang, translation in translations.items():
                 old_value = new_translations.get(lang) or new_translations.get('en_US')
-                translation_safe = {}
                 if digest:
                     old_terms = field.get_trans_terms(old_value)
                     old_terms_digested2value = {digest(old_term): old_term for old_term in old_terms}
-                    translation = {old_terms_digested2value[key]: value for key, value in translation.items() if key in old_terms_digested2value}
-                for key, value in translation.items():
-                    new_term = field.translate.term_converter(value)
-                    if len(field.get_trans_terms(new_term)) == 1:  # drop illegal new terms
-                        translation_safe[key] = new_term
-                new_translations[lang] = field.translate(translation_safe.get, old_value)
+                    translation = {
+                        old_terms_digested2value[key]: value
+                        for key, value in translation.items()
+                        if key in old_terms_digested2value
+                    }
+                new_translations[lang] = field.translate(translation.get, old_value)
             self.env.cache.update_raw(self, field, [new_translations], dirty=True)
             self.modified([field_name])
         return True
@@ -3567,7 +3077,7 @@ class BaseModel(metaclass=MetaModel):
         :param str field_name: field name
         :param list langs: languages
 
-        :return dict translations: [(lang, val_en, val_lang)]
+        :return: list of dicts like [{"lang": lang, "source": source_term, "value": value_term}]
         In the UI, translation_dialog.js
         for model: val_en will be shown as the translation
         for model term: val_en will be shown as the src
@@ -3578,11 +3088,10 @@ class BaseModel(metaclass=MetaModel):
         langs = set(langs or [l[0] for l in self.env['res.lang'].get_installed()])
         val_en = self.with_context(lang='en_US')[field_name]
         if not callable(field.translate):
-            val_lang_func = lambda val_lang: val_lang if val_lang != val_en else ''
             translations = [{
                 'lang': lang,
                 'source': val_en,
-                'value': val_lang_func(self.with_context(lang=lang)[field_name])
+                'value': self.with_context(lang=lang)[field_name]
             } for lang in langs]
         else:
             translation_dictionary = field.get_translation_dictionary(
@@ -3677,6 +3186,12 @@ class BaseModel(metaclass=MetaModel):
             if field.store and field.translate:
                 translated_field_names.append(field.name)
 
+            if field.type == 'properties':
+                # force calling fields.read for properties field because
+                # we want to read all relational properties in batch
+                # (and check their existence in batch as well)
+                other_fields.append(field)
+
         if column_fields:
             cr, context = self.env.cr, self.env.context
 
@@ -3720,8 +3235,17 @@ class BaseModel(metaclass=MetaModel):
                 cr.execute(query_str, params + [sub_ids])
                 result += cr.fetchall()
         else:
-            self.check_access_rule('read')
-            result = [(id_,) for id_ in self.ids]
+            try:
+                self.check_access_rule('read')
+            except MissingError:
+                # Method _read() should never raise a MissingError, but method
+                # check_access_rule() can, because it must read fields on self.
+                # So we restrict 'self' to existing records (to avoid an extra
+                # exists() at the end of the method).
+                self = self.exists()
+                self.check_access_rule('read')
+
+            result = [(id_,) for id_ in self._ids]
 
         fetched = self.browse()
         if result:
@@ -4135,7 +3659,7 @@ class BaseModel(metaclass=MetaModel):
         field_values = []                           # [(field, value)]
         determine_inverses = defaultdict(list)      # {inverse: fields}
         records_to_inverse = {}                     # {field: records}
-        relational_names = []
+        fnames_modifying_relations = []
         protected = set()
         check_company = False
         for fname, value in vals.items():
@@ -4156,8 +3680,8 @@ class BaseModel(metaclass=MetaModel):
                 # DLE P150: `test_cancel_propagation`, `test_manufacturing_3_steps`, `test_manufacturing_flow`
                 # TODO: check whether still necessary
                 records_to_inverse[field] = self.filtered('id')
-            if field.relational or self.pool.field_inverses[field]:
-                relational_names.append(fname)
+            if field in self.pool.fields_modifying_relations:
+                fnames_modifying_relations.append(fname)
             if field.inverse or (field.compute and not field.readonly):
                 if field.store or field.type not in ('one2many', 'many2many'):
                     # Protect the field from being recomputed while being
@@ -4201,7 +3725,7 @@ class BaseModel(metaclass=MetaModel):
             # In this situation, the total amount must be recomputed on *both*
             # sales order: the line's order before the modification, and the
             # line's order after the modification.
-            self.modified(relational_names, before=True)
+            self.modified(fnames_modifying_relations, before=True)
 
             real_recs = self.filtered('id')
 
@@ -6587,7 +6111,7 @@ class BaseModel(metaclass=MetaModel):
             DeprecationWarning, stacklevel=2,
         )
         if fnames is None:
-            self.env._recompute()
+            self.env._recompute_all()
         elif records is None:
             self._recompute_model(fnames)
         else:
@@ -6653,7 +6177,8 @@ class BaseModel(metaclass=MetaModel):
     # Generic onchange method
     #
 
-    def _dependent_fields(self, field):
+    @classmethod
+    def _dependent_fields(cls, field):
         """ Return an iterator on the fields that depend on ``field``. """
         def traverse(node):
             for key, val in node.items():
@@ -6661,7 +6186,7 @@ class BaseModel(metaclass=MetaModel):
                     yield from val
                 else:
                     yield from traverse(val)
-        return traverse(self.pool.field_triggers.get(field, {}))
+        return traverse(cls.pool.field_triggers.get(field, {}))
 
     def _has_onchange(self, field, other_fields):
         """ Return whether ``field`` should trigger an onchange event in the
@@ -6670,32 +6195,6 @@ class BaseModel(metaclass=MetaModel):
         return (field.name in self._onchange_methods) or any(
             dep in other_fields for dep in self._dependent_fields(field.base_field)
         )
-
-    @api.model
-    def _onchange_spec(self, view_info=None):
-        """ Return the onchange spec from a view description; if not given, the
-            result of ``self.get_view()`` is used.
-        """
-        result = {}
-
-        # for traversing the XML arch and populating result
-        def process(node, info, prefix):
-            if node.tag == 'field':
-                name = node.attrib['name']
-                names = "%s.%s" % (prefix, name) if prefix else name
-                if not result.get(names):
-                    result[names] = node.attrib.get('on_change')
-                # traverse the subviews included in relational fields
-                for child_view in node.xpath("./*[descendant::field]"):
-                    process(child_view, None, names)
-            else:
-                for child in node:
-                    process(child, info, prefix)
-
-        if view_info is None:
-            view_info = self.get_view()
-        process(etree.fromstring(view_info['arch']), view_info, '')
-        return result
 
     def _onchange_eval(self, field_name, onchange, result):
         """ Apply onchange method(s) for field ``field_name`` with spec ``onchange``
@@ -6830,9 +6329,26 @@ class BaseModel(metaclass=MetaModel):
                 for name, subnames in self['<tree>'].items():
                     if name == 'id':
                         continue
+                    field = record._fields[name]
+                    if (field.type == 'properties' and field.definition_record in field_name
+                       and other.get(name) == self[name] == []):
+                        # TODO: The parent field on "record" can be False, if it was changed,
+                        # (even if if was changed to a not Falsy value) because of
+                        # >>> initial_values = dict(values, **dict.fromkeys(names, False))
+                        # If it's the case when we will read the properties field on this record,
+                        # it will return False as well (no parent == no definition)
+                        # So record at the following line, will always return a empty properties
+                        # because the definition record is always False if it triggered the onchange
+                        # >>> snapshot0 = Snapshot(record, nametree, fetch=(not first_call))
+                        # but we need "snapshot0" to have the old value to be able
+                        # to compare it with the new one and trigger the onchange if necessary.
+                        # In that particular case, "other.get(name)" must contains the
+                        # non empty properties value.
+                        result[name] = []
+                        continue
+
                     if not force and other.get(name) == self[name]:
                         continue
-                    field = record._fields[name]
                     if field.type not in ('one2many', 'many2many'):
                         result[name] = field.convert_to_onchange(self[name], record, {})
                     else:
@@ -6959,18 +6475,6 @@ class BaseModel(metaclass=MetaModel):
 
         # make a snapshot based on the initial values of record
         snapshot0 = Snapshot(record, nametree, fetch=(not first_call))
-
-        for name in initial_values:
-            # TODO: The parent field on "record" can be False, if it was changed,
-            # (even if if was changed to a not Falsy value) because of
-            # >>> initial_values = dict(values, **dict.fromkeys(names, False))
-            # If it's the case when we will read the properties field on this record,
-            # it will return False as well (no parent == no definition) but we need
-            # "snapshot0" to have the old value to be able to compare it with the new one
-            # and trigger the onchange if necessary.
-            field = self._fields.get(name)
-            if field and field.type == 'properties':
-                snapshot0[name] = initial_values[name]
 
         # store changed values in cache; also trigger recomputations based on
         # subfields (e.g., line.a has been modified, line.b is computed stored
@@ -7134,12 +6638,6 @@ class BaseModel(metaclass=MetaModel):
         if create_values:
             records_batches.append(self.create(create_values))
         return self.concat(*records_batches)
-
-    def _neutralize(self):
-        """ Neutralize this model's records.
-        This should prevent the database from connecting to external services.
-        """
-        return
 
 
 collections.abc.Set.register(BaseModel)

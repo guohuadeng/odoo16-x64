@@ -118,7 +118,7 @@ class AlipayTest(AlipayCommon, PaymentHttpCommon):
             processing_values = tx._get_processing_values()
         redirect_form_data = self._extract_values_from_html_form(processing_values['redirect_form_html'])
 
-        self.assertEqual(redirect_form_data['inputs']['total_fee'], str(total_fee))
+        self.assertEqual(redirect_form_data['inputs']['total_fee'], f'{total_fee:.2f}')
 
     def test_21_standard_checkout_feedback(self):
         self.alipay.alipay_payment_method = 'standard_checkout'
@@ -208,10 +208,3 @@ class AlipayTest(AlipayCommon, PaymentHttpCommon):
         tx = self._create_transaction('redirect')
         payload = dict(self.notification_data, sign='dummy')
         self.assertRaises(Forbidden, AlipayController._verify_notification_signature, payload, tx)
-
-    def test_alipay_neutralize(self):
-        self.env['payment.provider']._neutralize()
-
-        self.assertEqual(self.provider.alipay_merchant_partner_id, False)
-        self.assertEqual(self.provider.alipay_md5_signature_key, False)
-        self.assertEqual(self.provider.alipay_seller_email, False)

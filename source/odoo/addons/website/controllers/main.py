@@ -21,7 +21,7 @@ import odoo
 
 from odoo import http, models, fields, _
 from odoo.exceptions import AccessError
-from odoo.http import request
+from odoo.http import request, SessionExpiredException
 from odoo.osv import expression
 from odoo.tools import OrderedSet, escape_psql, html_escape as escape
 from odoo.addons.http_routing.models.ir_http import slug, slugify, _guess_mimetype
@@ -103,7 +103,7 @@ class Website(Home):
         if homepage_url and homepage_url != '/':
             try:
                 return request._serve_ir_http()
-            except (AccessError, NotFound):
+            except (AccessError, NotFound, SessionExpiredException):
                 pass
 
         # Fallback on first accessible menu
@@ -339,7 +339,7 @@ class Website(Home):
         for name, url, mod in current_website.get_suggested_controllers():
             if needle.lower() in name.lower() or needle.lower() in url.lower():
                 module_sudo = mod and request.env.ref('base.module_%s' % mod, False).sudo()
-                icon = mod and "<img src='%s' width='24px' class='mr-2 rounded' /> " % (module_sudo and module_sudo.icon or mod) or ''
+                icon = mod and "<img src='%s' width='24px' height='24px' class='mr-2 rounded' /> " % (module_sudo and module_sudo.icon or mod) or ''
                 suggested_controllers.append({
                     'value': url,
                     'label': '%s%s (%s)' % (icon, url, name),
@@ -352,16 +352,6 @@ class Website(Home):
                 dict(title=_('Apps url'), values=suggested_controllers),
             ]
         }
-
-    @http.route('/website/get_modules_info', type='json', auth="user")
-    def get_modules_info(self, xml_ids):
-        def get_module_info(xml_id):
-            module_info = request.env.ref(xml_id)
-            return {'id': module_info.id, 'name': module_info.shortdesc}
-        modules_info = {}
-        for xml_id in xml_ids:
-            modules_info[xml_id] = get_module_info(xml_id)
-        return modules_info
 
     @http.route('/website/snippet/filters', type='json', auth='public', website=True)
     def get_dynamic_filter(self, filter_id, template_key, limit=None, search_domain=None, with_sample=False):
@@ -398,6 +388,10 @@ class Website(Home):
             t['numOfEl'] = attribs.get('data-number-of-elements')
             t['numOfElSm'] = attribs.get('data-number-of-elements-sm')
             t['numOfElFetch'] = attribs.get('data-number-of-elements-fetch')
+            t['rowPerSlide'] = attribs.get('data-row-per-slide')
+            t['arrowPosition'] = attribs.get('data-arrow-position')
+            t['extraClasses'] = attribs.get('data-extra-classes')
+            t['thumb'] = attribs.get('data-thumb')
         return templates
 
     @http.route('/website/get_current_currency', type='json', auth="public", website=True)
@@ -599,6 +593,10 @@ class Website(Home):
                 template = default_templ
 
         template = template and dict(template=template) or {}
+        website_id = kwargs.get('website_id')
+        if website_id:
+            website = request.env['website'].browse(website_id)
+            website._force()
         page = request.env['website'].new_page(path, add_menu=add_menu, **template)
         url = page['url']
 

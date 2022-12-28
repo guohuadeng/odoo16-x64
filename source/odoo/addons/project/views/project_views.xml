@@ -18,7 +18,7 @@
                <search string="Tasks">
                     <field name="name" string="Task" filter_domain="['|', ('name', 'ilike', self), ('id', 'ilike', self)]"/>
                     <field name="tag_ids"/>
-                    <field name="user_ids" filter_domain="[('user_ids', 'ilike', self), ('user_ids.active', 'in', [True, False])]"/>
+                    <field name="user_ids" filter_domain="[('user_ids.name', 'ilike', self), ('user_ids.active', 'in', [True, False])]"/>
                     <field name="milestone_id" groups="project.group_project_milestone"/>
                     <field name="ancestor_id" groups="project.group_subtask_project"/>
                     <field name="stage_id"/>
@@ -513,7 +513,7 @@
                     </group>
                     <notebook>
                         <page name="description" string="Description">
-                            <field name="description" options="{'resizable': false}"/>
+                            <field name="description" options="{'resizable': false}" placeholder="Project description..."/>
                         </page>
                         <page name="settings" string="Settings">
                             <group>
@@ -521,11 +521,10 @@
                                     <field name="analytic_account_id" domain="['|', ('company_id', '=', company_id), ('company_id', '=', False)]" context="{'default_partner_id': partner_id}" groups="analytic.group_analytic_accounting"/>
                                     <field name="privacy_visibility" widget="radio"/>
                                     <span colspan="2" class="text-muted" attrs="{'invisible':[('access_instruction_message', '=', '')]}">
-                                        <i class="fa fa-lightbulb-o"/>&amp;nbsp;<field name="access_instruction_message" nolabel="1"/>
+                                        <i class="fa fa-lightbulb-o"/>&amp;nbsp;<field class="d-inline" name="access_instruction_message" nolabel="1"/>
                                     </span>
                                     <span colspan="2" class="text-muted" attrs="{'invisible':[('privacy_visibility_warning', '=', '')]}">
-                                        <i class="fa fa-warning">&amp;nbsp;</i>
-                                        <field name="privacy_visibility_warning" nolabel="1"/>
+                                        <i class="fa fa-warning"/>&amp;nbsp;<field class="d-inline" name="privacy_visibility_warning" nolabel="1"/>
                                     </span>
                                 </group>
                                 <group>
@@ -547,7 +546,7 @@
                                 </group>
                             </group>
                             <group>
-                                <group name="group_tasks_managment" string="Tasks Managment" class="row mt16 o_settings_container" groups="project.group_subtask_project,project.group_project_task_dependencies,project.group_project_milestone,project.group_project_recurring_tasks">
+                                <group name="group_tasks_managment" string="Tasks Management" col="1" class="row mt16 o_settings_container" groups="project.group_subtask_project,project.group_project_task_dependencies,project.group_project_milestone,project.group_project_recurring_tasks">
                                     <div>
                                         <div class="o_setting_box" id="subtask_settings" groups="project.group_subtask_project">
                                             <div class="o_setting_left_pane">
@@ -595,8 +594,8 @@
                                         </div>
                                     </div>
                                 </group>
-                                <group name="group_time_managment" string="Time Managment" invisible="1" class="row mt16 o_settings_container"/>
-                                <group name="group_documents_analytics" string="Analytics" class="row mt16 o_settings_container" attrs="{'invisible': [('allow_rating', '=', False)]}">
+                                <group name="group_time_managment" string="Time Management" invisible="1" col="1" class="row mt16 o_settings_container"/>
+                                <group name="group_documents_analytics" string="Analytics" col="1" class="row mt16 o_settings_container" attrs="{'invisible': [('allow_rating', '=', False)]}">
                                     <div>
                                         <field name="allow_rating" invisible="1"/>
                                         <div class="o_setting_box" name="analytic_div" groups="project.group_project_rating">
@@ -681,7 +680,7 @@
             <field name="name">project.project.tree</field>
             <field name="model">project.project</field>
             <field name="arch" type="xml">
-                <tree decoration-muted="active == False" string="Projects" multi_edit="1" sample="1">
+                <tree decoration-muted="active == False" string="Projects" multi_edit="1" sample="1" default_order="sequence, name, id">
                     <field name="sequence" optional="show" widget="handle"/>
                     <field name="message_needaction" invisible="1"/>
                     <field name="active" invisible="1"/>
@@ -690,6 +689,7 @@
                     <field name="partner_id" optional="show" string="Customer"/>
                     <field name="privacy_visibility" optional="hide"/>
                     <field name="company_id" optional="show"  groups="base.group_multi_company" options="{'no_create': True, 'no_create': True}"/>
+                    <field name="company_id" invisible="1"/>
                     <field name="analytic_account_id" optional="hide" groups="analytic.group_analytic_accounting"/>
                     <field name="date_start" string="Start Date" widget="daterange" options="{'related_end_date': 'date'}"/>
                     <field name="date" string="End Date" widget="daterange" options="{'related_start_date': 'date_start'}"/>
@@ -790,6 +790,7 @@
                     on_create="project.open_create_project"
                     action="action_view_tasks" type="object"
                     sample="1"
+                    default_order="sequence, name, id"
                 >
                     <field name="display_name"/>
                     <field name="partner_id"/>
@@ -832,7 +833,7 @@
                                                     <i t-if="record.date.raw_value and record.date_start.raw_value" class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow"/>
                                                     <field name="date"/>
                                                 </div>
-                                                <div t-if="record.alias_name.value and record.alias_domain.value" class="text-muted">
+                                                <div t-if="record.alias_name.value and record.alias_domain.value" class="text-muted text-truncate" t-att-title="record.alias_id.value">
                                                     <span class="fa fa-envelope-o me-2" aria-label="Domain Alias" title="Domain Alias"></span><t t-esc="record.alias_id.value"/>
                                                 </div>
                                                 <div t-if="record.rating_active.raw_value and record.rating_count.raw_value &gt; 0" class="text-muted" groups="project.group_project_rating">
@@ -856,7 +857,7 @@
                                                 <div role="menuitem">
                                                     <a name="action_view_tasks" type="object">Tasks</a>
                                                 </div>
-                                                <div role="menuitem" groups="project.group_project_milestone">
+                                                <div role="menuitem" groups="project.group_project_milestone" t-if="record.allow_milestones.raw_value">
                                                     <a name="action_get_list_view" type="object">Milestones</a>
                                                 </div>
                                             </div>
@@ -1140,7 +1141,7 @@
                     <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
                     <div class="oe_title pe-0">
                         <h1 class="d-flex justify-content-between align-items-center">
-                            <div class="d-flex">
+                            <div class="d-flex w-100">
                                 <field name="priority" widget="priority" class="me-3"/>
                                 <field name="name" class="o_task_name text-truncate" placeholder="Task Title..."/>
                             </div>
@@ -1172,20 +1173,21 @@
                             <field name="partner_id" widget="res_partner_many2one" class="o_task_customer_field"/>
                             <field name="partner_phone" widget="phone" attrs="{'invisible': True}"/>
                             <field name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}"/>
-                            <field name="recurring_task" attrs="{'invisible': ['|', ('allow_recurring_tasks', '=', False), ('active', '=', False)]}" groups="project.group_project_recurring_tasks"/>
                             <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}" context="{'project_id': project_id}"/>
                             <field name="legend_blocked" invisible="1"/>
                             <field name="legend_normal" invisible="1"/>
                             <field name="legend_done" invisible="1"/>
                         </group>
                     </group>
+                    <field attrs="{'invisible': [('project_id', '=', False)]}"
+                        name="task_properties" nolabel="1" columns="2" hideKanbanOption="1"/>
                     <notebook>
                         <page name="description_page" string="Description">
-                            <field name="description" type="html" options="{'collaborative': true, 'resizable': false}"/>
+                            <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Task description..."/>
                         </page>
                         <page name="sub_tasks_page" string="Sub-tasks" attrs="{'invisible': [('allow_subtasks', '=', False)]}">
                             <field name="child_ids"
-                                   context="{'default_project_id': project_id if not parent_id or not display_project_id else display_project_id, 'default_user_ids': user_ids, 'default_parent_id': id,
+                                   context="{'search_view_ref' : 'project.view_task_search_form_extended', 'default_project_id': project_id if not parent_id or not display_project_id else display_project_id, 'default_user_ids': user_ids, 'default_parent_id': id,
                                     'default_partner_id': partner_id, 'default_milestone_id': allow_milestones and milestone_id, 'search_default_display_project_id': project_id }"
                                    widget="many2many"
                                    domain="['!', ('id', 'parent_of', id)]">
@@ -1265,7 +1267,7 @@
                             </field>
                         </page>
                         <page name="recurrence" string="Recurrent"  groups="project.group_project_recurring_tasks">
-                            <span class="o_form_label"> Recurrent </span>
+                            <label for="recurring_task" />
                             <field name="recurring_task" attrs="{'invisible': ['|', ('allow_recurring_tasks', '=', False), ('active', '=', False)]}"/>
                             <group attrs="{'invisible': [('recurring_task', '=', False)]}">
                                 <group>
@@ -1279,7 +1281,7 @@
                                     </div>
 
                                     <label for="repeat_on_month" string="Repeat On" attrs="{'invisible': [('repeat_unit', 'not in', ('month', 'year'))]}" />
-                                    <div class="o_row">
+                                    <div class="o_row" attrs="{'invisible': [('repeat_unit', 'not in', ('month', 'year'))]}">
                                         <field name="repeat_on_month" attrs="{'invisible': [('repeat_unit', '!=', 'month')], 'required': [('repeat_unit', '=', 'month')]}" />
                                         <field name="repeat_on_year" attrs="{'invisible': [('repeat_unit', '!=', 'year')], 'required': [('repeat_unit', '=', 'year')]}" />
 
@@ -1307,7 +1309,7 @@
                                 </group>
                             </group>
                             <group attrs="{'invisible': ['|', ('recurring_task', '=', False), ('recurrence_message', '=', False)]}">
-                                <div class="alert alert-success o_form_project_recurrence_message" role="status">
+                                <div class="alert alert-success o_form_project_recurrence_message" role="status" colspan="2">
                                     <field name="recurrence_message" widget="html" class="mb-0" />
                                 </div>
                             </group>
@@ -1368,7 +1370,7 @@
                         <field name="name" string = "Task Title" placeholder="e.g. Send Invitations"/>
                         <field name="project_id" widget="project_private_task" invisible="context.get('default_project_id', False)" placeholder="Private" class="o_project_task_project_field"/>
                         <field name="user_ids" options="{'no_open': True, 'no_quick_create': True}" domain="[('share', '=', False), ('active', '=', True)]"
-                            widget="many2many_tags"/>
+                            widget="many2many_avatar_user"/>
                         <field name="company_id" invisible="1"/>
                         <field name="parent_id" invisible="1" groups="base.group_no_one"/>
                     </group>
@@ -1525,11 +1527,28 @@
             </field>
         </record>
 
+        <!--
+            The below view is invalid since `multi_edit="1"` has been set on the tree
+            https://github.com/odoo/odoo/commit/972e097dbe7cdc7afdae722391692f9b3bf063b8#diff-db3b2f2e90f34ffef22194c3eac5a34b17af9b9a0a644d77da9e80738963931eL859
+            because `activity_type_id` uses in his domain a field `res_model`
+            which is not available in the view and not even in the model.
+            It has not been detected because:
+            - this view is unused / impossible to reach since Odoo 12.0,
+              and therefore nobody tried to edit the many2one field `activity_type_id` which would trigger the issue
+            - the field domains were not validated because `multi_edit="1"` tree views were not considered as editable,
+              and therefore their field domains were not validated in the views validation, as they should have been.
+            This view has been removed in master as it was no longer used,
+            through https://github.com/odoo/odoo/pull/103702.
+            We cannot remove it in 16.0 because it would require an upgrade script.
+            Hence we just remove the multi_edit="1" so the view is not validated
+            and the domain is not used in the web client.
+        -->
         <record id="project_task_view_tree_activity" model="ir.ui.view">
             <field name="name">project.task.tree.activity</field>
             <field name="model">project.task</field>
             <field name="arch" type="xml">
-                <tree string="Next Activities" decoration-danger="not is_closed and activity_date_deadline &lt; current_date" default_order="activity_date_deadline" multi_edit="1">
+                <tree string="Next Activities" decoration-danger="not is_closed and activity_date_deadline &lt; current_date" default_order="activity_date_deadline">
+                    <field name="company_id" invisible="1"/>
                     <field name="is_closed"/>
                     <field name="name"/>
                     <field name="project_id" options="{'no_open': 1}"/>

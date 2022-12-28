@@ -80,8 +80,10 @@ class account_journal(models.Model):
             SELECT move.journal_id,
                    move.sequence_prefix
               FROM account_move move
+              JOIN res_company company ON company.id = move.company_id
              WHERE move.journal_id = ANY(%(journal_ids)s)
                AND move.state = 'posted'
+               AND (company.fiscalyear_lock_date IS NULL OR move.date >= company.fiscalyear_lock_date) 
           GROUP BY move.journal_id, move.sequence_prefix
             HAVING COUNT(*) != MAX(move.sequence_number) - MIN(move.sequence_number) + 1
         """, {
@@ -278,11 +280,13 @@ class account_journal(models.Model):
                 SELECT COUNT(st_line.id)
                 FROM account_bank_statement_line st_line
                 JOIN account_move st_line_move ON st_line_move.id = st_line.move_id
+                JOIN account_move_line aml ON aml.move_id = st_line_move.id
                 WHERE st_line_move.journal_id IN %s
                 AND NOT st_line.is_reconciled
                 AND st_line_move.to_check IS NOT TRUE
                 AND st_line_move.state = 'posted'
-            ''', [tuple(self.ids)])
+                AND aml.account_id = %s
+            ''', [tuple(self.ids), self.default_account_id.id])
             number_to_reconcile = self.env.cr.fetchone()[0]
 
             to_check_ids = self.to_check_ids()
@@ -428,7 +432,7 @@ class account_journal(models.Model):
             rslt_sum += target_currency.round(amount)
         return (rslt_count, rslt_sum)
 
-    def action_create_new(self):
+    def _get_move_action_context(self):
         ctx = self._context.copy()
         ctx['default_journal_id'] = self.id
         if self.type == 'sale':
@@ -438,13 +442,16 @@ class account_journal(models.Model):
         else:
             ctx['default_move_type'] = 'entry'
             ctx['view_no_maturity'] = True
+        return ctx
+
+    def action_create_new(self):
         return {
             'name': _('Create invoice/bill'),
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
             'res_model': 'account.move',
             'view_id': self.env.ref('account.view_move_form').id,
-            'context': ctx,
+            'context': self._get_move_action_context(),
         }
 
     def create_cash_statement(self):
@@ -585,6 +592,7 @@ class account_journal(models.Model):
                 for journal_id, prefix in has_sequence_holes
             ),
             'context': {
+                **self._get_move_action_context(),
                 'search_default_group_by_sequence_prefix': 1,
                 'expand': 1,
             }

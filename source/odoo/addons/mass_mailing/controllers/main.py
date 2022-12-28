@@ -7,7 +7,7 @@ import werkzeug
 from odoo import _, exceptions, http, tools
 from odoo.http import request
 from odoo.tools import consteq
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 
 
 class MassMailController(http.Controller):
@@ -167,23 +167,13 @@ class MassMailController(http.Controller):
             if not self._valid_unsubscribe_token(mailing_id, res_id, email, str(token)) and not request.env.user.has_group('mass_mailing.group_mass_mailing_user'):
                 raise exceptions.AccessDenied()
 
-            res = mailing.convert_links()
-            base_url = mailing.get_base_url().rstrip('/')
-            urls_to_replace = [
-                (base_url + '/unsubscribe_from_list', mailing._get_unsubscribe_url(email, res_id)),
-                (base_url + '/view', mailing._get_view_url(email, res_id))
-            ]
-            for url_to_replace, new_url in urls_to_replace:
-                if url_to_replace in res[mailing_id]:
-                    res[mailing_id] = res[mailing_id].replace(url_to_replace, new_url if new_url else '#')
-
-            res[mailing_id] = res[mailing_id].replace(
-                'class="o_snippet_view_in_browser"',
-                'class="o_snippet_view_in_browser" style="display: none;"'
-            )
+            html_markupsafe = mailing._render_field('body_html', [res_id])[res_id]
+            # Update generic URLs (without parameters) to final ones
+            html_markupsafe = html_markupsafe.replace('/unsubscribe_from_list',
+                                                      mailing._get_unsubscribe_url(email, res_id))
 
             return request.render('mass_mailing.view', {
-                    'body': res[mailing_id],
+                    'body': html_markupsafe,
                 })
 
         return request.redirect('/web')
@@ -226,3 +216,15 @@ class MassMailController(http.Controller):
                 _("""Requested de-blacklisting via unsubscription page."""))
             return True
         return 'error'
+
+    # ------------------------------------------------------------
+    # MISCELLANEOUS
+    # ------------------------------------------------------------
+
+    @http.route('/mailing/get_preview_assets', type='json', auth='user')
+    def get_mobile_preview_styling(self):
+        """ This route allows a rpc call to get the styling needed for email template conversion.
+        We do this to avoid duplicating the template."""
+        if not request.env.user.has_group('mass_mailing.group_mass_mailing_user'):
+            raise NotFound
+        return request.env['ir.qweb']._render('mass_mailing.iframe_css_assets_edit')

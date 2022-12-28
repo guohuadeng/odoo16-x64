@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: odoo
-Version: 16.1a1.post20220923
+Version: 16.0.post20221228
 Summary: Odoo Server
 Home-page: https://www.odoo.com
 Author: OpenERP S.A.
@@ -17,5 +17,4 @@ Classifier: Development Status :: 5 - Production/Stable
 Classifier: License :: OSI Approved :: GNU Lesser General Public License v3
 Classifier: Programming Language :: Python
 Requires-Python: >=3.7
-Provides-Extra: SSL
 Provides-Extra: ldap

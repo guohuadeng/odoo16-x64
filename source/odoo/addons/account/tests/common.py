@@ -220,11 +220,13 @@ class AccountTestInvoicingCommon(TransactionCase):
             'currency': company.currency_id,
             'default_account_revenue': cls.env['account.account'].search([
                     ('company_id', '=', company.id),
-                    ('account_type', '=', 'income')
+                    ('account_type', '=', 'income'),
+                    ('id', '!=', company.account_journal_early_pay_discount_gain_account_id.id)
                 ], limit=1),
             'default_account_expense': cls.env['account.account'].search([
                     ('company_id', '=', company.id),
-                    ('account_type', '=', 'expense')
+                    ('account_type', '=', 'expense'),
+                    ('id', '!=', company.account_journal_early_pay_discount_loss_account_id.id)
                 ], limit=1),
             'default_account_receivable': search_account(company, chart_template, 'property_account_receivable_id', [
                 ('account_type', '=', 'asset_receivable')
@@ -390,7 +392,8 @@ class AccountTestInvoicingCommon(TransactionCase):
                 line_form.product_id = product
                 if taxes:
                     line_form.tax_ids.clear()
-                    line_form.tax_ids.add(taxes)
+                    for tax in taxes:
+                        line_form.tax_ids.add(tax)
 
         for amount in (amounts or []):
             with move_form.invoice_line_ids.new() as line_form:
@@ -686,7 +689,7 @@ class TestAccountReconciliationCommon(AccountTestInvoicingCommon):
         if currency_id:
             invoice_vals['currency_id'] = currency_id
 
-        invoice = self.env['account.move'].with_context(default_move_type=type).create(invoice_vals)
+        invoice = self.env['account.move'].with_context(default_move_type=move_type).create(invoice_vals)
         if auto_validate:
             invoice.action_post()
         return invoice

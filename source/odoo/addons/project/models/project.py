@@ -169,6 +169,11 @@ class ProjectTaskType(models.Model):
             else:
                 stage.disabled_rating_warning = False
 
+    @api.constrains('user_id', 'project_ids')
+    def _check_personal_stage_not_linked_to_projects(self):
+        if any(stage.user_id and stage.project_ids for stage in self):
+            raise UserError(_('A personal stage cannot be linked to a project because it is only visible to its corresponding user.'))
+
     def remove_personal_stage(self):
         """
         Remove a personal stage, tasks using that stage will move to the first
@@ -361,6 +366,7 @@ class Project(models.Model):
     allow_task_dependencies = fields.Boolean('Task Dependencies', default=lambda self: self.env.user.has_group('project.group_project_task_dependencies'))
     allow_milestones = fields.Boolean('Milestones', default=lambda self: self.env.user.has_group('project.group_project_milestone'))
     tag_ids = fields.Many2many('project.tags', relation='project_project_project_tags_rel', string='Tags')
+    task_properties_definition = fields.PropertiesDefinition('Task Properties')
 
     # Project Sharing fields
     collaborator_ids = fields.One2many('project.collaborator', 'project_id', string='Collaborators', copy=False)
@@ -387,10 +393,7 @@ class Project(models.Model):
 
     # Not `required` since this is an option to enable in project settings.
     stage_id = fields.Many2one('project.project.stage', string='Stage', ondelete='restrict', groups="project.group_project_stages",
-        tracking=True, index=True, copy=False, default=_default_stage_id, group_expand='_read_group_stage_ids',
-        help="The step, or stage, that your project is in. You can add, remove, and move stages around to adapt the pipeline to your own needs.\n"
-            "Via the stage configuration you can set up email templates and automate the sending of emails when a project moves into the stage.\n"
-            "Projects in a folded stage are considered as closed.")
+        tracking=True, index=True, copy=False, default=_default_stage_id, group_expand='_read_group_stage_ids')
 
     update_ids = fields.One2many('project.update', 'project_id')
     last_update_id = fields.Many2one('project.update', string='Last Update', copy=False)
@@ -491,11 +494,11 @@ class Project(models.Model):
         for project in self:
             project.milestone_count_reached = mapped_count.get(project.id, 0)
 
-    @api.depends('milestone_ids', 'milestone_ids.is_reached', 'milestone_ids.deadline')
+    @api.depends('milestone_ids', 'milestone_ids.is_reached', 'milestone_ids.deadline', 'allow_milestones')
     def _compute_is_milestone_exceeded(self):
         today = fields.Date.context_today(self)
         read_group = self.env['project.milestone']._read_group([
-            ('project_id', 'in', self.ids),
+            ('project_id', 'in', self.filtered('allow_milestones').ids),
             ('is_reached', '=', False),
             ('deadline', '<', today)], ['project_id'], ['project_id'])
         mapped_count = {group['project_id'][0]: group['project_id_count'] for group in read_group}
@@ -514,6 +517,7 @@ class Project(models.Model):
               FROM project_project P
          LEFT JOIN project_milestone M ON P.id = M.project_id
              WHERE M.is_reached IS false
+               AND P.allow_milestones IS true
                AND M.deadline < CAST(now() AS date)
         """
         if (operator == '=' and value is True) or (operator == '!=' and value is False):
@@ -1122,8 +1126,9 @@ class Task(models.Model):
         help="Date on which the stage of your task has last been modified.\n"
             "Based on this information you can identify tasks that are stalling and get statistics on the time it usually takes to move tasks from one stage to another.")
     project_id = fields.Many2one('project.project', string='Project', recursive=True,
-        compute='_compute_project_id', store=True, readonly=False,
+        compute='_compute_project_id', store=True, readonly=False, precompute=True,
         index=True, tracking=True, check_company=True, change_default=True)
+    task_properties = fields.Properties('Properties', definition='project_id.task_properties_definition', copy=True)
     # Defines in which project the task will be displayed / taken into account in statistics.
     # Example: 1 task A with 1 subtask B in project P
     # A -> project_id=P, display_project_id=P
@@ -1692,7 +1697,7 @@ class Task(models.Model):
 
     def _search_portal_user_names(self, operator, value):
         if operator != 'ilike' and not isinstance(value, str):
-            raise ValidationError('Not Implemented.')
+            raise ValidationError(_('Not Implemented.'))
 
         query = """
             SELECT task_user.task_id
@@ -1807,9 +1812,16 @@ class Task(models.Model):
     @api.model
     def _get_view_cache_key(self, view_id=None, view_type='form', **options):
         """The override of fields_get making fields readonly for portal users
-        makes the view cache dependent on the fact the user has the group portal or not"""
+        makes the view cache dependent on the fact the user has the group portal or not
+
+        The override of _get_view making the "Unread messages" filter invisible
+        according to the user notification type
+        makes the view cache dependent on the user notification type"""
         key = super()._get_view_cache_key(view_id, view_type, **options)
-        return key + (self.env.user.has_group('base.group_portal'),)
+        key = key + (self.env.user.has_group('base.group_portal'),)
+        if view_type == 'search':
+            key += (self.env.user.notification_type,)
+        return key
 
     @api.model
     def default_get(self, default_fields):
@@ -1846,7 +1858,9 @@ class Task(models.Model):
             if project.analytic_account_id:
                 vals['analytic_account_id'] = project.analytic_account_id.id
         else:
-            vals['user_ids'] = [Command.link(self.env.user.id)]
+            user_ids = vals.get('user_ids', [])
+            user_ids.append(Command.link(self.env.user.id))
+            vals['user_ids'] = user_ids
 
         return vals
 
@@ -1880,13 +1894,13 @@ class Task(models.Model):
             # only take field name when having ':' e.g 'date_deadline:week' => 'date_deadline'
             fields_list += [f.split(':')[0] for f in fields_groupby]
         if domain:
-            fields_list += [term[0].split('.')[0] for term in domain if isinstance(term, (tuple, list))]
+            fields_list += [term[0].split('.')[0] for term in domain if isinstance(term, (tuple, list)) and term not in [expression.TRUE_LEAF, expression.FALSE_LEAF]]
         self._ensure_fields_are_accessible(fields_list)
         return super(Task, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
 
     @api.model
     def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
-        fields_list = {term[0] for term in args if isinstance(term, (tuple, list))}
+        fields_list = {term[0] for term in args if isinstance(term, (tuple, list)) and term not in [expression.TRUE_LEAF, expression.FALSE_LEAF]}
         self._ensure_fields_are_accessible(fields_list)
         return super(Task, self)._search(args, offset=offset, limit=limit, order=order, count=count, access_rights_uid=access_rights_uid)
 
@@ -1898,7 +1912,7 @@ class Task(models.Model):
         return super(Task, self).mapped(func)
 
     def filtered_domain(self, domain):
-        fields_list = [term[0] for term in domain if isinstance(term, (tuple, list))]
+        fields_list = [term[0] for term in domain if isinstance(term, (tuple, list)) and term not in [expression.TRUE_LEAF, expression.FALSE_LEAF]]
         self._ensure_fields_are_accessible(fields_list)
         return super(Task, self).filtered_domain(domain)
 
@@ -1927,7 +1941,16 @@ class Task(models.Model):
             project_id = vals.get('project_id')
             if project_id:
                 self = self.with_context(default_project_id=project_id)
-        return super()._load_records_create(vals_list)
+        tasks = super()._load_records_create(vals_list)
+        stage_ids_per_project = defaultdict(list)
+        for task in tasks:
+            if task.stage_id and task.stage_id not in task.project_id.type_ids and task.stage_id.id not in stage_ids_per_project[task.project_id]:
+                stage_ids_per_project[task.project_id].append(task.stage_id.id)
+
+        for project, stage_ids in stage_ids_per_project.items():
+            project.write({'type_ids': [Command.link(stage_id) for stage_id in stage_ids]})
+
+        return tasks
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -2157,7 +2180,7 @@ class Task(models.Model):
 
     def _search_has_late_and_unreached_milestone(self, operator, value):
         if operator not in ('=', '!=') or not isinstance(value, bool):
-            raise NotImplementedError(f'The search does not support the {operator} operator or {value} value.')
+            raise NotImplementedError(_('The search does not support the %s operator or %s value.', operator, value))
         domain = [
             ('allow_milestones', '=', True),
             ('milestone_id', '!=', False),
@@ -2297,10 +2320,10 @@ class Task(models.Model):
             'done': 'project.mt_task_ready',
             'normal': 'project.mt_task_progress',
         }
-        if 'kanban_state_label' in init_values and self.kanban_state in mail_message_subtype_per_kanban_state:
-            return self.env.ref(mail_message_subtype_per_kanban_state[self.kanban_state])
-        elif 'stage_id' in init_values:
+        if 'stage_id' in init_values:
             return self.env.ref('project.mt_task_stage')
+        elif 'kanban_state_label' in init_values and self.kanban_state in mail_message_subtype_per_kanban_state:
+            return self.env.ref(mail_message_subtype_per_kanban_state[self.kanban_state])
         return super(Task, self)._track_subtype(init_values)
 
     def _mail_get_message_subtypes(self):
@@ -2536,7 +2559,7 @@ class Task(models.Model):
 
     def action_recurring_tasks(self):
         return {
-            'name': 'Tasks in Recurrence',
+            'name': _('Tasks in Recurrence'),
             'type': 'ir.actions.act_window',
             'res_model': 'project.task',
             'view_mode': 'tree,form,kanban,calendar,pivot,graph,activity',
@@ -2644,6 +2667,12 @@ class ProjectTags(models.Model):
         tag_ids = list(self.with_user(SUPERUSER_ID)._search(
             ['|', ('task_ids.project_id', '=', project_id), ('project_ids', 'in', project_id)]))
         return expression.AND([domain, [('id', 'in', tag_ids)]])
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if 'project_id' in self.env.context:
+            domain = self._get_project_tags_domain(domain, self.env.context.get('project_id'))
+        return super().read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
 
     @api.model
     def search_read(self, domain=None, fields=None, offset=0, limit=None, order=None):

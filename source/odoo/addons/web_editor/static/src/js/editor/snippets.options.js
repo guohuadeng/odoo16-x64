@@ -33,6 +33,7 @@ const {
     isGif,
 } = require('web_editor.image_processing');
 const OdooEditorLib = require('@web_editor/js/editor/odoo-editor/src/OdooEditor');
+const {SIZES, MEDIAS_BREAKPOINTS} = require('@web/core/ui/ui_service');
 
 var qweb = core.qweb;
 var _t = core._t;
@@ -1476,6 +1477,8 @@ const ColorpickerUserValueWidget = SelectUserValueWidget.extend({
 
         await this._colorPaletteRenderPromise;
 
+        const classes = weUtils.computeColorClasses(this.colorPalette.getColorNames());
+        this.colorPreviewEl.classList.remove(...classes);
         this.colorPreviewEl.style.removeProperty('background-color');
         this.colorPreviewEl.style.removeProperty('background-image');
         const prefix = this.options.dataAttributes.colorPrefix || 'bg';
@@ -1485,14 +1488,28 @@ const ColorpickerUserValueWidget = SelectUserValueWidget.extend({
         if (this._value) {
             if (ColorpickerWidget.isCSSColor(this._value)) {
                 this.colorPreviewEl.style.backgroundColor = this._value;
-            } else if (!weUtils.isColorGradient(this._value)) {
-                if (weUtils.EDITOR_COLOR_CSS_VARIABLES.includes(this._value)) {
-                    this.colorPreviewEl.style.backgroundColor = `var(--we-cp-${this._value}`;
-                } else {
-                    this.colorPreviewEl.classList.add(`bg-${this._value}`);
-                }
-            } else {
+            } else if (weUtils.isColorGradient(this._value)) {
                 this.colorPreviewEl.style.backgroundImage = this._value;
+            } else if (weUtils.EDITOR_COLOR_CSS_VARIABLES.includes(this._value)) {
+                this.colorPreviewEl.style.backgroundColor = `var(--we-cp-${this._value}`;
+            } else {
+                // Checking if the className actually exists seems overkill but
+                // it is actually needed to prevent a crash. As an example, if a
+                // colorpicker widget is linked to a SnippetOption instance's
+                // `selectStyle` method designed to handle the "border-color"
+                // property of an element, the value received can be split if
+                // the item uses different colors for its top/right/bottom/left
+                // borders. For instance, you could receive "red blue" if the
+                // item as red top and bottom borders and blue left and right
+                // borders, in which case you would reach this `else` and try to
+                // add the class "bg-red blue" which would crash because of the
+                // space inside). In that case, we simply do not show any color.
+                // We could choose to handle this split-value case specifically
+                // but it was decided that this is enough for the moment.
+                const className = `bg-${this._value}`;
+                if (classes.includes(className)) {
+                    this.colorPreviewEl.classList.add(className);
+                }
             }
         }
         // If the palette was already opened (e.g. modifying a gradient), the new DOM state must be
@@ -1961,12 +1978,21 @@ const ListUserValueWidget = UserValueWidget.extend({
         if (this.createWidget) {
             const selectedIds = currentValues.map(({ id }) => id)
                 .filter(id => typeof id === 'number');
-            const selectedIdsDomain = ['id', 'not in', selectedIds];
+            // Note: it's important to simplify the domain at its maximum as the
+            // rpc using it are cached. Similar domains should be written the
+            // same way for the cache to work.
+            const selectedIdsDomain = selectedIds.length ? ['id', 'not in', selectedIds] : null;
             const selectedIdsDomainIndex = this.createWidget.options.domain.findIndex(domain => domain[0] === 'id' && domain[1] === 'not in');
             if (selectedIdsDomainIndex > -1) {
-                this.createWidget.options.domain[selectedIdsDomainIndex] = selectedIdsDomain;
+                if (selectedIdsDomain) {
+                    this.createWidget.options.domain[selectedIdsDomainIndex] = selectedIdsDomain;
+                } else {
+                    this.createWidget.options.domain.splice(selectedIdsDomainIndex, 1);
+                }
             } else {
-                this.createWidget.options.domain = [...this.createWidget.options.domain, selectedIdsDomain];
+                if (selectedIdsDomain) {
+                    this.createWidget.options.domain = [...this.createWidget.options.domain, selectedIdsDomain];
+                }
             }
             this.createWidget.setValue('');
             this.createWidget.inputEl.value = '';
@@ -2120,9 +2146,8 @@ const ListUserValueWidget = UserValueWidget.extend({
             if (this.el.dataset.idMode && this.el.dataset.idMode === "name") {
                 id = el.name;
             }
-            const idInt = parseInt(id);
             return Object.assign({
-                id: isNaN(idInt) ? id : idInt,
+                id: /^-?[0-9]{1,15}$/.test(id) ? parseInt(id) : id,
                 name: el.value,
                 display_name: el.value,
             }, el.dataset);
@@ -2132,8 +2157,7 @@ const ListUserValueWidget = UserValueWidget.extend({
             this.selected = checkboxes.map(el => {
                 const input = el.parentElement.previousSibling.firstChild;
                 const id = input.name || input.value;
-                const idInt = parseInt(id);
-                return isNaN(idInt) ? id : idInt;
+                return /^-?[0-9]{1,15}$/.test(id) ? parseInt(id) : id;
             });
             values.forEach(v => {
                 // Elements not toggleable are considered as always selected.
@@ -2454,6 +2478,7 @@ const SelectPagerUserValueWidget = SelectUserValueWidget.extend({
     },
 });
 
+const m2oRpcCache = {};
 const Many2oneUserValueWidget = SelectUserValueWidget.extend({
     className: (SelectUserValueWidget.prototype.className || '') + ' o_we_many2one',
     events: Object.assign({}, SelectUserValueWidget.prototype.events, {
@@ -2471,7 +2496,7 @@ const Many2oneUserValueWidget = SelectUserValueWidget.extend({
     init(parent, title, options, $target) {
         this.afterSearch = [];
         this.displayNameCache = {};
-        this._rpcCache = {};
+        this._rpcCache = m2oRpcCache;
         const {dataAttributes} = options;
         Object.assign(options, {
             limit: '5',
@@ -3185,6 +3210,14 @@ const SnippetOptionWidget = Widget.extend({
      * @param {boolean} previewMode - @see this.selectClass
      * @param {string} widgetValue
      * @param {Object} params
+     * @param {string} [params.forceStyle] if undefined, the method will not
+     *      set the inline style (and thus even remove it) if the item would
+     *      already have the given style without it (thanks to a CSS rule for
+     *      example). If defined (as a string), it acts as the "priority" param
+     *      of @see CSSStyleDeclaration.setProperty: it should be 'important' to
+     *      set the style as important or '' otherwise. Note that if forceStyle
+     *      is undefined, the style is set as important only if required to have
+     *      an effect.
      * @returns {Promise|undefined}
      */
     selectStyle: async function (previewMode, widgetValue, params) {
@@ -3306,7 +3339,13 @@ const SnippetOptionWidget = Widget.extend({
         hasUserValue = applyCSS.call(this, cssProps[0], values.join(' '), styles) || hasUserValue;
 
         function applyCSS(cssProp, cssValue, styles) {
+            if (typeof params.forceStyle !== 'undefined') {
+                this.$target[0].style.setProperty(cssProp, cssValue, params.forceStyle);
+                return true;
+            }
+
             const propertyValue = styles.getPropertyValue(cssProp);
+
             // This condition requires extraClass to NOT be set.
             if (!weUtils.areCssValuesEqual(propertyValue, cssValue, cssProp, this.$target[0])) {
                 // Property must be set => extraClass will be enabled.
@@ -3749,8 +3788,10 @@ const SnippetOptionWidget = Widget.extend({
         const moveDownOrRight = widgetName === 'move_down_opt' || widgetName === 'move_right_opt';
 
         if (moveUpOrLeft || moveDownOrRight) {
-            // The arrows are not displayed if the target is in a grid and if not in mobile view.
-            const isMobileView = this.$target[0].ownerDocument.defaultView.frameElement.clientWidth < 768;
+            // The arrows are not displayed if the target is in a grid and if
+            // not in mobile view.
+            const mobileViewThreshold = MEDIAS_BREAKPOINTS[SIZES.LG].minWidth;
+            const isMobileView = this.$target[0].ownerDocument.defaultView.frameElement.clientWidth < mobileViewThreshold;
             if (this.$target[0].classList.contains('o_grid_item') && !isMobileView) {
                 return false;
             }
@@ -4112,7 +4153,7 @@ const SnippetOptionWidget = Widget.extend({
                 this.options.wysiwyg.odooEditor.historyStep();
             }
 
-            if (previewMode) {
+            if (previewMode || requiresReload) {
                 return;
             }
 
@@ -4200,6 +4241,7 @@ registry.sizing = SnippetOptionWidget.extend({
         let resizeValues = this._getSize();
         this.$handles.on('mousedown', function (ev) {
             ev.preventDefault();
+            self.options.wysiwyg.odooEditor.automaticStepUnactive('resizing');
 
             // If the handle has the class 'readonly', don't allow to resize.
             // (For the grid handles when we are in mobile view).
@@ -4259,8 +4301,8 @@ registry.sizing = SnippetOptionWidget.extend({
                 return;
             }
 
-            // If we are in grid mode, add a background grid and place the element
-            // we are resizing in front of it.
+            // If we are in grid mode, add a background grid and place the
+            // element we are resizing in front of it.
             const rowEl = self.$target[0].parentNode;
             let backgroundGridEl;
             if (rowEl.classList.contains('o_grid_mode')) {
@@ -4268,11 +4310,11 @@ registry.sizing = SnippetOptionWidget.extend({
                 backgroundGridEl = gridUtils._addBackgroundGrid(rowEl, 0);
                 self.options.wysiwyg.odooEditor.observerActive('displayBackgroundGrid');
                 gridUtils._setElementToMaxZindex(backgroundGridEl, rowEl);
-                gridUtils._setElementToMaxZindex(self.$target[0], rowEl);
             }
 
-            // For loop to handle the cases where it is ne, nw, se or sw. Since there are two
-            // directions, we compute for both directions and we store the values in an array.
+            // For loop to handle the cases where it is ne, nw, se or sw. Since
+            // there are two directions, we compute for both directions and we
+            // store the values in an array.
             const directions = [];
             for (const [i, resize] of resizeVal.entries()) {
                 const props = {};
@@ -4308,16 +4350,17 @@ registry.sizing = SnippetOptionWidget.extend({
 
                 let changeTotal = false;
                 for (const dir of directions) {
-                    // dd is the number of pixels by which the mouse moved, compared to the
-                    // initial position of the handle.
+                    // dd is the number of pixels by which the mouse moved,
+                    // compared to the initial position of the handle.
                     const dd = ev['page' + dir.XY] - dir.xy + dir.resize[1][dir.begin];
                     const next = dir.current + (dir.current + 1 === dir.resize[1].length ? 0 : 1);
                     const prev = dir.current ? (dir.current - 1) : 0;
 
                     let change = false;
-                    // If the mouse moved to the right/down by at least 2/3 of the space between the
-                    // previous and the next steps, the handle is snapped to the next step and the
-                    // class is replaced by the one matching this step.
+                    // If the mouse moved to the right/down by at least 2/3 of
+                    // the space between the previous and the next steps, the
+                    // handle is snapped to the next step and the class is
+                    // replaced by the one matching this step.
                     if (dd > (2 * dir.resize[1][next] + dir.resize[1][dir.current]) / 3) {
                         self.$target.attr('class', (self.$target.attr('class') || '').replace(dir.regClass, ''));
                         self.$target.addClass(dir.resize[0][next]);
@@ -4351,14 +4394,13 @@ registry.sizing = SnippetOptionWidget.extend({
                 $handle.removeClass('o_active');
 
                 // If we are in grid mode, removes the background grid.
-                // Also sync the col-* class with the g-col-* class so the toggle to normal mode
-                // and the mobile view are well done.
+                // Also sync the col-* class with the g-col-* class so the
+                // toggle to normal mode and the mobile view are well done.
                 if (rowEl.classList.contains('o_grid_mode')) {
                     self.options.wysiwyg.odooEditor.observerUnactive('displayBackgroundGrid');
                     backgroundGridEl.remove();
                     self.options.wysiwyg.odooEditor.observerActive('displayBackgroundGrid');
                     gridUtils._resizeGrid(rowEl);
-                    gridUtils._setElementToMaxZindex(self.$target[0], rowEl);
 
                     const colClass = [...self.$target[0].classList].find(c => /^col-/.test(c));
                     const gColClass = [...self.$target[0].classList].find(c => /^g-col-/.test(c));
@@ -4379,6 +4421,8 @@ registry.sizing = SnippetOptionWidget.extend({
                 setTimeout(function () {
                     self.options.wysiwyg.odooEditor.historyStep();
                 }, 0);
+
+                self.options.wysiwyg.odooEditor.automaticStepActive('resizing');
             };
             $body.on('mousemove', bodyMouseMove);
             $body.on('mouseup', bodyMouseUp);
@@ -4420,37 +4464,37 @@ registry.sizing = SnippetOptionWidget.extend({
     async updateUIVisibility() {
         await this._super(...arguments);
 
-        const isMobileView = this.$target[0].ownerDocument.defaultView.frameElement.clientWidth < 768;
+        const mobileViewThreshold = MEDIAS_BREAKPOINTS[SIZES.LG].minWidth;
+        const isMobileView = this.$target[0].ownerDocument.defaultView.frameElement.clientWidth < mobileViewThreshold;
         const isGrid = this.$target[0].classList.contains('o_grid_item');
-        if (this.$target[0].parentNode.classList.contains('row')) {
-            // Hiding/showing the correct resize handles if we are in grid mode or not.
-            for (const handle of this.$handles) {
-                const isGridHandle = handle.classList.contains('o_grid_handle');
-                handle.classList.toggle('d-none', isGrid ^ isGridHandle);
+        if (this.$target[0].parentNode && this.$target[0].parentNode.classList.contains('row')) {
+            // Hiding/showing the correct resize handles if we are in grid mode
+            // or not.
+            for (const handleEl of this.$handles) {
+                const isGridHandle = handleEl.classList.contains('o_grid_handle');
+                handleEl.classList.toggle('d-none', isGrid ^ isGridHandle);
                 // Disabling the resize if we are in mobile view.
-                handle.classList.toggle('readonly', isMobileView && isGridHandle);
+                handleEl.classList.toggle('readonly', isMobileView && isGridHandle);
             }
 
-            // Hiding the move handle for some snippets so we can't drag them and
-            // so we can't toggle grid mode.
-            const moveHandle = this.$overlay[0].querySelector('.o_move_handle');
-            const untoggleableColumns = '.s_masonry_block, .s_showcase, .s_features_grid, .s_website_form, .s_color_blocks_2';
-            const disableToggle = this.$target[0].closest(untoggleableColumns);
-            moveHandle.classList.toggle('d-none', disableToggle || isMobileView);
+            // Hiding the move handle in mobile view so we can't drag the
+            // columns.
+            const moveHandleEl = this.$overlay[0].querySelector('.o_move_handle');
+            moveHandleEl.classList.toggle('d-none', isMobileView);
 
             // Hiding/showing the arrows.
             if (isGrid) {
-                const moveLeftArrow = this.$overlay[0].querySelector('.fa-angle-left');
-                const moveRightArrow = this.$overlay[0].querySelector('.fa-angle-right');
+                const moveLeftArrowEl = this.$overlay[0].querySelector('.fa-angle-left');
+                const moveRightArrowEl = this.$overlay[0].querySelector('.fa-angle-right');
                 const showLeft = await this._computeWidgetVisibility('move_left_opt');
                 const showRight = await this._computeWidgetVisibility('move_right_opt');
-                moveLeftArrow.classList.toggle('d-none', !showLeft);
-                moveRightArrow.classList.toggle('d-none', !showRight);
+                moveLeftArrowEl.classList.toggle('d-none', !showLeft);
+                moveRightArrowEl.classList.toggle('d-none', !showRight);
             }
 
             // Show/hide the buttons to send back/front a grid item.
-            const bringFrontBack = this.$overlay[0].querySelectorAll('.o_front_back');
-            bringFrontBack.forEach(button => button.classList.toggle('d-none', !isGrid || isMobileView));
+            const bringFrontBackEls = this.$overlay[0].querySelectorAll('.o_front_back');
+            bringFrontBackEls.forEach(button => button.classList.toggle('d-none', !isGrid || isMobileView));
         }
     },
 
@@ -4608,24 +4652,35 @@ registry['sizing_x'] = registry.sizing.extend({
      * @override
      */
     _onResize: function (compass, beginClass, current) {
-        if (compass === 'w') {
-            // don't change the right border position when we change the offset (replace col size)
-            var beginCol = Number(beginClass.match(/col-lg-([0-9]+)|$/)[1] || 0);
-            var beginOffset = Number(beginClass.match(/offset-lg-([0-9-]+)|$/)[1] || beginClass.match(/offset-xl-([0-9-]+)|$/)[1] || 0);
-            var offset = Number(this.grid.w[0][current].match(/offset-lg-([0-9-]+)|$/)[1] || 0);
-            if (offset < 0) {
-                offset = 0;
-            }
-            var colSize = beginCol - (offset - beginOffset);
-            if (colSize <= 0) {
-                colSize = 1;
-                offset = beginOffset + beginCol - 1;
-            }
-            this.$target.attr('class', this.$target.attr('class').replace(/\s*(offset-xl-|offset-lg-|col-lg-)([0-9-]+)/g, ''));
+        if (compass === 'w' || compass === 'e') {
+            const beginOffset = Number(beginClass.match(/offset-lg-([0-9-]+)|$/)[1] || beginClass.match(/offset-xl-([0-9-]+)|$/)[1] || 0);
 
-            this.$target.addClass('col-lg-' + (colSize > 12 ? 12 : colSize));
-            if (offset > 0) {
-                this.$target.addClass('offset-lg-' + offset);
+            if (compass === 'w') {
+                // don't change the right border position when we change the offset (replace col size)
+                var beginCol = Number(beginClass.match(/col-lg-([0-9]+)|$/)[1] || 0);
+                var offset = Number(this.grid.w[0][current].match(/offset-lg-([0-9-]+)|$/)[1] || 0);
+                if (offset < 0) {
+                    offset = 0;
+                }
+                var colSize = beginCol - (offset - beginOffset);
+                if (colSize <= 0) {
+                    colSize = 1;
+                    offset = beginOffset + beginCol - 1;
+                }
+                this.$target.attr('class', this.$target.attr('class').replace(/\s*(offset-xl-|offset-lg-|col-lg-)([0-9-]+)/g, ''));
+
+                this.$target.addClass('col-lg-' + (colSize > 12 ? 12 : colSize));
+                if (offset > 0) {
+                    this.$target.addClass('offset-lg-' + offset);
+                }
+            } else if (beginOffset > 0) {
+                const endCol = Number(this.grid.e[0][current].match(/col-lg-([0-9]+)|$/)[1] || 0);
+                // Avoids overflowing the grid to the right if the
+                // column size + the offset exceeds 12.
+                if ((endCol + beginOffset) > 12) {
+                    this.$target[0].className = this.$target[0].className.replace(/\s*(col-lg-)([0-9-]+)/g, '');
+                    this.$target[0].classList.add('col-lg-' + (12 - beginOffset));
+                }
             }
         }
         this._super.apply(this, arguments);
@@ -4916,7 +4971,8 @@ registry.layout_column = SnippetOptionWidget.extend({
                 this.trigger_up('activate_snippet', {$snippet: this.$target});
             }
         } else {
-            // Toggle normal mode only if grid mode was activated (as it's in normal mode by default).
+            // Toggle normal mode only if grid mode was activated (as it's in
+            // normal mode by default).
             const rowEl = this.$target[0].querySelector('.row');
             if (rowEl && rowEl.classList.contains('o_grid_mode')) {
                 this._toggleNormalMode(rowEl);
@@ -4937,8 +4993,9 @@ registry.layout_column = SnippetOptionWidget.extend({
         const rowEl = this.$target[0].querySelector('.row');
         const elementType = widgetValue;
 
-        // If it has been less than 15 seconds that we have added an element, shift the new element
-        // right and down by one cell. Otherwise, put it on the top left corner.
+        // If it has been less than 15 seconds that we have added an element,
+        // shift the new element right and down by one cell. Otherwise, put it
+        // on the top left corner.
         const currentTime = new Date().getTime();
         if (this.lastAddTime && (currentTime - this.lastAddTime) / 1000 < 15) {
             this.lastStartPosition = [this.lastStartPosition[0] + 1, this.lastStartPosition[1] + 1];
@@ -4948,49 +5005,47 @@ registry.layout_column = SnippetOptionWidget.extend({
         this.lastAddTime = currentTime;
 
         // Create the new column.
-        const newColumn = document.createElement('div');
-        newColumn.classList.add('o_grid_item');
+        const newColumnEl = document.createElement('div');
+        newColumnEl.classList.add('o_grid_item');
         let numberColumns, numberRows;
 
         if (elementType === 'image') {
             // Set the columns properties.
-            newColumn.classList.add('col-lg-6', 'g-col-lg-6', 'g-height-6');
+            newColumnEl.classList.add('col-lg-6', 'g-col-lg-6', 'g-height-6', 'o_grid_item_image');
             numberColumns = 6;
             numberRows = 6;
 
             // Create a default image and add it to the new column.
-            const img = document.createElement('img');
-            img.classList.add('img', 'img-fluid', 'mx-auto');
-            img.src = '/web/image/website.s_text_image_default_image';
-            img.alt = '';
-            img.loading = 'lazy';
+            const imgEl = document.createElement('img');
+            imgEl.classList.add('img', 'img-fluid', 'mx-auto');
+            imgEl.src = '/web/image/website.s_text_image_default_image';
+            imgEl.alt = '';
+            imgEl.loading = 'lazy';
 
-            newColumn.appendChild(img);
-
+            newColumnEl.appendChild(imgEl);
         } else if (elementType === 'text') {
-            newColumn.classList.add('col-lg-4', 'g-col-lg-4', 'g-height-2');
+            newColumnEl.classList.add('col-lg-4', 'g-col-lg-4', 'g-height-2');
             numberColumns = 4;
             numberRows = 2;
 
             // Create default text content.
-            const p = document.createElement('p');
-            p.classList.add('o_default_snippet_text');
-            p.textContent = _t("Write something...");
+            const pEl = document.createElement('p');
+            pEl.classList.add('o_default_snippet_text');
+            pEl.textContent = _t("Write something...");
 
-            newColumn.appendChild(p);
-
+            newColumnEl.appendChild(pEl);
         } else if (elementType === 'button') {
-            newColumn.classList.add('col-lg-2', 'g-col-lg-2', 'g-height-1');
+            newColumnEl.classList.add('col-lg-2', 'g-col-lg-2', 'g-height-1');
             numberColumns = 2;
             numberRows = 1;
 
             // Create default button.
-            const a = document.createElement('a');
-            a.href = '#';
-            a.classList.add('mb-2', 'btn', 'btn-primary');
-            a.textContent = "Button";
+            const aEl = document.createElement('a');
+            aEl.href = '#';
+            aEl.classList.add('mb-2', 'btn', 'btn-primary');
+            aEl.textContent = "Button";
 
-            newColumn.appendChild(a);
+            newColumnEl.appendChild(aEl);
         }
         // Place the column in the grid.
         const rowStart = this.lastStartPosition[0];
@@ -4999,15 +5054,15 @@ registry.layout_column = SnippetOptionWidget.extend({
             columnStart = 1;
             this.lastStartPosition[1] = columnStart;
         }
-        newColumn.style.gridArea = `${rowStart} / ${columnStart} / ${rowStart + numberRows} / ${columnStart + numberColumns}`;
+        newColumnEl.style.gridArea = `${rowStart} / ${columnStart} / ${rowStart + numberRows} / ${columnStart + numberColumns}`;
 
         // Setting the z-index to the maximum of the grid.
-        gridUtils._setElementToMaxZindex(newColumn, rowEl);
+        gridUtils._setElementToMaxZindex(newColumnEl, rowEl);
 
         // Add the new column and update the grid height.
-        rowEl.appendChild(newColumn);
+        rowEl.appendChild(newColumnEl);
         gridUtils._resizeGrid(rowEl);
-        this.trigger_up('activate_snippet', {$snippet: $(newColumn)});
+        this.trigger_up('activate_snippet', {$snippet: $(newColumnEl)});
     },
 
     //--------------------------------------------------------------------------
@@ -5020,7 +5075,6 @@ registry.layout_column = SnippetOptionWidget.extend({
     _computeWidgetState: function (methodName, params) {
         if (methodName === 'selectCount') {
             return this.$('> .row').children().length;
-
         } else if (methodName === 'selectLayout') {
             const rowEl = this.$target[0].querySelector('.row');
             if (rowEl && rowEl.classList.contains('o_grid_mode')) {
@@ -5092,18 +5146,16 @@ registry.layout_column = SnippetOptionWidget.extend({
     _toggleNormalMode(rowEl) {
         // Removing the grid class
         rowEl.classList.remove('o_grid_mode');
-
-        const columns = rowEl.children;
-        for (const column of columns) {
-            // Reload the images.
-            gridUtils._reloadLazyImages(column);
+        const columnEls = rowEl.children;
+        for (const columnEl of columnEls) {
+            // Reloading the images.
+            gridUtils._reloadLazyImages(columnEl);
 
             // Removing the grid properties.
-            column.classList.remove('o_grid_item');
-            column.style.removeProperty('grid-area');
-            column.style.removeProperty('z-index');
+            columnEl.classList.remove('o_grid_item', 'o_grid_item_image', 'o_grid_item_image_contain');
+            columnEl.style.removeProperty('grid-area');
+            columnEl.style.removeProperty('z-index');
         }
-
         // Removing the grid properties.
         delete rowEl.dataset.rowCount;
 
@@ -5129,17 +5181,6 @@ registry.SnippetMove = SnippetOptionWidget.extend({
         $overlayArea.prepend($buttons[0]);
 
         return this._super(...arguments);
-    },
-    /**
-     * @override
-     */
-    onFocus: function () {
-        // TODO improve this: hack to hide options section if snippet move is
-        // the only one.
-        const $allOptions = this.$el.parent();
-        if ($allOptions.find('we-customizeblock-option').length <= 1) {
-            $allOptions.addClass('d-none');
-        }
     },
 
     //--------------------------------------------------------------------------
@@ -5216,9 +5257,7 @@ registry.ReplaceMedia = SnippetOptionWidget.extend({
      * @see this.selectClass for parameters
      */
     async replaceMedia() {
-        // TODO for now, this simulates a double click on the media,
-        // to be refactored when the new editor is merged
-        this.$target.dblclick();
+        this.options.wysiwyg.openMediaDialog({ node: this.$target[0] });
     },
     /**
      * Makes the image a clickable link by wrapping it in an <a>.
@@ -6577,6 +6616,17 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
     /**
      * @override
      */
+    onBuilt() {
+        this._patchShape(this.$target[0]);
+    },
+
+    //--------------------------------------------------------------------------
+    // Public
+    //--------------------------------------------------------------------------
+
+    /**
+     * @override
+     */
     updateUI() {
         if (this.rerender) {
             this.rerender = false;
@@ -6716,7 +6766,7 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
 
         const shapeContainer = target.querySelector(':scope > .o_we_shape');
         if (shapeContainer) {
-            shapeContainer.remove();
+            this._removeShapeEl(shapeContainer);
         }
         if (newContainer) {
             const preShapeLayerElement = this._getLastPreShapeLayerElement();
@@ -6813,6 +6863,13 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
             this.prevShapeContainer = shapeContainer.cloneNode(true);
             this.prevShape = target.dataset.oeShapeData;
         }
+    },
+    /**
+     * @private
+     * @param {HTMLElement} shapeEl
+     */
+    _removeShapeEl(shapeEl) {
+        shapeEl.remove();
     },
     /**
      * Overwrites shape properties with the specified data.
@@ -6943,6 +7000,22 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
         return _.pick(colors, defaultKeys);
     },
     /**
+     * @todo remove me in master, needed to patch errors on set-up shapes in
+     * themes.
+     *
+     * @param {HTMLElement} el
+     * @returns {Object}
+     */
+    _patchShape(el) {
+        const shapeData = this._getShapeData(el);
+        // Wrong shape data for s_picture in kea theme
+        if (shapeData.shape === 'web_editor/Origins/Wavy_03') {
+            shapeData.shape = 'web_editor/Wavy/03';
+            el.dataset.oeShapeData = JSON.stringify(shapeData);
+        }
+        return shapeData;
+    },
+    /**
      * Toggles whether there is a shape or not, to be called from bg toggler.
      *
      * @private
@@ -6957,11 +7030,17 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
             const possibleShapes = shapeWidget.getMethodsParams('shape').possibleValues;
             let shapeToSelect;
             if (previousSibling) {
-                const previousShape = this._getShapeData(previousSibling).shape;
+                const shapeData = this._patchShape(previousSibling);
+                const previousShape = shapeData.shape;
                 shapeToSelect = possibleShapes.find((shape, i) => {
                     return possibleShapes[i - 1] === previousShape;
                 });
-            } else {
+            }
+            // If there is no previous sibling, if the previous sibling had the
+            // last shape selected or if the previous shape could not be found
+            // in the possible shapes, default to the first shape. ([0] being no
+            // shapes selected.)
+            if (!shapeToSelect) {
                 shapeToSelect = possibleShapes[1];
             }
             this.trigger_up('snippet_edition_request', {exec: () => {
@@ -7236,7 +7315,7 @@ registry.BackgroundPosition = SnippetOptionWidget.extend({
     _onDragBackgroundStart: function (ev) {
         ev.preventDefault();
         this.$bgDragger.addClass('o_we_grabbing');
-        const $document = $(document);
+        const $document = $(this.$target[0].ownerDocument);
         $document.on('mousemove.bgposition', this._onDragBackgroundMove.bind(this));
         $document.one('mouseup', () => {
             this.$bgDragger.removeClass('o_we_grabbing');
@@ -7573,6 +7652,20 @@ registry.SnippetSave = SnippetOptionWidget.extend({
                 ]
             });
         });
+    },
+
+    //--------------------------------------------------------------------------
+    // Private
+    //--------------------------------------------------------------------------
+
+    /**
+     * TODO adapt in master, this option should only be instantiated for real
+     * snippets in the first place.
+     *
+     * @override
+     */
+    _computeVisibility() {
+        return this.$target[0].hasAttribute('data-snippet');
     },
 });
 

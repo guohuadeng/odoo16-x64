@@ -118,8 +118,6 @@ QUnit.module("Fields", (hooks) => {
             "should have one grey status since selection is the first, normal state"
         );
 
-        // switch to edit mode and check the result
-        await click(target.querySelector(".o_form_button_edit"));
         assert.containsNone(target, ".dropdown-menu", "there should still not be a dropdown");
         assert.containsNone(
             target,
@@ -190,7 +188,6 @@ QUnit.module("Fields", (hooks) => {
         });
 
         assert.hasClass(target.querySelector(".o_field_state_selection"), "o_readonly_modifier");
-        assert.hasClass(target.querySelector(".o_field_state_selection button"), "disabled");
         assert.isNotVisible(target.querySelector(".dropdown-menu"));
         await click(target, ".o_field_state_selection span.o_status");
         assert.isNotVisible(target.querySelector(".dropdown-menu"));

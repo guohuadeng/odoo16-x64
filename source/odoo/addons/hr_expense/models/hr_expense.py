@@ -58,7 +58,7 @@ class HrExpense(models.Model):
     product_id = fields.Many2one('product.product', string='Category', tracking=True, states={'done': [('readonly', True)]}, domain="[('can_be_expensed', '=', True), '|', ('company_id', '=', False), ('company_id', '=', company_id)]", ondelete='restrict')
     product_description = fields.Html(compute='_compute_product_description')
     product_uom_id = fields.Many2one('uom.uom', string='Unit of Measure', compute='_compute_from_product_id_company_id',
-        store=True, precompute=True, copy=True, states={'draft': [('readonly', False)], 'refused': [('readonly', False)]},
+        store=True, precompute=True, copy=True, readonly=True,
         domain="[('category_id', '=', product_uom_category_id)]")
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', readonly=True, string="UoM Category")
     unit_amount = fields.Float("Unit Price", compute='_compute_from_product_id_company_id', readonly=False, store=True, precompute=True, required=True, copy=True,
@@ -129,7 +129,7 @@ class HrExpense(models.Model):
         date_today = fields.Date.context_today(self.env.user)
         for expense in self:
             target_currency = expense.currency_id or self.env.company.currency_id
-            expense.currency_rate = self.env['res.currency']._get_conversion_rate(
+            expense.currency_rate = expense.company_id and self.env['res.currency']._get_conversion_rate(
                 from_currency=target_currency,
                 to_currency=expense.company_currency_id,
                 company=expense.company_id,
@@ -307,16 +307,15 @@ class HrExpense(models.Model):
                 expenses = expenses - exp
 
     @api.depends('product_id', 'account_id')
-    def _compute_analytic_distribution_stored_char(self):
+    def _compute_analytic_distribution(self):
         for expense in self:
-            distribution = self.env['account.analytic.distribution.model']._get_distributionjson({
+            distribution = self.env['account.analytic.distribution.model']._get_distribution({
                 'product_id': expense.product_id.id,
                 'product_categ_id': expense.product_id.categ_id.id,
                 'account_prefix': expense.account_id.code,
                 'company_id': expense.company_id.id,
             })
-            expense.analytic_distribution_stored_char = distribution or expense.analytic_distribution_stored_char
-            expense._compute_analytic_distribution()
+            expense.analytic_distribution = distribution or expense.analytic_distribution
 
     @api.constrains('payment_mode')
     def _check_payment_mode(self):
@@ -347,7 +346,7 @@ class HrExpense(models.Model):
 
         product = self.env['product.product'].search([('can_be_expensed', '=', True)])
         if product:
-            product = product.filtered(lambda p: p.default_code == "EXP_GEN") or product[0]
+            product = product.filtered(lambda p: p.default_code == "EXP_GEN")[:1] or product[0]
         else:
             raise UserError(_("You need to have at least one category that can be expensed in your database to proceed!"))
 
@@ -591,6 +590,7 @@ Or send your receipts at <a href="mailto:%(email)s?subject=Lunch%%20with%%20cust
                 ).id,
                 'move_type': 'in_receipt',
                 'company_id': sheet.company_id.id,
+                'partner_id': sheet.employee_id.sudo().address_home_id.commercial_partner_id.id,
                 'date': sheet.accounting_date or fields.Date.context_today(sheet),
                 'invoice_date': sheet.accounting_date or fields.Date.context_today(sheet),
                 'ref': sheet.name,
@@ -601,8 +601,9 @@ Or send your receipts at <a href="mailto:%(email)s?subject=Lunch%%20with%%20cust
                 'line_ids':[
                     Command.create({
                         'name': expense.employee_id.name + ': ' + expense.name.split('\n')[0][:64],
+                        'account_id': expense.account_id.id,
                         'quantity': expense.quantity or 1,
-                        'price_unit': expense.total_amount,
+                        'price_unit': expense.unit_amount if expense.unit_amount != 0 else expense.total_amount,
                         'product_id': expense.product_id.id,
                         'product_uom_id': expense.product_uom_id.id,
                         'analytic_distribution': expense.analytic_distribution,
@@ -680,6 +681,9 @@ Or send your receipts at <a href="mailto:%(email)s?subject=Lunch%%20with%%20cust
             ('user_id.email', 'ilike', email_address)
         ], limit=1)
 
+        if not employee:
+            return super().message_new(msg_dict, custom_values=custom_values)
+
         expense_description = msg_dict.get('subject', '')
 
         if employee.user_id:
@@ -742,15 +746,16 @@ Or send your receipts at <a href="mailto:%(email)s?subject=Lunch%%20with%%20cust
         symbols_pattern = '|'.join(symbols)
         price_pattern = "((%s)?\s?%s\s?(%s)?)" % (symbols_pattern, float_pattern, symbols_pattern)
         matches = re.findall(price_pattern, expense_description)
+        currency = currencies and currencies[0]
         if matches:
             match = max(matches, key=lambda match: len([group for group in match if group])) # get the longuest match. e.g. "2 chairs 120$" -> the price is 120$, not 2
             full_str = match[0]
             currency_str = match[1] or match[3]
             price = match[2].replace(',', '.')
 
-            if currency_str:
-                currency = currencies.filtered(lambda c: currency_str in [c.symbol, c.name])[0]
-                currency = currency or currencies[0]
+            if currency_str and currencies:
+                currencies = currencies.filtered(lambda c: currency_str in [c.symbol, c.name])
+                currency = (currencies and currencies[0]) or currency
             expense_description = expense_description.replace(full_str, ' ') # remove price from description
             expense_description = re.sub(' +', ' ', expense_description.strip())
 
@@ -1141,12 +1146,21 @@ class HrExpenseSheet(models.Model):
     def approve_expense_sheets(self):
         self._check_can_approve()
 
+        self._validate_analytic_distribution()
         duplicates = self.expense_line_ids.duplicate_expense_ids.filtered(lambda exp: exp.state in ['approved', 'done'])
         if duplicates:
             action = self.env["ir.actions.act_window"]._for_xml_id('hr_expense.hr_expense_approve_duplicate_action')
             action['context'] = {'default_sheet_ids': self.ids, 'default_expense_ids': duplicates.ids}
             return action
         self._do_approve()
+
+    def _validate_analytic_distribution(self):
+        for line in self.expense_line_ids:
+            line._validate_distribution(**{
+                'account': line.account_id.id,
+                'business_domain': 'expense',
+                'company_id': line.company_id.id,
+            })
 
     def _do_approve(self):
         self._check_can_approve()

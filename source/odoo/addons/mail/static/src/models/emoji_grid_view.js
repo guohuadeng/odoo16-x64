@@ -7,17 +7,6 @@ import { clear, increment } from '@mail/model/model_field_command';
 registerModel({
     name: 'EmojiGridView',
     recordMethods: {
-        calculateDimensions() {
-            if (!this.containerRef.el || !this.viewBlockRef.el) {
-                return;
-            }
-            const fittingAmount = this.containerRef.el.clientHeight / this.rowHeight;
-            const amountToDisplay = fittingAmount + this.additionalRowsToRender;
-            this.update({
-                amountToDisplay,
-                scrollRecomputeCount: increment()
-            });
-        },
         doJumpToCategorySelectedByUser() {
             this.containerRef.el.scrollTo({
                 top: this.rowHeight * this.categorySelectedByUser.emojiGridRowView.index,
@@ -43,11 +32,10 @@ registerModel({
         },
         _onChangeScrollRecomputeCount() {
             for (const viewCategory of this.emojiPickerViewOwner.categories) {
-                const rowIndex = this.firstRenderedRowIndex + this.topBufferAmount;
                 if (
                     viewCategory.emojiGridRowView &&
-                    rowIndex >= viewCategory.emojiGridRowView.index &&
-                    (viewCategory.emojiPickerViewOwnerAsLastCategory || rowIndex <= viewCategory.endSectionIndex)
+                    this.scrollIndex >= viewCategory.emojiGridRowView.index &&
+                    (viewCategory.emojiPickerViewOwnerAsLastCategory || this.scrollIndex <= viewCategory.endSectionIndex)
                 ) {
                     this.emojiPickerViewOwner.update({ activeCategoryByGridViewScroll: viewCategory });
                     break;
@@ -64,24 +52,25 @@ registerModel({
         },
     },
     fields: {
-        additionalRowsToRender: attr({
-            default: 4,
-        }),
         amountOfItemsPerRow: attr({
             default: 9,
         }),
-        amountToDisplay: attr({
-            default: 50,
-        }),
         categorySelectedByUser: one('EmojiPickerView.Category'),
         containerRef: attr(),
+        /**
+         * Distance of the rendered rows from top.
+         * This is from the PoV of 1st rendered row, including extra rendered rows!
+         */
         distanceFromTop: attr({
             compute() {
                 this.scrollRecomputeCount; // observe scroll changes
                 if (!this.listRef || !this.listRef.el) {
                     return clear();
                 }
-                return this.scrollPercentage * this.listRef.el.clientHeight;
+                return Math.max(
+                    (this.scrollPercentage * this.listRef.el.clientHeight - this.extraRenderRowsAmount * this.rowHeight),
+                    0,
+                );
             },
             default: 0,
         }),
@@ -95,21 +84,30 @@ registerModel({
             identifying: true,
             inverse: 'emojiGridView',
         }),
+        /**
+         * Extra rows above and below the visible part.
+         * 10 means 10 rows above and 10 rows below.
+         */
+        extraRenderRowsAmount: attr({
+            default: 10,
+        }),
         firstRenderedRowIndex: attr({
             compute() {
                 this.scrollRecomputeCount; // observe scroll changes
-                let value;
-                if (this.scrollIndex - this.amountToDisplay >= this.rows.length) {
-                    value = this.scrollIndex - this.amountToDisplay;
-                } else {
-                    value = this.scrollIndex;
-                }
-                return Math.floor(value);
+                return Math.max(
+                    this.scrollIndex - this.extraRenderRowsAmount,
+                    0,
+                );
             },
             default: 0,
         }),
         height: attr({
-            default: "275px",
+            compute() {
+                return this.rowHeight * 9.5;
+            },
+        }),
+        hoveredEmojiView: one('EmojiView', {
+            inverse: 'emojiGridViewAsHovered',
         }),
         itemWidth: attr({
             default: 30,
@@ -118,12 +116,12 @@ registerModel({
             compute() {
                 this.scrollRecomputeCount; // observe scroll changes
                 let value;
-                if (this.firstRenderedRowIndex + this.amountToDisplay >= this.rows.length) {
+                if (this.firstRenderedRowIndex + this.renderedMaxAmount >= this.rows.length) {
                     value = Math.max(this.rows.length - 1, 0);
                 } else {
-                    value = this.firstRenderedRowIndex + this.amountToDisplay;
+                    value = this.firstRenderedRowIndex + this.renderedMaxAmount;
                 }
-                return Math.floor(value);
+                return Math.ceil(value);
             },
             default: 0,
         }),
@@ -134,6 +132,15 @@ registerModel({
             default: 0,
         }),
         listRef: attr(),
+        loadingScreenView: one('EmojiGridLoadingScreen', {
+            compute() {
+                if (!this.messaging.emojiRegistry.isLoaded) {
+                    return {};
+                }
+                return clear();
+            },
+            inverse: 'emojiGridViewOwner',
+        }),
         nonSearchRowRegistry: one('EmojiGridViewRowRegistry', {
             default: {},
             inverse: 'emojiGridViewOwnerAsNonSearch',
@@ -143,6 +150,11 @@ registerModel({
                 return { func: () => this.update({ scrollRecomputeCount: increment() }) };
             },
             inverse: 'emojiGridViewAsOnScroll',
+        }),
+        renderedMaxAmount: attr({
+            compute() {
+                return this.extraRenderRowsAmount * 2 + Math.ceil(this.visibleMaxAmount);
+            },
         }),
         renderedRows: many('EmojiGridRowView', {
             compute() {
@@ -158,11 +170,7 @@ registerModel({
                     .filter(row => row !== undefined) // some corner cases where very briefly it doesn't sync with rows and it's bigger
                 );
             },
-            sort() {
-                return [
-                    ['smaller-first', 'index'],
-                ];
-            },
+            sort: [['smaller-first', 'index']],
         }),
         rowHeight: attr({
             default: 30,
@@ -175,13 +183,19 @@ registerModel({
                 return this.nonSearchRowRegistry.rows;
             },
         }),
+        /**
+         * Scroll index of the 1st visible rendered rows (so excluding the extra rendered rendered rows).
+         */
         scrollIndex: attr({
             compute() {
                 this.scrollRecomputeCount; // observe scroll changes
-                return (this.scrollPercentage * this.rows.length);
+                return Math.floor(this.scrollPercentage * this.rows.length);
             },
             default: 0,
         }),
+        /**
+         * Scroll percentage of the 1st visible rendered rows.
+         */
         scrollPercentage: attr({
             compute() {
                 this.scrollRecomputeCount; // observe scroll changes
@@ -211,13 +225,18 @@ registerModel({
             default: {},
             inverse: 'emojiGridViewOwnerAsSearch',
         }),
-        topBufferAmount: attr({
-            default: 2,
-        }),
         viewBlockRef: attr(),
+        /**
+         * Amount of emoji that are visibly rendered in emoji grid.
+         * Decimal determines the partial visibility of the last emoji.
+         * For example, 9.5 means 9 emojis fully visible, and the last is half visible.
+         */
+        visibleMaxAmount: attr({
+            default: 9.5,
+        }),
         width: attr({
             compute() {
-                return `${this.itemWidth * this.amountOfItemsPerRow + this.scrollbarThresholdWidth}px`;
+                return this.itemWidth * this.amountOfItemsPerRow + this.scrollbarThresholdWidth;
             },
         }),
     },

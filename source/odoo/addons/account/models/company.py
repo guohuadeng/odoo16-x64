@@ -71,7 +71,7 @@ class ResCompany(models.Model):
         ('included', 'On early payment'),
         ('excluded', 'Never'),
         ('mixed', 'Always (upon invoice)')
-    ], string='Cash Discount Tax Reduction', default='included', readonly=False)
+    ], string='Cash Discount Tax Reduction', readonly=False, store=True, compute='_compute_early_pay_discount_computation')
     transfer_account_code_prefix = fields.Char(string='Prefix of the transfer accounts')
     account_sale_tax_id = fields.Many2one('account.tax', string="Default Sale Tax")
     account_purchase_tax_id = fields.Many2one('account.tax', string="Default Purchase Tax")
@@ -83,12 +83,12 @@ class ResCompany(models.Model):
     income_currency_exchange_account_id = fields.Many2one(
         comodel_name='account.account',
         string="Gain Exchange Rate Account",
-        domain="[('account_type', 'not in', ('asset_receivable','liability_payable','asset_cash', 'liability_credit_card')), ('deprecated', '=', False), ('company_id', '=', id), \
+        domain="[('deprecated', '=', False), ('company_id', '=', id), \
                 ('account_type', 'in', ('income', 'income_other'))]")
     expense_currency_exchange_account_id = fields.Many2one(
         comodel_name='account.account',
         string="Loss Exchange Rate Account",
-        domain="[('account_type', 'not in', ('asset_receivable','liability_payable','asset_cash', 'liability_credit_card')), ('deprecated', '=', False), ('company_id', '=', id), \
+        domain="[('deprecated', '=', False), ('company_id', '=', id), \
                 ('account_type', '=', 'expense')]")
     anglo_saxon_accounting = fields.Boolean(string="Use anglo-saxon accounting")
     property_stock_account_input_categ_id = fields.Many2one('account.account', string="Input Account for Stock Valuation")
@@ -671,3 +671,13 @@ class ResCompany(models.Model):
 
         return {'date_from': datetime(year=current_date.year, month=1, day=1).date(),
                 'date_to': datetime(year=current_date.year, month=12, day=31).date()}
+
+    @api.depends('country_code')
+    def _compute_early_pay_discount_computation(self):
+        for company in self:
+            if company.country_code == 'BE':
+                company.early_pay_discount_computation = 'mixed'
+            elif company.country_code == 'NL':
+                company.early_pay_discount_computation = 'excluded'
+            else:
+                company.early_pay_discount_computation = 'included'

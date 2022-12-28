@@ -158,14 +158,14 @@
                 </div>
 
                 <page name="internal_notes" position="inside">
-                    <t groups="account.group_account_invoice,account.group_account_readonly">
-                        <group colspan="2" col="2" groups="account.group_warning_account">
-                            <separator string="Warning on the Invoice" colspan="4"/>
-                            <field name="invoice_warn" nolabel="1" />
-                            <field name="invoice_warn_msg" colspan="3" nolabel="1"
+                    <group groups="account.group_account_invoice,account.group_account_readonly">
+                        <group groups="account.group_warning_account" col="2">
+                            <separator string="Warning on the Invoice" colspan="2"/>
+                            <field name="invoice_warn" nolabel="1" colspan="2" required="1"/>
+                            <field name="invoice_warn_msg" placeholder="Type a message..." colspan="2" nolabel="1"
                                 attrs="{'required':[('invoice_warn','!=', False), ('invoice_warn','!=','no-message')], 'invisible':[('invoice_warn','in',(False,'no-message'))]}"/>
                         </group>
-                    </t>
+                    </group>
                 </page>
             </field>
         </record>
@@ -230,8 +230,8 @@
                                    groups="account.group_account_invoice,account.group_account_readonly"
                                    attrs="{'invisible': [('show_credit_limit', '=', False)]}">
                                 <field name="credit"/>
-                                <div name="partner_credit_limit" colspan="2" class="o_checkbox_optional_field">
-                                    <label for="use_partner_credit_limit"/>
+                                <label for="use_partner_credit_limit"/>
+                                <div class="o_row">
                                     <field name="use_partner_credit_limit"/>
                                     <field name="credit_limit" class="oe_inline" attrs="{'invisible': [('use_partner_credit_limit', '=', False)]}"/>
                                 </div>

@@ -3,6 +3,7 @@
 
 from collections import defaultdict
 from odoo import _, models
+import base64
 
 class PosOrder(models.Model):
     _inherit = 'pos.order'
@@ -74,7 +75,7 @@ class PosOrder(models.Model):
         } for p in coupons_to_create.values()]
 
         # Pos users don't have the create permission
-        new_coupons = self.env['loyalty.card'].sudo().create(coupon_create_vals)
+        new_coupons = self.env['loyalty.card'].with_context(action_no_send_mail=True).sudo().create(coupon_create_vals)
 
         # We update the gift card that we sold when the gift_card_settings = 'scan_use'.
         gift_cards_to_update = [v for v in coupon_data.values() if v.get('giftCardId')]
@@ -104,6 +105,8 @@ class PosOrder(models.Model):
                 coupon.points += coupon_data[coupon_new_id_map[coupon.id]]['points']
             for reward_code in coupon_data[coupon_new_id_map[coupon.id]].get('line_codes', []):
                 lines_per_reward_code[reward_code].coupon_id = coupon
+        # Send creation email
+        new_coupons.with_context(action_no_send_mail=False)._send_creation_communication()
         # Reports per program
         report_per_program = {}
         coupon_per_report = defaultdict(list)
@@ -144,3 +147,30 @@ class PosOrder(models.Model):
         fields = super(PosOrder, self)._get_fields_for_order_line()
         fields.extend(['is_reward_line', 'reward_id', 'coupon_id', 'reward_identifier_code', 'points_cost'])
         return fields
+
+    def _add_mail_attachment(self, name, ticket):
+        attachment = super()._add_mail_attachment(name, ticket)
+        gift_card_programs = self.config_id._get_program_ids().filtered(lambda p: p.program_type == 'gift_card' and
+                                                                                  p.pos_report_print_id)
+        if gift_card_programs:
+            gift_cards = self.env['loyalty.card'].search([('source_pos_order_id', '=', self.id),
+                                                          ('program_id', 'in', gift_card_programs.mapped('id'))])
+            if gift_cards:
+                for program in gift_card_programs:
+                    filtered_gift_cards = gift_cards.filtered(lambda gc: gc.program_id == program)
+                    if filtered_gift_cards:
+                        action_report = program.pos_report_print_id
+                        report = action_report._render_qweb_pdf(action_report.report_name, filtered_gift_cards.mapped('id'))
+                        filename = name + '.pdf'
+                        gift_card_pdf = self.env['ir.attachment'].create({
+                            'name': filename,
+                            'type': 'binary',
+                            'datas': base64.b64encode(report[0]),
+                            'store_fname': filename,
+                            'res_model': 'pos.order',
+                            'res_id': self.ids[0],
+                            'mimetype': 'application/x-pdf'
+                        })
+                        attachment += [(4, gift_card_pdf.id)]
+
+        return attachment

@@ -3,7 +3,7 @@
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
-from odoo.tools import float_compare
+from odoo.tools import float_compare, float_is_zero
 
 
 class StockScrap(models.Model):
@@ -52,12 +52,21 @@ class StockScrap(models.Model):
     scrap_location_id = fields.Many2one(
         'stock.location', 'Scrap Location', default=_get_default_scrap_location_id,
         domain="[('scrap_location', '=', True), ('company_id', 'in', [company_id, False])]", required=True, states={'done': [('readonly', True)]}, check_company=True)
-    scrap_qty = fields.Float('Quantity', default=1.0, required=True, states={'done': [('readonly', True)]}, digits='Product Unit of Measure')
+    scrap_qty = fields.Float(
+        'Quantity', required=True, states={'done': [('readonly', True)]}, digits='Product Unit of Measure',
+        compute='_compute_scrap_qty', precompute=True, readonly=False, store=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('done', 'Done')],
         string='Status', default="draft", readonly=True, tracking=True)
     date_done = fields.Datetime('Date', readonly=True)
+
+    @api.depends('move_id', 'move_id.move_line_ids.qty_done')
+    def _compute_scrap_qty(self):
+        self.scrap_qty = 1
+        for scrap in self:
+            if scrap.move_id:
+                scrap.scrap_qty = scrap.move_id.quantity_done
 
     @api.onchange('picking_id')
     def _onchange_picking_id(self):
@@ -114,6 +123,20 @@ class StockScrap(models.Model):
         if 'done' in self.mapped('state'):
             raise UserError(_('You cannot delete a scrap which is done.'))
 
+    # TODO: replace with computes in master
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if not vals.get('product_uom_id'):
+                vals['product_uom_id'] = self.env["product.product"].browse(vals.get('product_id')).uom_id.id
+        return super().create(vals_list)
+
+    # TODO: replace with computes in master
+    def write(self, vals):
+        if vals.get('product_id') and not vals.get('product_uom_id'):
+            vals['product_uom_id'] = self.env["product.product"].browse(vals.get('product_id')).uom_id.id
+        return super().write(vals)
+
     def _prepare_move_values(self):
         self.ensure_one()
         return {
@@ -162,6 +185,9 @@ class StockScrap(models.Model):
 
     def action_validate(self):
         self.ensure_one()
+        if float_is_zero(self.scrap_qty,
+                         precision_rounding=self.product_uom_id.rounding):
+            raise UserError(_('You can only enter positive quantities.'))
         if self.product_id.type != 'product':
             return self.do_scrap()
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')

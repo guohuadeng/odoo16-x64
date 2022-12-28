@@ -97,6 +97,7 @@ class Discussion(models.Model):
     important_emails = fields.One2many('test_new_api.emailmessage', 'discussion',
                                        domain=[('important', '=', True)])
 
+    history = fields.Json('History', default={'delete_messages': []})
     attributes_definition = fields.PropertiesDefinition('Message Properties')  # see message@attributes
 
     def _domain_very_important(self):
@@ -863,6 +864,7 @@ class MonetaryRelated(models.Model):
     monetary_id = fields.Many2one('test_new_api.monetary_base')
     currency_id = fields.Many2one('res.currency', related='monetary_id.base_currency_id')
     amount = fields.Monetary(related='monetary_id.amount')
+    total = fields.Monetary()
 
 
 class MonetaryCustom(models.Model):
@@ -1351,6 +1353,12 @@ class ComputeContainer(models.Model):
 
     name = fields.Char()
     member_ids = fields.One2many('test_new_api.compute.member', 'container_id')
+    member_count = fields.Integer(compute='_compute_member_count', store=True)
+
+    @api.depends('member_ids')
+    def _compute_member_count(self):
+        for record in self:
+            record.member_count = len(record.member_ids)
 
 
 class ComputeMember(models.Model):
@@ -1724,3 +1732,16 @@ class RelatedTranslation3(models.Model):
     parent_id = fields.Many2one('test_new_api.related_translation_2', string='Parent Model')
     name = fields.Char('Name Related', related='parent_id.name', readonly=False)
     html = fields.Html('HTML Related', related='parent_id.html', readonly=False)
+
+
+class IndexedTranslation(models.Model):
+    _name = 'test_new_api.indexed_translation'
+    _description = 'A model to indexed translated fields'
+
+    name = fields.Text('Name trigram', translate=True, index='trigram')
+
+class EmptyChar(models.Model):
+    _name = 'test_new_api.empty_char'
+    _description = 'A model to test emtpy char'
+
+    name = fields.Char('Name')

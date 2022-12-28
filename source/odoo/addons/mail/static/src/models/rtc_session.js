@@ -10,6 +10,7 @@ registerModel({
         _willDelete() {
             this._removeAudio();
             this._removeVideo();
+            this.messaging.browser.clearTimeout(this.connectionRecoveryTimeout);
         },
     },
     recordMethods: {
@@ -340,7 +341,6 @@ registerModel({
          */
         callParticipantCards: many('CallParticipantCard', {
             inverse: 'rtcSession',
-            isCausal: true,
         }),
         /**
          * States whether there is currently an error with the audio element.

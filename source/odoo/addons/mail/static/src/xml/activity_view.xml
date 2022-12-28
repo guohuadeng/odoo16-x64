@@ -61,8 +61,8 @@
     <t t-set="isCellHidden" t-value="activeFilter.resIds.length and !activeFilter.resIds.includes(resId) and activeFilter.activityTypeId === type[0]"/>
     <td t-if="activityGroup.state and !isCellHidden" t-att-data-res-id="resId" t-att-data-activity-type-id="type[0]"
         t-attf-class="o_activity_summary_cell {{activityGroup.state}} {{ activeFilter.resIds.includes(resId) ? 'o_activity_filter_' + activeFilter.state.value : '' }}">
-        <ActivityCellAdapter Component="widgetComponents.ActivityCell"
-            widgetArgs="['activity_ids', props.getKanbanActivityData(activityGroup, resId), { activityType: type[0] }]"/>
+        <ActivityCellAdapter Component="widgetComponents.KanbanActivity"
+            widgetArgs="['activity_ids', props.getKanbanActivityData(activityGroup, resId), { activityType: type[0], isActivityViewCell: true }]"/>
     </td>
     <td t-else="" t-att-data-res-id="resId" t-att-data-activity-type-id="type[0]"
         class="o_activity_summary_cell o_activity_empty_cell"
@@ -76,7 +76,7 @@
     <tfoot>
         <tr class="o_data_row">
             <td class="o_record_selector p-3" t-on-click.prevent.stop="() => this.trigger('schedule_activity')">
-                <span class="fa fa-plus pe-2"/><span>Schedule activity</span>
+                <span class="btn btn-link"><i class="fa fa-plus pe-2"/><span>Schedule activity</span></span>
             </td>
         </tr>
     </tfoot>
@@ -84,7 +84,7 @@
 
 <div t-name="mail.ActivityRenderer" class="o_activity_view" owl="1">
     <t t-if="!props.activity_types.length" t-call="web.NoContentHelper"/>
-    <table t-else="" class="table table-bordered mb-5">
+    <table t-else="" class="table table-bordered mb-5 bg-view">
         <t t-call="mail.ActivityViewHeader"/>
         <t t-call="mail.ActivityViewBody"/>
         <t t-call="mail.ActivityViewFooter"/>

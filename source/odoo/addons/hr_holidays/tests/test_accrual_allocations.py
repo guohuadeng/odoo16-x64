@@ -4,7 +4,6 @@ import datetime
 from freezegun import freeze_time
 from dateutil.relativedelta import relativedelta
 
-from odoo import fields
 from odoo.tests import tagged
 
 from odoo.addons.hr_holidays.tests.common import TestHrHolidaysCommon
@@ -19,6 +18,7 @@ class TestAccrualAllocations(TestHrHolidaysCommon):
             'name': 'Paid Time Off',
             'time_type': 'leave',
             'requires_allocation': 'yes',
+            'allocation_validation_type': 'officer',
         })
 
     def setAllocationCreateDate(self, allocation_id, date):

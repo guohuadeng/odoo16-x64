@@ -3,6 +3,7 @@ odoo.define('web.form_tests', function (require) {
 
 const AbstractField = require("web.AbstractField");
 var AbstractStorageService = require('web.AbstractStorageService');
+var basicFields = require('web.basic_fields');
 var BasicModel = require('web.BasicModel');
 var concurrency = require('web.concurrency');
 var core = require('web.core');
@@ -23,6 +24,7 @@ const widgetRegistryOwl = require('web.widgetRegistry');
 var Widget = require('web.Widget');
 const { registry } = require('@web/core/registry');
 const legacyViewRegistry = require('web.view_registry');
+const { registerCleanup } = require("@web/../tests/helpers/cleanup");
 
 var _t = core._t;
 var createView = testUtils.createView;
@@ -35,7 +37,7 @@ const { mapLegacyEnvToWowlEnv } = require("@web/legacy/utils");
 const { scrollerService } = require("@web/core/scroller_service");
 const { LegacyComponent } = require("@web/legacy/legacy_component");
 
-const { onMounted, onWillUnmount, xml } = owl;
+const { onMounted, onWillUnmount, xml } = require("@odoo/owl");
 
 let serverData;
 let target;
@@ -7680,6 +7682,44 @@ QUnit.module('LegacyViews', {
         form.destroy();
     });
 
+    QUnit.test('buttons with "confirm" attribute: click twice on "Ok"', async function (assert) {
+        assert.expect(7);
+
+        const form = await createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: `
+                <form>
+                    <header>
+                        <button name="post" class="p" string="Confirm" type="object" confirm="U sure?"/>
+                    </header>
+                </form>`,
+            mockRPC: function (route, args) {
+                assert.step(args.method);
+                return this._super.apply(this, arguments);
+            },
+            intercepts: {
+                execute_action: function (event) {
+                    assert.step('execute_action'); // should be called only once
+                    event.data.on_success();
+                },
+            },
+        });
+
+        assert.verifySteps(["onchange"]);
+
+        await testUtils.dom.click(form.$('.o_statusbar_buttons button'));
+        assert.verifySteps([]);
+
+        testUtils.dom.click($('.modal-footer button.btn-primary'));
+        await Promise.resolve();
+        await testUtils.dom.click($('.modal-footer button.btn-primary'));
+        assert.verifySteps(['create', 'read', 'execute_action']);
+
+        form.destroy();
+    });
+
     QUnit.test('buttons are disabled until action is resolved (in dialogs)', async function (assert) {
         assert.expect(3);
 
@@ -9436,6 +9476,9 @@ QUnit.module('LegacyViews', {
 
     QUnit.test('edit a record in readonly and switch to edit before it is actually saved', async function (assert) {
         assert.expect(3);
+
+        fieldRegistry.add("toggle_button", basicFields.FieldToggleBoolean);
+        registerCleanup(() => delete fieldRegistry.map.toggle_button);
 
         const prom = testUtils.makeTestPromise();
         const form = await createView({

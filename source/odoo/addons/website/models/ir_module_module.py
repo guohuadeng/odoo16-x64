@@ -75,7 +75,7 @@ class IrModuleModule(models.Model):
 
                     -> We want to upgrade every website using this theme.
         """
-        if request and request.context.get('apply_new_theme'):
+        if request and request.db and request.context.get('apply_new_theme'):
             self = self.with_context(apply_new_theme=True)
 
         for module in self:
@@ -399,8 +399,8 @@ class IrModuleModule(models.Model):
             result = active_todo.action_launch()
         else:
             result = website.button_go_website(mode_edit=True)
-        if result.get('url') and 'enable_editor' in result['url']:
-            result['url'] = result['url'].replace('enable_editor', 'with_loader=1&enable_editor')
+        if result.get('tag') == 'website_preview' and result.get('context', {}).get('params', {}).get('enable_editor'):
+            result['context']['params']['with_loader'] = True
         return result
 
     def button_remove_theme(self):
@@ -501,10 +501,11 @@ class IrModuleModule(models.Model):
             if not generic_arch_db:
                 continue
             langs_update = (langs & generic_arch_db.keys()) - {'en_US'}
+            specific_langs = (langs & specific_arch_db.keys()) - {'en_US'}
             generic_arch_db_en = generic_arch_db.pop('en_US')
             specific_arch_db_en = specific_arch_db.pop('en_US')
             generic_arch_db = {k: generic_arch_db[k] for k in langs_update}
-            specific_arch_db = {k: specific_arch_db.get(k, specific_arch_db_en) for k in langs_update}
+            specific_arch_db = {k: specific_arch_db.get(k, specific_arch_db_en) for k in specific_langs}
             generic_translation_dictionary = field.get_translation_dictionary(generic_arch_db_en, generic_arch_db)
             specific_translation_dictionary = field.get_translation_dictionary(specific_arch_db_en, specific_arch_db)
             # update specific_translation_dictionary

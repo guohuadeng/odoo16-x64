@@ -252,11 +252,7 @@ class Forum(models.Model):
 
     def go_to_website(self):
         self.ensure_one()
-        return {
-            'type': 'ir.actions.act_url',
-            'target': 'self',
-            'url': self.env['website'].get_client_action_url(self._compute_website_url()),
-        }
+        return self.env['website'].get_client_action(self._compute_website_url())
 
     @api.model
     def _update_website_count(self):
@@ -378,6 +374,9 @@ class Post(models.Model):
     can_post = fields.Boolean('Can Automatically be Validated', compute='_get_post_karma_rights', compute_sudo=False)
     can_flag = fields.Boolean('Can Flag', compute='_get_post_karma_rights', compute_sudo=False)
     can_moderate = fields.Boolean('Can Moderate', compute='_get_post_karma_rights', compute_sudo=False)
+    can_use_full_editor = fields.Boolean(
+        compute='_get_post_karma_rights', compute_sudo=False,
+        help="Editor Features: image and links")
 
     def _search_can_view(self, operator, value):
         if operator not in ('=', '!=', '<>'):
@@ -499,6 +498,7 @@ class Post(models.Model):
             post.can_post = is_admin or user.karma >= post.forum_id.karma_post
             post.can_flag = is_admin or user.karma >= post.forum_id.karma_flag
             post.can_moderate = is_admin or user.karma >= post.forum_id.karma_moderate
+            post.can_use_full_editor = is_admin or user.karma >= post.forum_id.karma_editor
 
     def _update_content(self, content, forum_id):
         forum = self.env['forum.forum'].browse(forum_id)
@@ -974,11 +974,7 @@ class Post(models.Model):
 
     def go_to_website(self):
         self.ensure_one()
-        return {
-            'type': 'ir.actions.act_url',
-            'target': 'self',
-            'url': self.env['website'].get_client_action_url(self.website_url),
-        }
+        return self.env['website'].get_client_action(self.website_url)
 
     @api.model
     def _search_get_detail(self, website, order, options):

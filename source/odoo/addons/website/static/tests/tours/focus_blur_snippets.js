@@ -31,8 +31,8 @@ function clickAndCheck(blockID, expected) {
     }, {
         content: 'Once the related overlays are enabled/disabled, check that the focus/blur calls have been correct.',
         trigger: blockID
-            ? `.oe_overlay.ui-draggable:eq(${blockData.overlayIndex}).oe_active`
-            : `#oe_manipulators:not(:has(.oe_active))`,
+            ? `iframe .oe_overlay.ui-draggable:eq(${blockData.overlayIndex}).oe_active`
+            : `iframe #oe_manipulators:not(:has(.oe_active))`,
         run: function (actions) {
             const result = window.focusBlurSnippetsResult;
             window.focusBlurSnippetsResult = [];
@@ -51,6 +51,7 @@ function clickAndCheck(blockID, expected) {
 window.focusBlurSnippetsResult = [];
 
 tour.register('focus_blur_snippets', {
+    test: true,
     url: '/?enable_editor=1',
 }, [
     {

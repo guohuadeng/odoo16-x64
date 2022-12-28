@@ -5,9 +5,10 @@ import { registry } from '@web/core/registry';
 import { kanbanView } from '@web/views/kanban/kanban_view';
 import { KanbanModel } from '@web/views/kanban/kanban_model';
 
+// TODO KBA: to remove in master
 export class EmployeeKanbanRecord extends KanbanModel.Record {
     async openChat(employeeId) {
-        const messaging = await this.model.messaging.get();
+        const messaging = await this.model.env.services.messaging.get();
         messaging.openChat({ employeeId });
     }
 }

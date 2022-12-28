@@ -12,11 +12,11 @@ from datetime import datetime, timedelta, time
 from pytz import timezone, UTC
 from odoo.tools import date_utils
 
-from odoo import api, Command, fields, models, tools, SUPERUSER_ID
+from odoo import api, Command, fields, models, tools
 from odoo.addons.base.models.res_partner import _tz_get
 from odoo.addons.resource.models.resource import float_to_time, HOURS_PER_DAY
 from odoo.exceptions import AccessError, UserError, ValidationError
-from odoo.tools import float_compare
+from odoo.tools import float_compare, format_date
 from odoo.tools.float_utils import float_round
 from odoo.tools.misc import format_date
 from odoo.tools.translate import _
@@ -80,7 +80,7 @@ class HolidaysRequest(models.Model):
         defaults = super(HolidaysRequest, self).default_get(fields_list)
         defaults = self._default_get_request_parameters(defaults)
 
-        if 'holiday_status_id' in fields_list and not defaults.get('holiday_status_id'):
+        if self.env.context.get('holiday_status_name_get', True) and 'holiday_status_id' in fields_list and not defaults.get('holiday_status_id'):
             lt = self.env['hr.leave.type'].search(['|', ('requires_allocation', '=', 'no'), ('has_valid_allocation', '=', True)], limit=1, order='sequence')
 
             if lt:
@@ -143,7 +143,7 @@ class HolidaysRequest(models.Model):
     holiday_status_id = fields.Many2one(
         "hr.leave.type", compute='_compute_from_employee_id', store=True, string="Time Off Type", required=True, readonly=False,
         states={'cancel': [('readonly', True)], 'refuse': [('readonly', True)], 'validate1': [('readonly', True)], 'validate': [('readonly', True)]},
-        domain=['|', ('requires_allocation', '=', 'no'), ('has_valid_allocation', '=', True)])
+        domain="[('company_id', '?=', employee_company_id), '|', ('requires_allocation', '=', 'no'), ('has_valid_allocation', '=', True)]")
     holiday_allocation_id = fields.Many2one(
         'hr.leave.allocation', compute='_compute_from_holiday_status_id', string="Allocation", store=True, readonly=False)
     color = fields.Integer("Color", related='holiday_status_id.color')
@@ -450,12 +450,17 @@ class HolidaysRequest(models.Model):
             else:
                 holiday.employee_ids = self.env.context.get('default_employee_id') or holiday.employee_id or self.env.user.employee_id
 
-    @api.depends('employee_id')
+    @api.depends('employee_id', 'employee_ids')
     def _compute_from_employee_id(self):
         for holiday in self:
             holiday.manager_id = holiday.employee_id.parent_id.id
-            if holiday.employee_id.user_id != self.env.user and self._origin.employee_id != holiday.employee_id:
+            if holiday.holiday_status_id.requires_allocation == 'no':
+                continue
+            if holiday.employee_ids:
                 holiday.holiday_status_id = False
+            elif holiday.employee_id.user_id != self.env.user and holiday._origin.employee_id != holiday.employee_id:
+                if holiday.employee_id and not holiday.holiday_status_id.with_context(employee_id=holiday.employee_id.id).has_valid_allocation:
+                    holiday.holiday_status_id = False
 
     @api.depends('employee_id', 'holiday_type')
     def _compute_department_id(self):
@@ -471,7 +476,6 @@ class HolidaysRequest(models.Model):
     @api.depends('date_from', 'date_to', 'holiday_status_id')
     def _compute_has_stress_day(self):
         date_from, date_to = min(self.mapped('date_from')), max(self.mapped('date_to'))
-        resource_calendar_id = self.employee_id.resource_calendar_id or self.env.company.resource_calendar_id
         if date_from and date_to:
             stress_days = self.employee_id._get_stress_days(
                 date_from.date(),
@@ -617,9 +621,7 @@ class HolidaysRequest(models.Model):
 
     def _inverse_supported_attachment_ids(self):
         for holiday in self:
-            holiday.supported_attachment_ids.write({
-                'res_id': holiday.id,
-            })
+            holiday.attachment_ids = holiday.supported_attachment_ids
 
     @api.constrains('date_from', 'date_to', 'employee_id')
     def _check_date(self):
@@ -691,13 +693,29 @@ class HolidaysRequest(models.Model):
     @api.constrains('state', 'number_of_days', 'holiday_status_id')
     def _check_holidays(self):
         for holiday in self:
-            mapped_days = self.holiday_status_id.get_employees_days(holiday.employee_id.ids, holiday.date_from.date())
-            if holiday.holiday_type != 'employee' or not holiday.employee_id or holiday.holiday_status_id.requires_allocation == 'no':
+            mapped_days = self.holiday_status_id.get_employees_days((holiday.employee_id | holiday.employee_ids).ids, holiday.date_from.date())
+            if holiday.holiday_type != 'employee'\
+                    or not holiday.employee_id and not holiday.employee_ids\
+                    or holiday.holiday_status_id.requires_allocation == 'no':
                 continue
-            leave_days = mapped_days[holiday.employee_id.id][holiday.holiday_status_id.id]
-            if float_compare(leave_days['remaining_leaves'], 0, precision_digits=2) == -1 or float_compare(leave_days['virtual_remaining_leaves'], 0, precision_digits=2) == -1:
-                raise ValidationError(_('The number of remaining time off is not sufficient for this time off type.\n'
-                                        'Please also check the time off waiting for validation.'))
+            if holiday.employee_id:
+                leave_days = mapped_days[holiday.employee_id.id][holiday.holiday_status_id.id]
+                if float_compare(leave_days['remaining_leaves'], 0, precision_digits=2) == -1\
+                        or float_compare(leave_days['virtual_remaining_leaves'], 0, precision_digits=2) == -1:
+                    raise ValidationError(_('The number of remaining time off is not sufficient for this time off type.\n'
+                                            'Please also check the time off waiting for validation.'))
+            else:
+                unallocated_employees = []
+                for employee in holiday.employee_ids:
+                    leave_days = mapped_days[employee.id][holiday.holiday_status_id.id]
+                    if float_compare(leave_days['remaining_leaves'], self.number_of_days, precision_digits=2) == -1\
+                            or float_compare(leave_days['virtual_remaining_leaves'], self.number_of_days, precision_digits=2) == -1:
+                        unallocated_employees.append(employee.name)
+                if unallocated_employees:
+                    raise ValidationError(_('The number of remaining time off is not sufficient for this time off type.\n'
+                                            'Please also check the time off waiting for validation.')
+                                        + _('\nThe employees that lack allocation days are:\n%s',
+                                            (', '.join(unallocated_employees))))
 
     @api.constrains('date_from', 'date_to', 'employee_id')
     def _check_date_state(self):
@@ -754,6 +772,10 @@ class HolidaysRequest(models.Model):
     # ORM Overrides methods
     ####################################################
 
+    @api.depends('employee_id', 'holiday_status_id')
+    def _compute_display_name(self):
+        super()._compute_display_name()
+
     def onchange(self, values, field_name, field_onchange):
         # Try to force the leave_type name_get when creating new records
         # This is called right after pressing create and returns the name_get for
@@ -785,6 +807,7 @@ class HolidaysRequest(models.Model):
                     target = leave.employee_id.name
                 else:
                     target = ', '.join(leave.employee_ids.mapped('name'))
+                display_date = format_date(self.env, date_from_utc) or ""
                 if leave.leave_type_request_unit == 'hour':
                     if self.env.context.get('hide_employee_name') and 'employee_id' in self.env.context.get('group_by', []):
                         res.append((
@@ -793,7 +816,7 @@ class HolidaysRequest(models.Model):
                                 person=target,
                                 leave_type=leave.holiday_status_id.name,
                                 duration=leave.number_of_hours_display,
-                                date=fields.Date.to_string(date_from_utc) or "",
+                                date=display_date,
                             )
                         ))
                     else:
@@ -803,14 +826,14 @@ class HolidaysRequest(models.Model):
                                 person=target,
                                 leave_type=leave.holiday_status_id.name,
                                 duration=leave.number_of_hours_display,
-                                date=fields.Date.to_string(date_from_utc) or "",
+                                date=display_date,
                             )
                         ))
                 else:
                     display_date = fields.Date.to_string(date_from_utc) or ""
                     if leave.number_of_days > 1 and date_from_utc and date_to_utc:
-                        display_date += ' / %s' % fields.Date.to_string(date_to_utc) or ""
-                    if self.env.context.get('hide_employee_name') and 'employee_id' in self.env.context.get('group_by', []):
+                        display_date += ' / %s' % format_date(self.env, date_to_utc) or ""
+                    if not target or self.env.context.get('hide_employee_name') and 'employee_id' in self.env.context.get('group_by', []):
                         res.append((
                             leave.id,
                             _("%(leave_type)s: %(duration).2f days (%(start)s)",
@@ -951,7 +974,7 @@ class HolidaysRequest(models.Model):
             raise UserError(_("You can't manually archive/unarchive a time off."))
 
         is_officer = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.is_superuser()
-        if not is_officer and values.keys() - {'supported_attachment_ids', 'message_main_attachment_id'}:
+        if not is_officer and values.keys() - {'attachment_ids', 'supported_attachment_ids', 'message_main_attachment_id'}:
             if any(hol.date_from.date() < fields.Date.today() and hol.employee_id.leave_manager_id != self.env.user for hol in self):
                 raise UserError(_('You must have manager rights to modify/validate a time off that already begun'))
 
@@ -1059,6 +1082,7 @@ class HolidaysRequest(models.Model):
             Meeting = self.env['calendar.event']
             for user_id, meeting_values in meeting_values_for_user_id.items():
                 meetings += Meeting.with_user(user_id or self.env.uid).with_context(
+                                allowed_company_ids=[],
                                 no_mail_to_attendees=True,
                                 calendar_no_videocall=True,
                                 active_model=self._name

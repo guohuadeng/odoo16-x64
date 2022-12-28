@@ -9,7 +9,7 @@ import { isVisible } from "@web/core/utils/ui";
 import { registerCleanup } from "./cleanup";
 import { templates } from "@web/core/assets";
 
-const { App, onMounted, onPatched, useComponent } = owl;
+import { App, onMounted, onPatched, useComponent } from "@odoo/owl";
 
 /**
  * Patch the native Date object
@@ -157,7 +157,7 @@ export function makeDeferred() {
     return new Deferred();
 }
 
-function findElement(el, selector) {
+export function findElement(el, selector) {
     let target = el;
     if (selector) {
         const els = el.querySelectorAll(selector);
@@ -385,16 +385,17 @@ export function clickCreate(htmlElement) {
 }
 
 export function clickEdit(htmlElement) {
-    if (htmlElement.querySelectorAll(".o_form_button_edit").length) {
-        return click(htmlElement, ".o_form_button_edit");
-    } else if (htmlElement.querySelectorAll(".o_list_button_edit").length) {
+    if (htmlElement.querySelectorAll(".o_list_button_edit").length) {
         return click(htmlElement, ".o_list_button_edit");
     } else {
         throw new Error("No edit button found to be clicked.");
     }
 }
 
-export function clickSave(htmlElement) {
+export async function clickSave(htmlElement) {
+    if (htmlElement.querySelectorAll(".o_form_status_indicator").length) {
+        await mouseEnter(htmlElement, ".o_form_status_indicator");
+    }
     if (htmlElement.querySelectorAll(".o_form_button_save").length) {
         return click(htmlElement, ".o_form_button_save");
     } else if (htmlElement.querySelectorAll(".o_list_button_save").length) {
@@ -404,7 +405,10 @@ export function clickSave(htmlElement) {
     }
 }
 
-export function clickDiscard(htmlElement) {
+export async function clickDiscard(htmlElement) {
+    if (htmlElement.querySelectorAll(".o_form_status_indicator").length) {
+        await mouseEnter(htmlElement, ".o_form_status_indicator");
+    }
     if (htmlElement.querySelectorAll(".o_form_button_cancel").length) {
         return click(htmlElement, ".o_form_button_cancel");
     } else if (htmlElement.querySelectorAll(".o_list_button_discard").length) {
@@ -485,6 +489,7 @@ export function editSelect(el, selector, value) {
  * @param {string} hotkey
  * @param {boolean} addOverlayModParts
  * @param {KeyboardEventInit} eventAttrs
+ * @returns {{ keydownEvent: KeyboardEvent, keyupEvent: KeyboardEvent }}
  */
 export function triggerHotkey(hotkey, addOverlayModParts = false, eventAttrs = {}) {
     eventAttrs.key = hotkey.split("+").pop();
@@ -513,8 +518,11 @@ export function triggerHotkey(hotkey, addOverlayModParts = false, eventAttrs = {
         eventAttrs.bubbles = true;
     }
 
-    document.activeElement.dispatchEvent(new KeyboardEvent("keydown", eventAttrs));
-    document.activeElement.dispatchEvent(new KeyboardEvent("keyup", eventAttrs));
+    const keydownEvent = new KeyboardEvent("keydown", eventAttrs);
+    const keyupEvent = new KeyboardEvent("keyup", eventAttrs);
+    document.activeElement.dispatchEvent(keydownEvent);
+    document.activeElement.dispatchEvent(keyupEvent);
+    return { keydownEvent, keyupEvent };
 }
 
 export async function legacyExtraNextTick() {

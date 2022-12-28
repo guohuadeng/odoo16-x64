@@ -26,26 +26,16 @@
             <field name="arch" type="xml">
                 <form string="Website Settings">
                     <sheet>
-                        <div name="domain">
-                            <group name="domain">
-                                <field name="name"/>
-                                <field name="domain"/>
-                            </group>
-                        </div>
-                        <div name="logo">
-                            <group name="logo">
-                                <field name="logo" widget="image" class="oe_avatar float-start"/>
-                            </group>
-                        </div>
-                        <div name="other">
-                            <group name="other">
-                                <field name="language_count" invisible="1"/>
-                                <field name="company_id" options="{'no_open': True, 'no_create': True}" groups="base.group_multi_company"/>
-                                <field name="language_ids" widget="many2many_tags" options="{'no_open': True, 'no_create': True}"/>
-                                <field name="default_lang_id" options="{'no_open': True, 'no_create': True}"
-                                       attrs="{'invisible': [('language_count', '&lt;=', 1)]}"/>
-                            </group>
-                        </div>
+                        <group name="domain">
+                            <field name="name"/>
+                            <field name="domain"/>
+                            <field name="logo" widget="image" class="oe_avatar w-auto float-start"/>
+                            <field name="language_count" invisible="1"/>
+                            <field name="company_id" options="{'no_open': True, 'no_create': True}" groups="base.group_multi_company"/>
+                            <field name="language_ids" widget="many2many_tags" options="{'no_open': True, 'no_create': True}"/>
+                            <field name="default_lang_id" options="{'no_open': True, 'no_create': True}"
+                                    attrs="{'invisible': [('language_count', '&lt;=', 1)]}"/>
+                        </group>
                         <notebook>
                             <page string="Custom Code" groups="base.group_no_one">
                                 <label for="custom_code_head"/>
@@ -73,7 +63,7 @@
                     </footer>
                 </xpath>
                 <xpath expr="//notebook" position="replace"/>
-                <xpath expr="//div[@name='logo']" position="replace"/>
+                <xpath expr="//field[@name='logo']" position="replace"/>
             </field>
         </record>
 
@@ -329,7 +319,7 @@
                             <t t-set="has_screenshot" t-value="record.image_ids.raw_value.length > 1"/>
                             <t t-set="image_url" t-value="has_image ? '/web/image/' + record.image_ids.raw_value[0] : record.icon.value"/>
 
-                            <div class="o_theme_preview_top bg-white mb4">
+                            <div class="o_theme_preview_top bg-white mb4 border">
                                 <div t-attf-class="bg-gray-lighter #{has_screenshot? 'o_theme_screenshot' : (has_image ? 'o_theme_cover' : 'o_theme_logo')}" t-attf-style="background-image: url(#{image_url});"/>
                                 <div t-if="record.is_installed_on_current_website.raw_value" class="o_button_area">
                                     <button type="object" name="button_refresh_theme" class="btn btn-primary">Update theme</button>
@@ -457,6 +447,12 @@
             name="HTML / CSS Editor"
             action="website.website_preview"/>
 
+        <menuitem id="custom_menu_edit_menu"
+            parent="menu_current_page"
+            name="Edit Menu"
+            sequence="40"
+            action="website.website_preview"/>
+
         <menuitem id="menu_reporting"
             name="Reporting"
             sequence="30"
@@ -464,14 +460,14 @@
 
         <menuitem id="menu_website_dashboard"
             name="eCommerce"
-            sequence="10"
+            sequence="20"
             parent="menu_reporting"
             action="website.ir_actions_server_website_dashboard"
             active="0"/>
 
         <menuitem id="menu_website_analytics"
             name="Analytics"
-            sequence="20"
+            sequence="10"
             parent="menu_reporting"
             action="website.ir_actions_server_website_analytics"/>
 

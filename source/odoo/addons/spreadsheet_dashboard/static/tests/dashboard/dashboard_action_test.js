@@ -1,14 +1,37 @@
 /** @odoo-module */
 
-import { getFixture, click, triggerEvent, legacyExtraNextTick } from "@web/../tests/helpers/utils";
-import spreadsheet from "@spreadsheet/o_spreadsheet/o_spreadsheet_extended";
+import { getFixture, click, legacyExtraNextTick, nextTick, editInput } from "@web/../tests/helpers/utils";
 import { getDashboardServerData } from "../utils/data";
 import { getBasicData, getBasicListArchs } from "@spreadsheet/../tests/utils/data";
 import { createSpreadsheetDashboard } from "../utils/dashboard_action";
 
-const { dashboardMenuRegistry } = spreadsheet.registries;
-
 QUnit.module("spreadsheet_dashboard > Dashboard > Dashboard action");
+
+function getServerData(spreadsheetData) {
+    const serverData = getDashboardServerData();
+    serverData.models = {
+        ...serverData.models,
+        ...getBasicData(),
+    };
+    serverData.views = getBasicListArchs();
+    serverData.models["spreadsheet.dashboard.group"].records = [
+        {
+            dashboard_ids: [789],
+            id: 1,
+            name: "Pivot",
+        },
+    ];
+    serverData.models["spreadsheet.dashboard"].records = [
+        {
+            id: 789,
+            name: "Spreadsheet with Pivot",
+            json_data: JSON.stringify(spreadsheetData),
+            raw: JSON.stringify(spreadsheetData),
+            dashboard_group_id: 1,
+        },
+    ];
+    return serverData;
+}
 
 QUnit.test("display available spreadsheets", async (assert) => {
     await createSpreadsheetDashboard();
@@ -90,15 +113,6 @@ QUnit.test("display error message", async (assert) => {
     assert.containsNone(fixture, ".o_renderer .error", "It should not display an error");
 });
 
-QUnit.test("Dashboard registry contains see records of pivots and lists", (assert) => {
-    const records = dashboardMenuRegistry.getAll();
-    assert.strictEqual(records.length, 2);
-    assert.strictEqual(records[0].id, "see_records_pivot");
-    assert.ok(records[0].isReadonlyAllowed);
-    assert.strictEqual(records[1].id, "see_records_list");
-    assert.ok(records[1].isReadonlyAllowed);
-});
-
 QUnit.test(
     "Last selected spreadsheet is kept when go back from breadcrumb",
     async function (assert) {
@@ -120,43 +134,53 @@ QUnit.test(
                 },
             },
         };
-        const serverData = getDashboardServerData();
-        serverData.models = {
-            ...serverData.models,
-            ...getBasicData(),
-        };
-        serverData.views = getBasicListArchs();
-        serverData.models["spreadsheet.dashboard.group"].records = [
-            {
-                dashboard_ids: [789],
-                id: 1,
-                name: "Pivot",
-            },
-        ];
-        serverData.models["spreadsheet.dashboard"].records = [
-            {
-                id: 789,
-                name: "Spreadsheet with Pivot",
-                json_data: JSON.stringify(spreadsheetData),
-                raw: JSON.stringify(spreadsheetData),
-                dashboard_group_id: 1,
-            },
-        ];
+        const serverData = getServerData(spreadsheetData);
         const fixture = getFixture();
         await createSpreadsheetDashboard({ serverData });
         await click(fixture, ".o_search_panel li:last-child");
-        const rect = fixture
-            .querySelector(".o-spreadsheet .o-grid-overlay")
-            .getBoundingClientRect();
-        await triggerEvent(fixture, ".o-spreadsheet .o-grid-overlay", "contextmenu", {
-            pageX: 5 + rect.left,
-            pageY: 5 + rect.top,
-        });
-        await click(fixture, ".o-menu-item[data-name='see_records_pivot']");
+        await click(fixture, ".o-dashboard-clickable-cell");
         await legacyExtraNextTick();
         assert.containsOnce(fixture, ".o_list_view");
         await click(document.body.querySelector(".o_back_button"));
         await legacyExtraNextTick();
         assert.hasClass(fixture.querySelector(".o_search_panel li:last-child"), "active");
+    }
+);
+
+QUnit.test(
+    "Can clear filter date filter value that defaults to current period",
+    async function (assert) {
+        const spreadsheetData = {
+            globalFilters: [
+                {
+                    id: "1",
+                    type: "date",
+                    label: "Date Filter",
+                    rangeType: "year",
+                    defaultValue: {},
+                    defaultsToCurrentPeriod: true,
+                    pivotFields: {},
+                },
+            ],
+        };
+        const serverData = getServerData(spreadsheetData);
+        const fixture = getFixture();
+        await createSpreadsheetDashboard({ serverData });
+        const year = fixture.querySelector(".o_cp_top_right input.o_datepicker_input");
+        const this_year = luxon.DateTime.local().year;
+        assert.equal(year.value, String(this_year));
+        const input = fixture.querySelector(
+            "input.o_datepicker_input.o_input.datetimepicker-input"
+        );
+        await click(input);
+        await editInput(input, null, String(this_year - 1));
+        await nextTick();
+
+        assert.equal(year.value, String(this_year - 1));
+        assert.containsOnce(fixture, ".o_cp_top_right .fa-times");
+        await click(fixture.querySelector(".o_cp_top_right .fa-times"));
+
+        assert.containsNone(fixture, ".o_cp_top_right .fa-times");
+        assert.equal(year.value, "Select year...");
     }
 );

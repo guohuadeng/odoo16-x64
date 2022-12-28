@@ -5,8 +5,8 @@ import { attr, many, one } from '@mail/model/model_field';
 import { clear } from '@mail/model/model_field_command';
 
 import { qweb } from 'web.core';
-
-import { get_cookie, Markup, set_cookie } from 'web.utils';
+import { Markup } from 'web.utils';
+import {getCookie, setCookie, deleteCookie} from 'web.utils.cookies';
 
 registerModel({
     name: 'PublicLivechatGlobal',
@@ -14,7 +14,7 @@ registerModel({
         _created() {
             // History tracking
             const page = window.location.href.replace(/^.*\/\/[^/]+/, '');
-            const pageHistory = get_cookie(this.LIVECHAT_COOKIE_HISTORY);
+            const pageHistory = getCookie(this.LIVECHAT_COOKIE_HISTORY);
             let urlHistory = [];
             if (pageHistory) {
                 urlHistory = JSON.parse(pageHistory) || [];
@@ -24,7 +24,7 @@ registerModel({
                 while (urlHistory.length > this.HISTORY_LIMIT) {
                     urlHistory.shift();
                 }
-                set_cookie(this.LIVECHAT_COOKIE_HISTORY, JSON.stringify(urlHistory), 60 * 60 * 24); // 1 day cookie
+                setCookie(this.LIVECHAT_COOKIE_HISTORY, JSON.stringify(urlHistory), 60 * 60 * 24, 'optional'); // 1 day cookie
             }
             if (this.isAvailable) {
                 this.willStart();
@@ -44,12 +44,13 @@ registerModel({
             await this._willStartChatbot();
         },
         async _willStart() {
-            const cookie = get_cookie('im_livechat_session');
-            if (cookie) {
-                const channel = JSON.parse(cookie);
+            const strCookie = getCookie('im_livechat_session');
+            const isSessionCookieAvailable = Boolean(strCookie);
+            const cookie = JSON.parse(strCookie || '{}');
+            if (cookie.id) {
                 const history = await this.messaging.rpc({
                     route: '/mail/chat_history',
-                    params: { uuid: channel.uuid, limit: 100 },
+                    params: { uuid: cookie.uuid, limit: 100 },
                 });
                 history.reverse();
                 this.update({ history });
@@ -57,6 +58,8 @@ registerModel({
                     message.body = Markup(message.body);
                 }
                 this.update({ isAvailableForMe: true });
+            } else if (isSessionCookieAvailable) {
+                this.update({ history: [], isAvailableForMe: true });
             } else {
                 const result = await this.messaging.rpc({
                     route: '/im_livechat/init',
@@ -98,7 +101,7 @@ registerModel({
                     }),
                 });
             } else if (this.history !== null && this.history.length !== 0) {
-                const sessionCookie = get_cookie('im_livechat_session');
+                const sessionCookie = getCookie('im_livechat_session');
                 if (sessionCookie) {
                     this.update({ sessionCookie });
                 }
@@ -120,7 +123,7 @@ registerModel({
                 // -> remove cookie to force opening the popup again
                 // -> initialize necessary state
                 // -> batch welcome message (see '_sendWelcomeChatbotMessage')
-                set_cookie('im_livechat_auto_popup', '', -1);
+                deleteCookie('im_livechat_auto_popup');
                 this.update({ history: clear() });
                 this.update({ rule: this.livechatInit.rule });
             } else if (this.chatbot.state === 'restore_session') {
@@ -162,6 +165,11 @@ registerModel({
         hasLoadedQWebTemplate: attr({
             default: false,
         }),
+        hasWebsiteLivechatFeature: attr({
+            compute() {
+                return false;
+            },
+        }),
         history: attr({
             default: null,
         }),
@@ -182,11 +190,20 @@ registerModel({
                 if (!this.publicLivechat) {
                     return clear();
                 }
+                if (!this.publicLivechat.operator) {
+                    return clear();
+                }
                 return this.lastMessage.authorId !== this.publicLivechat.operator.id;
             },
             default: false,
         }),
         isTestChatbot: attr({
+            compute() {
+                if (!this.options) {
+                    return clear();
+                }
+                return Boolean(this.options.isTestChatbot);
+            },
             default: false,
         }),
         lastMessage: one('PublicLivechatMessage', {
@@ -199,7 +216,7 @@ registerModel({
         }),
         livechatButtonView: one('LivechatButtonView', {
             compute() {
-                if (this.isAvailable && this.isAvailableForMe && this.hasLoadedQWebTemplate && this.env.services.public_livechat_service) {
+                if (this.isAvailable && (this.isAvailableForMe || this.isTestChatbot) && this.hasLoadedQWebTemplate && this.env.services.public_livechat_service) {
                     return {};
                 }
                 return clear();
@@ -210,6 +227,12 @@ registerModel({
         messages: many('PublicLivechatMessage'),
         notificationHandler: one('PublicLivechatGlobalNotificationHandler', {
             inverse: 'publicLivechatGlobalOwner',
+            compute() {
+                if (this.publicLivechat && !this.publicLivechat.isTemporary) {
+                    return {};
+                }
+                return clear();
+            }
         }),
         options: attr({
             default: {},
@@ -222,7 +245,14 @@ registerModel({
             default: '',
         }),
         sessionCookie: attr(),
-        testChatbotData: attr(),
+        testChatbotData: attr({
+            compute() {
+                if (!this.options) {
+                    return clear();
+                }
+                return this.options.testChatbotData;
+            },
+        }),
         welcomeMessages: many('PublicLivechatMessage', {
             compute() {
                 return this.messages.filter((message) => {

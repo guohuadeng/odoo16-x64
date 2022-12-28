@@ -9,11 +9,11 @@
                         <t t-if="activityView.activity.assignee">
                             <img class="o_Activity_userAvatar rounded-circle h-100 w-100 o_object_fit_cover" t-attf-src="/web/image/res.users/{{ activityView.activity.assignee.id }}/avatar_128" t-att-alt="activityView.activity.assignee.nameOrDisplayName"/>
                         </t>
-                        <div class="o_Activity_iconContainer d-flex align-items-center justify-content-center rounded-circle w-50 h-50 text-white"
+                        <div class="o_Activity_iconContainer d-flex align-items-center justify-content-center rounded-circle w-50 h-50"
                             t-att-class="{
-                                'bg-success': activityView.activity.state === 'planned',
-                                'bg-warning': activityView.activity.state === 'today',
-                                'bg-danger': activityView.activity.state === 'overdue',
+                                'text-bg-success': activityView.activity.state === 'planned',
+                                'text-bg-warning': activityView.activity.state === 'today',
+                                'text-bg-danger': activityView.activity.state === 'overdue',
                             }"
                         >
                             <i class="o_Activity_icon fa small" t-attf-class="{{ activityView.activity.icon }}"/>
@@ -71,7 +71,7 @@
                                     <div class="d-md-table-cell fw-bold text-md-end m-0 py-md-1 px-md-4">Created</div>
                                     <div class="o_Activity_detailsCreation d-md-table-cell py-md-1 pe-4">
                                         <t t-esc="activityView.formattedCreateDatetime"/>, <br t-if="messaging.device.isSmall"/>by
-                                        <img class="o_Activity_detailsUserAvatar o_Activity_detailsCreatorAvatar ms-1 me-1 rounded-circle align-text-bottom" t-attf-src="/web/image/res.users/{{ activityView.activity.creator.id }}/avatar_128" t-att-title="activityView.activity.creator.nameOrDisplayName" t-att-alt="activityView.activity.creator.nameOrDisplayName"/>
+                                        <img class="o_Activity_detailsUserAvatar o_Activity_detailsCreatorAvatar ms-1 me-1 rounded-circle align-text-bottom p-0" t-attf-src="/web/image/res.users/{{ activityView.activity.creator.id }}/avatar_128" t-att-title="activityView.activity.creator.nameOrDisplayName" t-att-alt="activityView.activity.creator.nameOrDisplayName"/>
                                         <b class="o_Activity_detailsCreator">
                                             <t t-esc="activityView.activity.creator.nameOrDisplayName"/>
                                         </b>
@@ -80,7 +80,7 @@
                                 <div t-if="activityView.activity.assignee" class="d-md-table-row mb-3">
                                     <div class="d-md-table-cell fw-bold text-md-end m-0 py-md-1 px-md-4">Assigned to</div>
                                     <div class="o_Activity_detailsAssignation d-md-table-cell py-md-1 pe-4">
-                                        <img class="o_Activity_detailsUserAvatar o_Activity_detailsAssignationUserAvatar me-1 rounded-circle align-text-bottom" t-attf-src="/web/image/res.users/{{ activityView.activity.assignee.id }}/avatar_128" t-att-title="activityView.activity.assignee.nameOrDisplayName" t-att-alt="activityView.activity.assignee.nameOrDisplayName"/>
+                                        <img class="o_Activity_detailsUserAvatar o_Activity_detailsAssignationUserAvatar me-1 rounded-circle align-text-bottom p-0" t-attf-src="/web/image/res.users/{{ activityView.activity.assignee.id }}/avatar_128" t-att-title="activityView.activity.assignee.nameOrDisplayName" t-att-alt="activityView.activity.assignee.nameOrDisplayName"/>
                                         <b t-esc="activityView.activity.assignee.nameOrDisplayName"/>
                                     </div>
                                 </div>

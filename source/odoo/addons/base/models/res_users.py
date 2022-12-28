@@ -472,9 +472,9 @@ class Users(models.Model):
                         # skip SpecialValue (e.g. for missing record or access right)
                         pass
 
-    @api.constrains('company_id', 'company_ids')
+    @api.constrains('company_id', 'company_ids', 'active')
     def _check_company(self):
-        for user in self:
+        for user in self.filtered(lambda u: u.active):
             if user.company_id not in user.company_ids:
                 raise ValidationError(
                     _('Company %(company_name)s is not in the allowed companies for user %(user_name)s (%(company_allowed)s).',
@@ -593,7 +593,20 @@ class Users(models.Model):
                 # safe fields only, so we write as super-user to bypass access rights
                 self = self.sudo().with_context(binary_field_real_user=self.env.user)
 
+        if 'groups_id' in values:
+            default_user = self.env.ref('base.default_user', raise_if_not_found=False)
+            if default_user and default_user in self:
+                old_groups = default_user.groups_id
+
         res = super(Users, self).write(values)
+
+        if 'groups_id' in values and default_user and default_user in self:
+            # Sync added groups on default user template to existing users
+            added_groups = default_user.groups_id - old_groups
+            if added_groups:
+                internal_users = self.env.ref('base.group_user').users - default_user
+                internal_users.write({'groups_id': [Command.link(gid) for gid in added_groups.ids]})
+
         if 'company_id' in values:
             for user in self:
                 # if partner is global we keep it that way
@@ -684,9 +697,11 @@ class Users(models.Model):
 
         return frozendict(context)
 
-    @tools.ormcache('self._uid')
+    @tools.ormcache('self.id')
     def _get_company_ids(self):
-        return frozenset(self.company_ids.ids)
+        # use search() instead of `self.company_ids` to avoid extra query for `active_test`
+        domain = [('active', '=', True), ('user_ids', 'in', self.id)]
+        return self.env['res.company'].search(domain)._ids
 
     @api.model
     def action_get(self):
@@ -938,7 +953,7 @@ class Users(models.Model):
         assert group_ext_id and '.' in group_ext_id, "External ID '%s' must be fully qualified" % group_ext_id
         module, ext_id = group_ext_id.split('.')
         self._cr.execute("""SELECT 1 FROM res_groups_users_rel WHERE uid=%s AND gid IN
-                            (SELECT res_id FROM ir_model_data WHERE module=%s AND name=%s)""",
+                            (SELECT res_id FROM ir_model_data WHERE module=%s AND name=%s AND model='res.groups')""",
                          (self._uid, module, ext_id))
         return bool(self._cr.fetchone())
 
@@ -1101,7 +1116,7 @@ class Users(models.Model):
                     "and *might* be a proxy. If your Odoo is behind a proxy, "
                     "it may be mis-configured. Check that you are running "
                     "Odoo in Proxy Mode and that the proxy is properly configured, see "
-                    "https://www.odoo.com/documentation/master/administration/install/deploy.html#https for details.",
+                    "https://www.odoo.com/documentation/16.0/administration/install/deploy.html#https for details.",
                     source
                 )
             raise AccessDenied(_("Too many login failures, please wait a bit before trying again."))
@@ -1388,15 +1403,22 @@ class GroupsView(models.Model):
                 else:
                     # application separator with boolean fields
                     app_name = app.name or 'Other'
-                    xml4.append(E.separator(string=app_name, colspan="4", **attrs))
+                    xml4.append(E.separator(string=app_name, **attrs))
+                    left_group, right_group = [], []
                     attrs['attrs'] = user_type_readonly
+                    # we can't use enumerate, as we sometime skip groups
+                    group_count = 0
                     for g in gs:
                         field_name = name_boolean_group(g.id)
+                        dest_group = left_group if group_count % 2 == 0 else right_group
                         if g == group_no_one:
                             # make the group_no_one invisible in the form view
-                            xml4.append(E.field(name=field_name, invisible="1", **attrs))
+                            dest_group.append(E.field(name=field_name, invisible="1", **attrs))
                         else:
-                            xml4.append(E.field(name=field_name, **attrs))
+                            dest_group.append(E.field(name=field_name, **attrs))
+                        group_count += 1
+                    xml4.append(E.group(*left_group))
+                    xml4.append(E.group(*right_group))
 
             xml4.append({'class': "o_label_nowrap"})
             if user_type_field_name:
@@ -1406,12 +1428,13 @@ class GroupsView(models.Model):
 
             for xml_cat in sorted(xml_by_category.keys(), key=lambda it: it[0]):
                 master_category_name = xml_cat[1]
-                xml3.append(E.group(*(xml_by_category[xml_cat]), col="2", string=master_category_name))
+                xml3.append(E.group(*(xml_by_category[xml_cat]), string=master_category_name))
 
             field_name = 'user_group_warning'
             user_group_warning_xml = E.div({
                 'class': "alert alert-warning",
                 'role': "alert",
+                'colspan': "2",
                 'attrs': str({'invisible': [(field_name, '=', False)]})
             })
             user_group_warning_xml.append(E.label({
@@ -1424,10 +1447,10 @@ class GroupsView(models.Model):
 
             xml = E.field(
                 *(xml0),
-                E.group(*(xml1), col="2", groups="base.group_no_one"),
-                E.group(*(xml2), col="4", attrs=str(user_type_attrs)),
-                E.group(*(xml3), col="2", attrs=str(user_type_attrs)),
-                E.group(*(xml4), col="4", attrs=str(user_type_attrs), groups="base.group_no_one"), name="groups_id", position="replace")
+                E.group(*(xml1), groups="base.group_no_one"),
+                E.group(*(xml2), attrs=str(user_type_attrs)),
+                E.group(*(xml3), attrs=str(user_type_attrs)),
+                E.group(*(xml4), attrs=str(user_type_attrs), groups="base.group_no_one"), name="groups_id", position="replace")
             xml.addprevious(etree.Comment("GENERATED AUTOMATICALLY BY GROUPS"))
 
         # serialize and update the view
@@ -1917,7 +1940,8 @@ class APIKeysUser(models.Model):
         }
 
 class APIKeys(models.Model):
-    _name = _description = 'res.users.apikeys'
+    _name = 'res.users.apikeys'
+    _description = 'Users API Keys'
     _auto = False # so we can have a secret column
 
     name = fields.Char("Description", required=True, readonly=True)
@@ -2005,7 +2029,8 @@ class APIKeys(models.Model):
         return k
 
 class APIKeyDescription(models.TransientModel):
-    _name = _description = 'res.users.apikeys.description'
+    _name = 'res.users.apikeys.description'
+    _description = 'API Key Description'
 
     name = fields.Char("Description", required=True)
 
@@ -2034,7 +2059,8 @@ class APIKeyDescription(models.TransientModel):
             raise AccessError(_("Only internal users can create API keys"))
 
 class APIKeyShow(models.AbstractModel):
-    _name = _description = 'res.users.apikeys.show'
+    _name = 'res.users.apikeys.show'
+    _description = 'Show API Key'
 
     # the field 'id' is necessary for the onchange that returns the value of 'key'
     id = fields.Id()

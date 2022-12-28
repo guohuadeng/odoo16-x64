@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { IS_RECORD, registry } from '@mail/model/model_core';
+import { IS_RECORD, patchesAppliedPromise, registry } from '@mail/model/model_core';
 import { ModelField } from '@mail/model/model_field';
 import { ModelIndexAnd } from '@mail/model/model_index_and';
 import { ModelIndexXor } from '@mail/model/model_index_xor';
@@ -105,25 +105,7 @@ export class ModelManager {
      * @param {Object} values field name/value pairs to give at messaging create
      */
     async start(values) {
-        if (document.readyState === 'loading') {
-            await new Promise(resolve => {
-                /**
-                 * Called when all JS resources are loaded. This is useful in order
-                 * to do some processing after other JS files have been parsed, for
-                 * example new models or patched models that are coming from
-                 * other modules, because some of those patches might need to be
-                 * applied before messaging initialization.
-                 */
-                window.addEventListener('load', resolve);
-            });
-        }
-        /**
-         * All JS resources are loaded, but not necessarily processed.
-         * We assume no messaging-related modules return any Promise,
-         * therefore they should be processed *at most* asynchronously at
-         * "Promise time".
-         */
-        await new Promise(resolve => setTimeout(resolve));
+        await patchesAppliedPromise;
         this._generateModels();
         /**
          * Create the messaging singleton record.
@@ -418,11 +400,11 @@ export class ModelManager {
             for (const [fieldName, field] of registry.get(model.name).get('fields')) {
                 // 0. Forbidden name.
                 if (fieldName in model.prototype) {
-                    throw new Error(`field(${fieldName}) on ${model} has a forbidden name.`);
+                    throw new Error(`Field ${model}/${fieldName} has a forbidden name.`);
                 }
                 // 1. Field type is required.
                 if (!(['attribute', 'relation'].includes(field.fieldType))) {
-                    throw new Error(`field(${fieldName}) on ${model} has unsupported type ${field.fieldType}.`);
+                    throw new Error(`Field ${model}/${fieldName} has unsupported type "${field.fieldType}".`);
                 }
                 // 2. Invalid keys based on field type.
                 if (field.fieldType === 'attribute') {
@@ -439,7 +421,7 @@ export class ModelManager {
                         ].includes(key)
                     );
                     if (invalidKeys.length > 0) {
-                        throw new Error(`field(${fieldName}) on ${model} contains some invalid keys: "${invalidKeys.join(", ")}".`);
+                        throw new Error(`Field ${model}/${fieldName} contains some invalid keys: "${invalidKeys.join(", ")}".`);
                     }
                 }
                 if (field.fieldType === 'relation') {
@@ -460,13 +442,13 @@ export class ModelManager {
                         ].includes(key)
                     );
                     if (invalidKeys.length > 0) {
-                        throw new Error(`field(${fieldName}) on ${model} contains some invalid keys: "${invalidKeys.join(", ")}".`);
+                        throw new Error(`Field ${model}/${fieldName} contains some invalid keys: "${invalidKeys.join(", ")}".`);
                     }
                     if (!this.models[field.to]) {
-                        throw new Error(`Relational field(${fieldName}) on ${model} targets to unknown model name "${field.to}".`);
+                        throw new Error(`Relational field ${model}/${fieldName} targets to unknown model name "${field.to}".`);
                     }
                     if (field.required && field.relationType !== 'one') {
-                        throw new Error(`Relational field(${fieldName}) on ${model} has "required" true with a relation of type "${field.relationType}" but "required" is only supported for "one".`);
+                        throw new Error(`Relational field ${model}/${fieldName} has "required" true with a relation of type "${field.relationType}" but "required" is only supported for "one".`);
                     }
                     if (field.sort && field.relationType !== 'many') {
                         throw new Error(`Relational field "${model}/${fieldName}" has "sort" with a relation of type "${field.relationType}" but "sort" is only supported for "many".`);
@@ -475,32 +457,32 @@ export class ModelManager {
                 // 3. Check for redundant attributes on identifying fields.
                 if (field.identifying) {
                     if ('readonly' in field) {
-                        throw new Error(`Identifying field(${fieldName}) on ${model} has unnecessary "readonly" attribute (readonly is implicit for identifying fields).`);
+                        throw new Error(`Identifying field ${model}/${fieldName} has unnecessary "readonly" attribute (readonly is implicit for identifying fields).`);
                     }
                     if ('required' in field && model.identifyingMode === 'and') {
-                        throw new Error(`Identifying field(${fieldName}) on ${model} has unnecessary "required" attribute (required is implicit for AND identifying fields).`);
+                        throw new Error(`Identifying field ${model}/${fieldName} has unnecessary "required" attribute (required is implicit for AND identifying fields).`);
                     }
                 }
                 // 4. Computed field.
                 if (field.compute) {
                     if (typeof field.compute !== 'function') {
-                        throw new Error(`Property "compute" of field(${fieldName}) on ${model} must be a function (the actual compute).`);
+                        throw new Error(`Property "compute" of field ${model}/${fieldName} must be a string (instance method name) or a function (the actual compute).`);
                     }
                     if ('readonly' in field) {
-                        throw new Error(`Computed field(${fieldName}) on ${model} has unnecessary "readonly" attribute (readonly is implicit for computed fields).`);
+                        throw new Error(`Computed field ${model}/${fieldName} has unnecessary "readonly" attribute (readonly is implicit for computed fields).`);
                     }
                 }
                 // 5. Related field.
                 if (field.related) {
                     if (field.compute) {
-                        throw new Error(`field(${fieldName}) on ${model} cannot be a related and compute field at the same time.`);
+                        throw new Error(`field ${model}/${fieldName} cannot be a related and compute field at the same time.`);
                     }
                     if (!(typeof field.related === 'string')) {
-                        throw new Error(`Property "related" of field(${fieldName}) on ${model} has invalid format.`);
+                        throw new Error(`Property "related" of field ${model}/${fieldName} has invalid format.`);
                     }
                     const [relationName, relatedFieldName, other] = field.related.split('.');
                     if (!relationName || !relatedFieldName || other) {
-                        throw new Error(`Property "related" of field(${fieldName}) on ${model} has invalid format.`);
+                        throw new Error(`Property "related" of field ${model}/${fieldName} has invalid format.`);
                     }
                     // find relation on self or parents.
                     let relatedRelation;
@@ -510,10 +492,10 @@ export class ModelManager {
                         targetModel = targetModel.__proto__;
                     }
                     if (!relatedRelation) {
-                        throw new Error(`Related field(${fieldName}) on ${model} relates to unknown relation name "${relationName}".`);
+                        throw new Error(`Related field ${model}/${fieldName} relates to unknown relation name "${relationName}".`);
                     }
                     if (relatedRelation.fieldType !== 'relation') {
-                        throw new Error(`Related field(${fieldName}) on ${model} relates to non-relational field "${relationName}".`);
+                        throw new Error(`Related field ${model}/${fieldName} relates to non-relational field "${relationName}".`);
                     }
                     // Assuming related relation is valid...
                     // find field name on related model or any parents.
@@ -525,19 +507,48 @@ export class ModelManager {
                         targetModel = targetModel.__proto__;
                     }
                     if (!relatedField) {
-                        throw new Error(`Related field(${fieldName}) on ${model} relates to unknown related model field "${relatedFieldName}".`);
+                        throw new Error(`Related field ${model}/${fieldName} relates to unknown related model field "${relatedFieldName}".`);
                     }
                     if (relatedField.fieldType !== field.fieldType) {
-                        throw new Error(`Related field(${fieldName}) on ${model} has mismatched type with its related model field.`);
+                        throw new Error(`Related field ${model}/${fieldName} has mismatched type with its related model field.`);
                     }
                     if (
                         relatedField.fieldType === 'relation' &&
                         relatedField.to !== field.to
                     ) {
-                        throw new Error(`Related field(${fieldName}) on ${model} has mismatched target model name with its related model field.`);
+                        throw new Error(`Related field ${model}/${fieldName} has mismatched target model name with its related model field.`);
                     }
                     if ('readonly' in field) {
-                        throw new Error(`Related field(${fieldName}) on ${model} has unnecessary "readonly" attribute (readonly is implicit for related fields).`);
+                        throw new Error(`Related field ${model}/${fieldName} has unnecessary "readonly" attribute (readonly is implicit for related fields).`);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @private
+     * @throws {Error}
+     */
+    _checkOnChangesOnModels() {
+        for (const model of Object.values(this.models)) {
+            for (const { dependencies, methodName } of registry.get(model.name).get('onChanges')) {
+                for (const dependency of dependencies) {
+                    let currentModel = model;
+                    let currentField;
+                    for (const fieldName of dependency) {
+                        if (!currentModel) {
+                            throw new Error(`OnChange '${methodName}' defines a dependency with path '${dependency.join('.')}', but this dependency does not resolve: ${currentField} is not a relational field, therefore there is no relation to follow.`);
+                        }
+                        currentField = currentModel.__fieldMap.get(fieldName);
+                        if (!currentField) {
+                            throw new Error(`OnChange '${methodName}' defines a dependency with path '${dependency.join('.')}', but this path does not resolve: ${currentModel}/${fieldName} does not exist.`);
+                        }
+                        if (currentField.to) {
+                            currentModel = this.models[currentField.to];
+                        } else {
+                            currentModel = undefined;
+                        }
                     }
                 }
             }
@@ -550,68 +561,74 @@ export class ModelManager {
      */
     _checkProcessedFieldsOnModels() {
         for (const model of Object.values(this.models)) {
-            switch (model.identifyingMode) {
-                case 'and':
-                    break;
-                case 'xor':
-                    if (model.__identifyingFieldNames.size === 0) {
-                        throw new Error(`No identifying fields has been specified for 'xor' identifying mode on ${model}`);
-                    }
-                    break;
-                default:
-                    throw new Error(`Unsupported identifying mode "${model.identifyingMode}" on ${model}. Must be one of 'and' or 'xor'.`);
+            if (!['and', 'xor'].includes(model.identifyingMode)) {
+                throw new Error(`Unsupported identifying mode "${model.identifyingMode}" on ${model}. Must be one of 'and' or 'xor'.`);
             }
             for (const field of model.__fieldList) {
                 const fieldName = field.fieldName;
                 if (!(['attribute', 'relation'].includes(field.fieldType))) {
-                    throw new Error(`${field} on ${model} has unsupported type ${field.fieldType}.`);
+                    throw new Error(`${field} has unsupported type "${field.fieldType}".`);
                 }
                 if (field.compute && field.related) {
-                    throw new Error(`${field} on ${model} cannot be a related and compute field at the same time.`);
+                    throw new Error(`${field} cannot be a related and compute field at the same time.`);
                 }
                 if (field.fieldType === 'attribute') {
                     continue;
                 }
                 if (!field.relationType) {
-                    throw new Error(`${field} on ${model} must define a relation type in "relationType".`);
+                    throw new Error(`${field} must define a relation type in "relationType".`);
                 }
                 if (!(['many', 'one'].includes(field.relationType))) {
-                    throw new Error(`${field} on ${model} has invalid relation type "${field.relationType}".`);
+                    throw new Error(`${field} has invalid relation type "${field.relationType}".`);
                 }
                 if (!field.inverse) {
-                    throw new Error(`${field} on ${model} must define an inverse relation name in "inverse".`);
+                    throw new Error(`${field} must define an inverse relation name in "inverse".`);
                 }
                 if (!field.to) {
-                    throw new Error(`${field} on ${model} must define a model name in "to" (1st positional parameter of relation field helpers).`);
+                    throw new Error(`${field} must define a model name in "to" (1st positional parameter of relation field helpers).`);
                 }
                 const relatedModel = this.models[field.to];
                 if (!relatedModel) {
-                    throw new Error(`${field} on ${model} defines a relation to model(${field.to}), but there is no model registered with this name.`);
+                    throw new Error(`${field} defines a relation to model ${field.to}, but there is no model registered with this name.`);
                 }
                 const inverseField = relatedModel.__fieldMap.get(field.inverse);
                 if (!inverseField) {
-                    throw new Error(`${field} on ${model} defines its inverse as field(${field.inverse}) on ${relatedModel}, but it does not exist.`);
+                    throw new Error(`${field} defines its inverse as field ${relatedModel}/${field.inverse}, but it does not exist.`);
                 }
                 if (inverseField.inverse !== fieldName) {
-                    throw new Error(`The name of ${field} on ${model} does not match with the name defined in its inverse ${inverseField} on ${relatedModel}.`);
+                    throw new Error(`The name of ${field} does not match with the name defined in its inverse ${inverseField}.`);
                 }
                 if (![model.name, 'Record'].includes(inverseField.to)) {
-                    throw new Error(`${field} on ${model} has its inverse ${inverseField} on ${relatedModel} referring to an invalid model (model(${inverseField.to})).`);
+                    throw new Error(`${field} has its inverse ${inverseField} referring to an invalid model (${inverseField.to}).`);
+                }
+                if (field.sort) {
+                    for (const path of field.sortedFieldSplittedPaths) {
+                        let currentField = field;
+                        for (const fieldName of path) {
+                            if (!currentField.to) {
+                                throw new Error(`Field ${field} defines a sort with path '${path.join('.')}', but this path does not resolve: ${currentField} is not a relational field, therefore there is no relation to follow.`);
+                            }
+                            if (!this.models[currentField.to].__fieldMap.has(fieldName)) {
+                                throw new Error(`Field ${field} defines a sort with path '${path.join('.')}', but this path does not resolve: ${this.models[currentField.to]}/${fieldName} does not exist.`);
+                            }
+                            currentField = this.models[currentField.to].__fieldMap.get(fieldName);
+                        }
+                    }
                 }
             }
             for (const identifyingField of model.__identifyingFieldNames) {
                 const field = model.__fieldMap.get(identifyingField);
                 if (!field) {
-                    throw new Error(`Identifying field "${identifyingField}" is not a field on ${model}.`);
+                    throw new Error(`Identifying field "${model}/${identifyingField}" is not a field on ${model}.`);
                 }
                 if (field.to) {
                     if (field.relationType !== 'one') {
-                        throw new Error(`Identifying field "${identifyingField}" on ${model} has a relation of type "${field.relationType}" but identifying field is only supported for "one".`);
+                        throw new Error(`Identifying field "${model}/${identifyingField}" has a relation of type "${field.relationType}" but identifying field is only supported for "one".`);
                     }
                     const relatedModel = this.models[field.to];
                     const inverseField = relatedModel.__fieldMap.get(field.inverse);
                     if (!inverseField.isCausal) {
-                        throw new Error(`Identifying field "${identifyingField}" on ${model} has an inverse "${field.inverse}" not declared as "isCausal" on ${relatedModel}.`);
+                        throw new Error(`Identifying field "${model}/${identifyingField}" has an inverse "${inverseField}" not declared as "isCausal".`);
                     }
                 }
             }
@@ -939,6 +956,7 @@ export class ModelManager {
          * should have matching reversed relation.
          */
         this._checkProcessedFieldsOnModels();
+        this._checkOnChangesOnModels();
     }
 
     /**

@@ -69,6 +69,7 @@
         width: 75px;
         border: none;
         outline: none;
+        background-color: var(--o-input-background-color, #{$input-bg});
     }
 
     .o_searchview_autocomplete {
@@ -103,7 +104,9 @@
 }
 
 .o_search_options {
+    flex-wrap: wrap;
     margin: auto 0;
+    flex-grow: 1;
 }
 
 // Filter menu
@@ -147,7 +150,7 @@
 
 .o_web_client .o_mobile_search {
     align-items: normal;
-    background-color: white;
+    background-color: var(--mobileSearch-bg, #{$o-white});
     border: none;
     bottom: 0;
     display: flex;
@@ -161,7 +164,7 @@
     z-index: $zindex-modal;
 
     .o_mobile_search_header {
-        background-color: $o-brand-odoo;
+        background-color: var(--mobileSearch__header-bg, #{$o-brand-odoo});
         display: flex;
         min-height: $o-navbar-height;
         justify-content: space-between;
@@ -191,6 +194,7 @@
                 border-bottom: 1px solid $o-brand-secondary;
                 margin-bottom: 15px;
                 width: 100%;
+                background-color: var(--o-input-background-color, #{$input-bg});
             }
     
             .o_searchview_facet {

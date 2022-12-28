@@ -17,6 +17,7 @@ from odoo import api, models
 from odoo import SUPERUSER_ID
 from odoo.exceptions import AccessError
 from odoo.http import request
+from odoo.tools.json import scriptsafe as json_scriptsafe
 from odoo.tools.safe_eval import safe_eval
 from odoo.osv.expression import FALSE_DOMAIN
 from odoo.addons.http_routing.models import ir_http
@@ -63,7 +64,8 @@ class Http(models.AbstractModel):
 
     @classmethod
     def routing_map(cls, key=None):
-        key = key or (request and request.website_routing)
+        if not key and request:
+            key = request.website_routing
         return super(Http, cls).routing_map(key=key)
 
     @classmethod
@@ -81,6 +83,10 @@ class Http(models.AbstractModel):
 
     @classmethod
     def _generate_routing_rules(cls, modules, converters):
+        if not request:
+            yield from super()._generate_routing_rules(modules, converters)
+            return
+
         website_id = request.website_routing
         logger.debug("_generate_routing_rules for website: %s", website_id)
         domain = [('redirect_type', 'in', ('308', '404')), '|', ('website_id', '=', False), ('website_id', '=', website_id)]
@@ -116,6 +122,14 @@ class Http(models.AbstractModel):
             super()._get_converters(),
             model=ModelConverter,
         )
+
+    @classmethod
+    def _get_public_users(cls):
+        public_users = super()._get_public_users()
+        website = request.env(user=SUPERUSER_ID)['website'].get_current_website()  # sudo
+        if website:
+            public_users.append(website._get_cached('user_id'))
+        return public_users
 
     @classmethod
     def _auth_method_public(cls):
@@ -379,6 +393,29 @@ class Http(models.AbstractModel):
             })
         session_info['bundle_params']['website_id'] = request.website.id
         return session_info
+
+    @classmethod
+    def _is_allowed_cookie(cls, cookie_type):
+        result = super()._is_allowed_cookie(cookie_type)
+        if result and cookie_type == 'optional':
+            if not request.env['website'].get_current_website().cookies_bar:
+                # Cookies bar is disabled on this website
+                return True
+            accepted_cookie_types = json_scriptsafe.loads(request.httprequest.cookies.get('website_cookies_bar', '{}'))
+
+            # pre-16.0 compatibility, `website_cookies_bar` was `"true"`.
+            # In that case we delete that cookie and let the user choose again.
+            if not isinstance(accepted_cookie_types, dict):
+                request.future_response.set_cookie('website_cookies_bar', expires=0, max_age=0)
+                return False
+
+            if 'optional' in accepted_cookie_types:
+                return accepted_cookie_types['optional']
+            return False
+
+        # Pass-through if already forbidden for another reason or a type that
+        # is not restricted by the website module.
+        return result
 
 
 class ModelConverter(ir_http.ModelConverter):

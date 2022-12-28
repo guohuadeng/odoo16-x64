@@ -234,6 +234,7 @@ export class MockServer {
         const processedNodes = params.processedNodes || [];
         const { arch, context, modelName } = params;
         const level = params.level || 0;
+        const editable = params.editable || true;
         const fields = deepCopy(params.fields);
         function isNodeProcessed(node) {
             return processedNodes.findIndex((n) => n.isSameNode(node)) > -1;
@@ -249,7 +250,10 @@ export class MockServer {
         } else {
             doc = arch;
         }
-        const inTreeView = doc.tagName === "tree";
+        const editableView = editable && this._editableNode(doc, modelName);
+        const onchangeAbleView = this._onchangeAbleView(doc);
+        const modifiersFromModel = this._modifiersFromModel(doc);
+        const inTreeView = ["tree", "list"].includes(doc.tagName);
         const inFormView = doc.tagName === "form";
         // mock _postprocess_access_rights
         const isBaseModel = !context.base_model_name || modelName === context.base_model_name;
@@ -271,7 +275,11 @@ export class MockServer {
             const isGroupby = node.tagName === "groupby";
             if (isField) {
                 const fieldName = node.getAttribute("name");
-                fieldNodes[fieldName] = { node, isInvisible: node.getAttribute("invisible") };
+                fieldNodes[fieldName] = {
+                    node,
+                    isInvisible: node.getAttribute("invisible"),
+                    isEditable: editableView && this._editableNode(node, modelName),
+                };
                 // 'transfer_field_to_modifiers' simulation
                 const field = fields[fieldName];
                 if (!field) {
@@ -279,7 +287,8 @@ export class MockServer {
                 }
                 const defaultValues = {};
                 const stateExceptions = {}; // what is this ?
-                modifiersNames.forEach((attr) => {
+
+                modifiersFromModel.forEach((attr) => {
                     stateExceptions[attr] = [];
                     defaultValues[attr] = !!field[attr];
                 });
@@ -352,9 +361,9 @@ export class MockServer {
         });
         Object.keys(fieldNodes).forEach((field) => relatedModels[modelName].add(field));
         let relModel, relFields;
-        Object.entries(fieldNodes).forEach(([name, { node, isInvisible }]) => {
+        Object.entries(fieldNodes).forEach(([name, { node, isInvisible, isEditable }]) => {
             const field = fields[name];
-            if (field.type === "many2one" || field.type === "many2many") {
+            if (isEditable && (field.type === "many2one" || field.type === "many2many")) {
                 const canCreate = node.getAttribute("can_create");
                 node.setAttribute("can_create", canCreate || "true");
                 const canWrite = node.getAttribute("can_write");
@@ -401,6 +410,7 @@ export class MockServer {
                             context,
                             processedNodes,
                             level: level + 1,
+                            editable: editableView,
                         });
                         Object.entries(models).forEach(([modelName, fields]) => {
                             relatedModels[modelName] = relatedModels[modelName] || new Set();
@@ -410,7 +420,7 @@ export class MockServer {
                 });
             }
             // add onchanges
-            if (name in onchanges) {
+            if (onchangeAbleView && name in onchanges) {
                 node.setAttribute("on_change", "1");
             }
         });
@@ -431,6 +441,7 @@ export class MockServer {
                 fields: relFields,
                 context,
                 processedNodes,
+                editable: false,
             });
             Object.entries(models).forEach(([modelName, fields]) => {
                 relatedModels[modelName] = relatedModels[modelName] || new Set();
@@ -451,6 +462,48 @@ export class MockServer {
             type: viewType,
             models: this._getViewFields(modelName, viewType, relatedModels),
         };
+    }
+
+    _editableNode(node, modelName) {
+        switch (node.tagName) {
+            case "form":
+                return true;
+            case "tree":
+                return node.getAttribute("editable") || node.getAttribute("multi_edit");
+            case "field": {
+                const fname = node.getAttribute("name");
+                const field = this.models[modelName].fields[fname];
+                return (
+                    (!field.readonly ||
+                        (field.states &&
+                            Object.values(field.states).some((item) =>
+                                item.includes("readonly")
+                            ))) &&
+                    (!["1", "True"].includes(node.getAttribute("readonly")) ||
+                        !_.isEmpty(evaluateExpr(node.getAttribute("attrs") || "{}")))
+                );
+            }
+            default:
+                return false;
+        }
+    }
+
+    _onchangeAbleView(node) {
+        if (node.tagName === "form") {
+            return true;
+        } else if (node.tagName === "tree") {
+            return true;
+        } else if (node.tagName === "kanban") {
+            return true;
+        }
+    }
+
+    _modifiersFromModel(node) {
+        const modifiersNames = ['invisible'];
+        if (['kanban', 'tree', 'form'].includes(node.tagName)) {
+            modifiersNames.push(...['readonly', 'required']);
+        }
+        return modifiersNames;
     }
 
     /**
@@ -536,7 +589,7 @@ export class MockServer {
             case "get_views":
                 return this.mockGetViews(args.model, args.kwargs);
             case "name_create":
-                return this.mockNameCreate(args.model, args.args[0]);
+                return this.mockNameCreate(args.model, args.args[0], args.kwargs);
             case "name_get":
                 return this.mockNameGet(args.model, args.args);
             case "name_search":
@@ -710,14 +763,16 @@ export class MockServer {
      * @private
      * @param {string} modelName
      * @param {string} name
+     * @param {object} kwargs
+     * @param {object} [kwargs.context]
      * @returns {Array} a couple [id, name]
      */
-    mockNameCreate(modelName, name) {
+    mockNameCreate(modelName, name, kwargs) {
         const values = {
             name: name,
             display_name: name,
         };
-        const id = this.mockCreate(modelName, values);
+        const id = this.mockCreate(modelName, values, kwargs);
         return [id, name];
     }
 
@@ -1093,7 +1148,13 @@ export class MockServer {
                 delete group.__range;
             }
             // compute count key to match dumb server logic...
-            const countKey = kwargs.lazy ? groupBy[0].split(":")[0] + "_count" : "__count";
+            const groupByNoLeaf = kwargs.context ? "group_by_no_leaf" in kwargs.context : false;
+            let countKey;
+            if (kwargs.lazy && (groupBy.length >= 2 || !groupByNoLeaf)) {
+                countKey = groupBy[0].split(":")[0] + "_count";
+            } else {
+                countKey = "__count";
+            }
             group[countKey] = groupRecords.length;
             aggregateFields(group, groupRecords);
             readGroupResult.push(group);
@@ -1173,7 +1234,17 @@ export class MockServer {
         const data = {};
         for (const group of groups) {
             const records = this.getRecords(modelName, group.__domain || []);
-            const groupByValue = group[groupBy]; // always technical value here
+            let groupByValue = group[groupBy]; // always technical value here
+
+            // special case for bool values: rpc call response with capitalized strings
+            if (!(groupByValue in data)) {
+                if (groupByValue === true) {
+                    groupByValue = "True";
+                } else if (groupByValue === false) {
+                    groupByValue = "False";
+                }
+            }
+
             if (!(groupByValue in data)) {
                 data[groupByValue] = {};
                 for (const key in progressBar.colors) {

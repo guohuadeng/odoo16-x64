@@ -20,7 +20,7 @@ import { KanbanCompiler } from "./kanban_compiler";
 import { KanbanCoverImageDialog } from "./kanban_cover_image_dialog";
 import { KanbanDropdownMenuWrapper } from "./kanban_dropdown_menu_wrapper";
 
-const { Component, onMounted, onWillUpdateProps, useRef, xml } = owl;
+import { Component, onMounted, onWillUpdateProps, useRef } from "@odoo/owl";
 const { COLORS } = ColorList;
 
 const formatters = registry.category("formatters");
@@ -163,9 +163,9 @@ export class KanbanRecord extends Component {
 
         const { archInfo, Compiler, templates } = this.props;
         const { arch } = archInfo;
-        const ViewCompiler = Compiler || KanbanCompiler;
+        const ViewCompiler = Compiler || this.constructor.Compiler;
 
-        this.templates = useViewCompiler(ViewCompiler, arch, templates, KANBAN_BOX_ATTRIBUTE);
+        this.templates = useViewCompiler(ViewCompiler, arch, templates);
 
         if (KANBAN_TOOLTIP_ATTRIBUTE in templates) {
             useTooltip("root", {
@@ -207,7 +207,7 @@ export class KanbanRecord extends Component {
 
         // Widget
         const deletable = activeActions.delete && (!list.groupedBy || !list.groupedBy("m2m"));
-        const editable = archInfo.activeActions.edit;
+        const editable = activeActions.edit;
         this.widget = {
             deletable,
             editable,
@@ -235,9 +235,6 @@ export class KanbanRecord extends Component {
         if (archInfo.cardColorField) {
             const value = record.data[archInfo.cardColorField];
             classes.push(getColorClass(value));
-        }
-        if (record.model.useSampleModel) {
-            classes.push("o_sample_data_disabled");
         }
         if (!this.props.list.isGrouped) {
             classes.push("flex-grow-1 flex-md-shrink-1 flex-shrink-0");
@@ -381,7 +378,6 @@ export class KanbanRecord extends Component {
         return getImageSrcFromRecordInfo(this.props.record, ...arguments);
     }
 }
-
 KanbanRecord.components = {
     Dropdown,
     DropdownItem,
@@ -408,13 +404,6 @@ KanbanRecord.props = [
     "record",
     "templates",
 ];
-KanbanRecord.template = xml`
-    <div
-        role="article"
-        t-att-class="getRecordClasses()"
-        t-att-data-id="props.canResequence and props.record.id"
-        t-att-tabindex="props.record.model.useSampleModel ? -1 : 0"
-        t-on-click="onGlobalClick"
-        t-ref="root">
-        <t t-call="{{ templates['${KANBAN_BOX_ATTRIBUTE}'] }}"/>
-    </div>`;
+KanbanRecord.Compiler = KanbanCompiler;
+KanbanRecord.KANBAN_BOX_ATTRIBUTE = KANBAN_BOX_ATTRIBUTE;
+KanbanRecord.template = "web.KanbanRecord";

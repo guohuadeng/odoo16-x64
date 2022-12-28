@@ -2,6 +2,7 @@
 'use strict';
 
 import { isBlock, rgbToHex } from '../editor/odoo-editor/src/utils/utils';
+
 /* global html2canvas */
 
 //--------------------------------------------------------------------------

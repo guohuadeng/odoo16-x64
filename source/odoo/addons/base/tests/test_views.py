@@ -1738,12 +1738,12 @@ class TestViews(ViewCase):
         def _test_modifiers(what, expected):
             modifiers = {}
             if isinstance(what, dict):
-                transfer_field_to_modifiers(what, modifiers)
+                transfer_field_to_modifiers(what, modifiers, ['invisible', 'readonly', 'required'])
             else:
                 node = etree.fromstring(what) if isinstance(what, str) else what
                 transfer_node_to_modifiers(node, modifiers)
             simplify_modifiers(modifiers)
-            assert modifiers == expected, "%s != %s" % (modifiers, expected)
+            assert str(modifiers) == str(expected), "%s != %s" % (modifiers, expected)
 
         _test_modifiers('<field name="a"/>', {})
         _test_modifiers('<field name="a" invisible="1"/>', {"invisible": True})
@@ -1752,6 +1752,14 @@ class TestViews(ViewCase):
         _test_modifiers('<field name="a" invisible="0"/>', {})
         _test_modifiers('<field name="a" readonly="0"/>', {})
         _test_modifiers('<field name="a" required="0"/>', {})
+        _test_modifiers(
+            """<field name="a" attrs="{'readonly': 1}"/>""",
+            {"readonly": True},
+        )
+        _test_modifiers(
+            """<field name="a" attrs="{'readonly': 0}"/>""",
+            {},
+        )
         # TODO: Order is not guaranteed
         _test_modifiers(
             '<field name="a" invisible="1" required="1"/>',
@@ -2212,6 +2220,22 @@ class TestViews(ViewCase):
             self.assertEqual(modifiers.get('invisible'), expected.get('invisible'))
             self.assertEqual(modifiers.get('readonly'), expected.get('readonly'))
             self.assertEqual(modifiers.get('required'), expected.get('required'))
+
+    def test_modifier_attribute_priority(self):
+        view = self.assertValid("""
+            <form string="View">
+                <field name="type" invisible="1"/>
+                <field name="name" invisible="context.get('foo')" attrs="{'invisible': [('type', '=', 'tree')]}"/>
+            </form>
+        """)
+        for context, expected in [
+            ({}, [['type', '=', 'tree']]),
+            ({'foo': True}, True)
+        ]:
+            arch = self.View.with_context(**context).get_view(view.id)['arch']
+            field_node = etree.fromstring(arch).xpath('//field[@name="name"]')[0]
+            modifiers = json.loads(field_node.get('modifiers') or '{}')
+            self.assertEqual(modifiers.get('invisible'), expected)
 
     @mute_logger('odoo.addons.base.models.ir_ui_view')
     def test_domain_in_filter(self):
@@ -2864,6 +2888,28 @@ class TestViews(ViewCase):
             </form>
         """, valid=True)
 
+    def test_attrs_groups_with_groups_in_model(self):
+        """Tests the attrs is well processed to modifiers for a field node combining:
+        - a `groups` attribute on the field node in the view architecture
+        - a `groups` attribute on the field in the Python model
+        This is an edge case and it worths a unit test."""
+        self.patch(type(self.env['res.partner']).name, 'groups', 'base.group_system')
+        self.env.user.groups_id += self.env.ref('base.group_multi_company')
+        view = self.View.create({
+            'name': 'foo',
+            'model': 'res.partner',
+            'arch': """
+                <form>
+                    <field name="active"/>
+                    <field name="name" groups="base.group_multi_company" attrs="{'invisible': [('active', '=', True)]}"/>
+                </form>
+            """,
+        })
+        arch = self.env['res.partner'].get_view(view_id=view.id)['arch']
+        tree = etree.fromstring(arch)
+        node_field_name = tree.xpath('//field[@name="name"]')[0]
+        self.assertEqual(node_field_name.get('modifiers'), '{"invisible": [["active", "=", true]]}')
+
     def test_button(self):
         arch = """
             <form>
@@ -3151,37 +3197,6 @@ class TestViews(ViewCase):
                     view1.arch = """<form position="inside">
                         <field name="type"/>
                     </form>"""
-
-    def test_address_view(self):
-        # pe_partner_address_form
-        address_arch = """<form><div class="o_address_format"><field name="parent_name"/></div></form>"""
-        address_view = self.View.create({
-            'name': 'view',
-            'model': 'res.partner',
-            'arch': address_arch,
-            'priority': 900,
-        })
-
-        # view can be created without address_view
-        form_arch = """<form><field name="id"/><div class="o_address_format"><field name="street"/></div></form>"""
-        partner_view = self.View.create({
-            'name': 'view',
-            'model': 'res.partner',
-            'arch': form_arch,
-        })
-
-        # default view, no address_view defined
-        arch = self.env['res.partner'].get_view(partner_view.id)['arch']
-        self.assertIn('"street"', arch)
-        self.assertNotIn('"parent_name"', arch)
-
-        # custom view, address_view defined
-        self.env.company.country_id.address_view_id = address_view
-        arch = self.env['res.partner'].get_view(partner_view.id)['arch']
-        self.assertNotIn('"street"', arch)
-        self.assertIn('"parent_name"', arch)
-        # weird result: <form> inside a <form>
-        self.assertRegex(arch, r"<form>.*<form>.*</form>.*</form>")
 
     def test_graph_fields(self):
         self.assertValid('<graph string="Graph"><field name="model" type="row"/><field name="inherit_id" type="measure"/></graph>')

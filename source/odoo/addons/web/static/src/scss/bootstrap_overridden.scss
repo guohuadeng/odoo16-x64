@@ -15,7 +15,7 @@ $cyan: #17a2b8 !default;
 //End Restore BS4 Colors
 
 // All of those are BS default
-$white:    #fff !default;
+$white:    $o-white !default;
 $gray-100: $o-gray-100 !default;
 $gray-200: $o-gray-200 !default;
 $gray-300: $o-gray-300 !default;
@@ -26,7 +26,7 @@ $gray-700: $o-gray-700 !default;
 $gray-800: $o-gray-800 !default;
 $gray-900: $o-gray-900 !default;
 
-$black:    #000 !default;
+$black:    $o-black !default;
 
 $primary: $o-brand-primary !default;
 $secondary: $white !default;
@@ -70,7 +70,7 @@ $spacer: 1rem !default;
 //
 // Settings for the `<body>` element.
 
-$body-bg: $o-main-bg-color !default;
+$body-bg: $o-webclient-background-color !default;
 $body-color: $o-main-text-color !default;
 
 // Links
@@ -98,6 +98,8 @@ $grid-gutter-width: $o-horizontal-padding * 2 !default;
 //
 // Define common padding and border radius sizes and more.
 
+$border-color: $o-border-color!default;
+
 $border-radius: $o-border-radius !default;
 $border-radius-sm: $o-border-radius-sm !default;
 $border-radius-lg: $o-border-radius-lg !default;
@@ -108,11 +110,15 @@ $component-active-bg: $gray-200 !default;
 
 $caret-width: 4px !default;
 
-// Fonts
+// Typography
 //
 // Font, line-height, and color for body text, headings, and more.
 
-$font-family-sans-serif: o-add-unicode-support-font(("Lucida Grande", Helvetica, Verdana, Arial, sans-serif), 1) !default;
+$font-weight-normal: 400 !default;
+$font-weight-bold: 500 !default;
+$font-weight-bolder: 700 !default;
+
+$font-family-sans-serif: $o-font-family-sans-serif !default;
 
 $font-size-base: $o-font-size-base !default;
 $line-height-base: $o-line-height-base !default;
@@ -123,7 +129,8 @@ $h3-font-size: $font-size-base * 1.3 !default;
 $h4-font-size: $font-size-base * 1.2 !default;
 $h5-font-size: $font-size-base * 1.1 !default;
 
-$headings-font-weight: bold !default;
+$headings-font-family: $o-headings-font-family !default;
+$headings-font-weight: $font-weight-bold !default;
 $headings-color: $o-main-headings-color !default;
 
 // Tables
@@ -132,13 +139,14 @@ $headings-color: $o-main-headings-color !default;
 
 $table-striped-color: inherit !default;
 $table-striped-bg-factor: .01 !default;
-$table-hover-bg-factor: .075 !default;
+$table-hover-bg-factor: .055 !default;
 $table-border-color: $gray-200 !default;
 $table-group-separator-color: $gray-200 !default;
 $table-cell-padding-x: .75rem !default;
 $table-cell-padding-y: .75rem !default;
 $table-cell-padding-x-sm: .3rem !default;
-$table-cell-padding-y-sm: .3rem !default;
+$table-cell-padding-y-sm: .5rem !default;
+$table-striped-order: even !default;
 
 $table-active-bg-factor: .05 !default;
 $table-active-color: $headings-color !default;
@@ -146,6 +154,9 @@ $table-th-font-weight: $headings-font-weight !default;
 
 // Buttons
 //
+
+$btn-font-weight: $font-weight-bold !default;
+$btn-disabled-opacity: $o-opacity-disabled !default;
 $btn-border-radius-lg: $border-radius !default;
 
 // Dropdowns
@@ -170,6 +181,7 @@ $dropdown-item-padding-x: $o-dropdown-hpadding !default;
 
 $list-group-active-color: $o-list-group-active-color !default;
 $list-group-active-bg: $o-list-group-active-bg !default;
+$list-group-action-hover-color: $gray-900 !default;
 
 // Z-index master list
 
@@ -243,12 +255,15 @@ $kbd-bg: $o-gray-100 !default;
 $kbd-box-shadow: 0px 1px 1px rgba($o-black, 0.2), inset 0px -1px 1px 1px rgba($o-gray-200, 0.8), inset 0px 2px 0px 0px rgba($o-white, 0.8) !default;
 
 // Input
-$input-bg: $o-white !default;
+$input-bg: $o-view-background-color !default;
+$input-focus-border-color: $o-brand-primary !default;
 $form-check-input-checked-color: $o-brand-lightsecondary !default;
 $form-check-input-checked-border-color: $o-brand-primary !default;
 $form-check-input-checked-bg-color: $o-brand-primary !default;
 $form-switch-checked-color: $input-bg !default;
 $form-switch-circle-bg-color: $input-bg !default;
+
+$form-range-thumb-bg: $primary !default;
 
 // Badge
 $badge-color: inherit !default;
@@ -262,4 +277,3 @@ $input-placeholder-color: $gray-300 !default;
 
 $card-spacer-y: $spacer !default; // BS Default
 $card-cap-padding-y: $card-spacer-y !default;
-$card-cap-bg: $o-white !default;

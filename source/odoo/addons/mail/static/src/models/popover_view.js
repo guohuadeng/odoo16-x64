@@ -46,6 +46,16 @@ registerModel({
         },
     },
     fields: {
+        activityButtonViewOwnerAsActivityList: one('ActivityButtonView', {
+            identifying: true,
+            inverse: 'activityListPopoverView',
+        }),
+        activityListView: one('ActivityListView', {
+            compute() {
+                return this.activityButtonViewOwnerAsActivityList ? {} : clear();
+            },
+            inverse: 'popoverViewOwner',
+        }),
         activityMarkDonePopoverContentView: one('ActivityMarkDonePopoverContentView', {
             compute() {
                 if (this.activityViewOwnerAsMarkDone) {
@@ -78,6 +88,9 @@ registerModel({
                 }
                 if (this.composerViewOwnerAsEmoji) {
                     return this.composerViewOwnerAsEmoji.buttonEmojisRef;
+                }
+                if (this.activityButtonViewOwnerAsActivityList) {
+                    return this.activityButtonViewOwnerAsActivityList.buttonRef;
                 }
                 if (this.messageActionViewOwnerAsReaction) {
                     return this.messageActionViewOwnerAsReaction.actionRef;
@@ -158,6 +171,9 @@ registerModel({
                 if (this.emojiPickerView) {
                     return this.emojiPickerView;
                 }
+                if (this.activityButtonViewOwnerAsActivityList) {
+                    return this.activityListView;
+                }
                 if (this.messageNotificationPopoverContentView) {
                     return this.messageNotificationPopoverContentView;
                 }
@@ -200,6 +216,9 @@ registerModel({
                 }
                 if (this.emojiPickerView) {
                     return 'EmojiPickerView';
+                }
+                if (this.activityButtonViewOwnerAsActivityList) {
+                    return 'ActivityListView';
                 }
                 if (this.messageNotificationPopoverContentView) {
                     return 'MessageNotificationPopoverContent';
@@ -273,6 +292,9 @@ registerModel({
                 }
                 if (this.composerViewOwnerAsEmoji) {
                     return 'top';
+                }
+                if (this.activityButtonViewOwnerAsActivityList) {
+                    return 'bottom-start';
                 }
                 if (this.messageActionViewOwnerAsReaction) {
                     return 'top';

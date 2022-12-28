@@ -96,7 +96,7 @@
                             groups="hr.group_hr_user"
                             attrs="{'invisible': [('emp_id', '=', False)]}">
                         <div class="o_field_widget o_stat_info">
-                            <span class="o_stat_text"><field name="employee_name"/></span>
+                            <span class="o_stat_text"><field name="employee_name" readonly="1"/></span>
                             <span class="o_stat_value">Employee</span>
                         </div>
                     </button>
@@ -140,7 +140,7 @@
                         <field name="refuse_reason_id" attrs="{'invisible': [('active', '=', True)]}"/>
                         <field name="email_from" widget="email"/>
                         <field name="email_cc" groups="base.group_no_one"/>
-                        <field name="partner_phone" widget="phone" options="{'enable_sms': 0}"/>
+                        <field name="partner_phone" widget="phone" options="{'enable_sms': false}"/>
                         <field name="partner_mobile" widget="phone"/>
                         <field name="type_id" placeholder="Degree"/>
                         <field name="linkedin_profile" widget="url"/>
@@ -263,6 +263,9 @@
                     domain="[('my_activity_date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
                 <filter invisible="1" string="Future Activities" name="activities_upcoming_all"
                     domain="[('my_activity_date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter invisible="1" string="Running Applicants" name="running_applicant_activities"
+                    domain="[('stage_id.hired_stage', '=', False)]"/>
                 <separator/>
                 <group expand="0" string="Group By">
                     <filter string="Responsible" name="responsible" domain="[]"  context="{'group_by': 'user_id'}"/>

@@ -76,10 +76,10 @@ tour.stepUtils.openBuggerMenu("li.breadcrumb-item.active:contains('Quotations')"
     content: _t("Save this product and the modifications you've made to it."),
     position: 'bottom',
 },
-tour.stepUtils.autoExpandMoreButtons('.o_form_readonly'),
+tour.stepUtils.autoExpandMoreButtons('.o_form_saved'),
 {
     trigger: ".oe_button_box .oe_stat_button div[name=bom_count]",
-    extra_trigger: '.o_form_readonly',
+    extra_trigger: '.o_form_saved',
     content: _t('See Bill of material'),
     position: 'bottom',
 }, {
@@ -148,7 +148,7 @@ tour.stepUtils.autoExpandMoreButtons('.o_form_readonly'),
 }, {
     mobile: false,
     trigger: ".o_field_widget[name=partner_id] input",
-    extra_trigger: ".modal-dialog",
+    extra_trigger: ".breadcrumb-item.active:contains(the_flow.component1)",
     content: _t('Select a seller'),
     position: 'top',
     run: "text the_flow.vendor",
@@ -206,23 +206,21 @@ tour.stepUtils.autoExpandMoreButtons('.o_form_readonly'),
 }, {
     mobile: true,
     trigger: '.o_field_widget[name=code] input',
-    extra_trigger: ".o_field_widget[name=product_id] .o_external_button", // Wait name_create
     // click somewhere else to exit cell focus
 }, {
     mobile: false,
     trigger: 'label:contains("Vendor Taxes")',
-    extra_trigger: ".o_field_widget[name=partner_id] .o_external_button", // Wait name_create
     // click somewhere else to exit cell focus
 }, {
     mobile: false,
-    trigger: ".modal-footer .o_form_button_save",
-    content: _t('Save'),
+    trigger: '.breadcrumb .o_back_button',
+    content: _t('Go back'),
     position: 'bottom',
 }, {
 // Add second component
     mobile: false,
     trigger: ".o_field_x2many_list_row_add > a",
-    extra_trigger: "body:not(:has(table.o_list_table div.o_field_widget[name='product_id'] input))",
+    extra_trigger: ".breadcrumb-item.active:contains('the_flow.product')",
     content: _t("Click here to add some lines."),
     position: "bottom",
 }, {
@@ -290,7 +288,7 @@ tour.stepUtils.autoExpandMoreButtons('.o_form_readonly'),
 }, {
     mobile: false,
     trigger: ".o_field_widget[name=partner_id] input",
-    extra_trigger: ".modal-dialog",
+    extra_trigger: ".breadcrumb-item.active:contains(the_flow.component2)",
     content: _t('Select a seller'),
     position: 'top',
     run: "text the_flow.vendor",
@@ -320,7 +318,6 @@ tour.stepUtils.autoExpandMoreButtons('.o_form_readonly'),
 }, {
     mobile: true,
     trigger: '.o_field_widget[name=code] input',
-    extra_trigger: ".o_field_widget[name=product_id] .o_external_button", // Wait name_create
     // click somewhere else to exit cell focus
 }, {
     mobile: false,
@@ -328,13 +325,8 @@ tour.stepUtils.autoExpandMoreButtons('.o_form_readonly'),
     // click somewhere else to exit cell focus
 }, {
     mobile: false,
-    trigger: ".modal-footer .o_form_button_save",
-    content: _t('Save'),
-    position: 'bottom',
-}, {
-    trigger: '.o_form_button_save',
-    extra_trigger: ".o_field_widget[name=bom_line_ids] tr:nth-child(3):has(.o_field_x2many_list_row_add)",
-    content: _t('Save the bom.'),
+    trigger: '.breadcrumb .o_back_button',
+    content: _t('Go back'),
     position: 'bottom',
 }, {
     mobile: false,
@@ -424,7 +416,6 @@ tour.stepUtils.autoExpandMoreButtons('.o_form_readonly'),
     position: 'right',
 }, {
     trigger: '.o_form_button_save',
-    extra_trigger: '.o_field_widget[name=project_id] .o_external_button', // Wait name_create
     content: _t("Save this product and the modifications you've made to it."),
     position: 'bottom',
 }, {
@@ -486,18 +477,18 @@ tour.stepUtils.autoExpandMoreButtons('.o_form_readonly'),
     position: "right",
 }, {
     mobile: false,
-    trigger: ".o_kanban_group:first .o_kanban_record:has(span:contains('the_flow.opportunity'))",
+    trigger: ".o_kanban_group:first .o_kanban_record span:contains('the_flow.opportunity')",
     content: Markup(_t("<b>Drag &amp; drop opportunities</b> between columns as you progress in your sales cycle.")),
     position: "right",
     run: "drag_and_drop_native .o_opportunity_kanban .o_kanban_group:eq(2) ",
 }, {
     mobile: false,
-    trigger: ".o_kanban_group:eq(2) > .o_kanban_record:has(span:contains('the_flow.opportunity'))",
+    trigger: ".o_kanban_group:eq(2) > .o_kanban_record span:contains('the_flow.opportunity')",
     content: _t("Click on an opportunity to zoom to it."),
     position: "bottom",
 }, {
     mobile: true,
-    trigger: ".o_kanban_group:first .o_kanban_record:has(span:contains('the_flow.opportunity'))",
+    trigger: ".o_kanban_group:first .o_kanban_record span:contains('the_flow.opportunity')",
     content: _t("Open the_flow.opportunity"),
     position: "bottom",
 }, {
@@ -539,8 +530,8 @@ tour.stepUtils.autoExpandMoreButtons('.o_form_readonly'),
     trigger: ".ui-menu-item > a:contains('the_flow.product')",
 }, {
     mobile: false,
-    trigger: ".o_field_widget[name=order_line] .o_external_button",
-    run: () => {},
+    trigger: "td[name='name'][data-tooltip*='the_flow.product']",
+    run: () => {}, // check
 }, {
     mobile: true,
     trigger: ".o_field_widget[name=product_id] input",
@@ -577,8 +568,8 @@ tour.stepUtils.autoExpandMoreButtons('.o_form_readonly'),
     trigger: ".ui-menu-item > a:contains('the_flow.service')",
 }, {
     mobile: false,
-    trigger: ".o_field_widget[name=order_line] .o_external_button",
-    run: () => {},
+    trigger: "td[name='name'][data-tooltip*='the_flow.service']",
+    run: () => {}, // check
 }, {
     mobile: false,
     trigger: 'label:contains("Untaxed Amount")',
@@ -586,7 +577,7 @@ tour.stepUtils.autoExpandMoreButtons('.o_form_readonly'),
 }, {
     mobile: true,
     trigger: ".o_field_widget[name=product_id] input",
-    extra_trigger: '.o_field_x2many_kanban[name=order_line] .oe_kanban_card:contains(the_flow.product)',
+    extra_trigger: '.o_field_widget[name=order_line] .oe_kanban_card:contains(the_flow.product)',
     content: _t("Select a product, or create a new one on the fly. The product will define the default sales price (that you can change), taxes and description automatically."),
     position: "right",
 },
@@ -598,7 +589,7 @@ tour.stepUtils.autoExpandMoreButtons('.o_form_readonly'),
     content: _t('Save & Close'),
     position: 'right',
 },
-...tour.stepUtils.statusbarButtonsSteps('Send by Email', _t("Try to send it to email"), ".o_statusbar_status .btn-primary:contains('Quotation')"),
+...tour.stepUtils.statusbarButtonsSteps('Send by Email', _t("Try to send it to email"), ".o_statusbar_status .btn:contains('Quotation')"),
 {
     trigger: ".o_field_widget[name=email] input",
     content: _t("Enter an email address"),
@@ -615,12 +606,6 @@ tour.stepUtils.autoExpandMoreButtons('.o_form_readonly'),
 },
 ...tour.stepUtils.statusbarButtonsSteps('Confirm', Markup(_t("<p>Confirm this quotation</p>"))),
 {
-    trigger: ".o_form_button_save",
-    extra_trigger: ".o_statusbar_status .btn-primary:contains('Sales Order')",
-    content: Markup(_t("<p>Save this quotation</p>")),
-    position: "bottom"
-// Reordering rule
-}, {
     edition: "enterprise",
     trigger: '.o_menu_toggle',
     content: _t('Go back to the home menu'),
@@ -704,7 +689,7 @@ tour.stepUtils.openBuggerMenu("li.breadcrumb-item.active:contains('OP/')"),
     position: 'bottom',
 }, {
     mobile: true,
-    trigger: '.o_kanban_record:has(.o_kanban_record_title:contains("the_flow.vendor"))',
+    trigger: '.o_kanban_record .o_kanban_record_title:contains("the_flow.vendor")',
     content: _t('Select the generated request for quotation'),
     position: 'bottom',
 },
@@ -723,11 +708,8 @@ tour.stepUtils.openBuggerMenu("li.breadcrumb-item.active:contains('OP/')"),
 },
 ...tour.stepUtils.statusbarButtonsSteps('Create Bill', _t('go to Vendor Bills'), ".o_statusbar_status .btn.dropdown-toggle:contains('Purchase Order')"),
 {
-    trigger: '.o_form_button_edit',
-    content: _t('Edit the vendor bill'),
-    extra_trigger: ".o_form_label .o_field_widget:contains('Vendor Bill')",
-}, {
     trigger:".o_field_widget[name=invoice_date] input",
+    extra_trigger: ".o_form_label .o_field_widget:contains('Vendor Bill')",
     content: _t('Set the invoice date'),
     run: "text 01/01/2020",
 },
@@ -761,21 +743,28 @@ tour.stepUtils.openBuggerMenu("li.breadcrumb-item.active:contains('Manufacturing
     position: 'bottom',
 }, {
     mobile: true,
-    trigger: '.o_kanban_record:has(.o_kanban_record_title:contains("the_flow.product")):first',
+    trigger: '.o_kanban_record .o_kanban_record_title:contains("the_flow.product"):first',
     extra_trigger: "li.breadcrumb-item.active:contains('Manufacturing Orders')",
     content: _t('Select the generated manufacturing order'),
     position: 'bottom',
 },
-...tour.stepUtils.statusbarButtonsSteps('Check availability', _t("Check availability")),
+...tour.stepUtils.statusbarButtonsSteps('Unreserve', _t("Unreserve")),
 {
-    trigger: ".o_form_button_edit:not(:disabled)",
-    content: _t('Edit the production order'),
-}, {
     trigger: ".o_field_widget[name=qty_producing] input",
+    extra_trigger: ".o_field_widget[name=move_raw_ids] tr[data-id]:first .o_field_widget[name=forecast_availability]:contains('Available')",
     position: 'left',
     content: _t("Produce"),
     run: "text 1",
 },
+...tour.stepUtils.statusbarButtonsSteps('Check availability', _t("Check availability")),
+{
+    trigger: ".o_field_widget[name=qty_producing] input",
+    extra_trigger: ".o_field_widget[name=move_raw_ids] tr[data-id]:first .o_field_widget[name=forecast_availability]:contains('1')",
+    position: 'left',
+    content: _t("Produce"),
+    run: "text 1",
+},
+
 ...tour.stepUtils.statusbarButtonsSteps('Mark as Done', _t("Mark as Done"), ".o_statusbar_status .btn.dropdown-toggle:contains('To Close')"),
 {
     edition: "enterprise",
@@ -824,16 +813,13 @@ tour.stepUtils.mobileModifier(tour.stepUtils.autoExpandMoreButtons('.o_control_p
     extra_trigger: 'div.o_notebook_headers',
     content: 'Click on Timesheets page to log a timesheet',
 }, {
-    trigger: '.o_form_button_edit',
-    content: _t('Click on Edit button to enter to the form view of the task.'),
-}, {
     mobile: false,
     trigger: 'div[name="timesheet_ids"] td.o_field_x2many_list_row_add a[role="button"]',
     content: 'Click on Add a line to create a new timesheet into the task.',
 }, {
     mobile: true,
     trigger: '.o-kanban-button-new',
-    content: _t("Click on Add in order to add a timesheet."),
+    content: _t('Open the full search field'),
     position: 'bottom',
 }, {
     mobile: false,
@@ -842,7 +828,7 @@ tour.stepUtils.mobileModifier(tour.stepUtils.autoExpandMoreButtons('.o_control_p
     run: 'text 10 hours',
 }, {
     mobile: true,
-    trigger: '.modal-body .o_form_view div[name="name"] input',
+    trigger: '.modal-content.o_form_view div[name="name"] input',
     content: 'Enter a description this timesheet',
     run: 'text 10 hours',
 }, {
@@ -852,13 +838,12 @@ tour.stepUtils.mobileModifier(tour.stepUtils.autoExpandMoreButtons('.o_control_p
     run: 'text 10',
 }, {
     mobile: true,
-    trigger: '.modal-body .o_form_view div[name="unit_amount"] input',
+    trigger: '.modal-content.o_form_view div[name="unit_amount"] input',
     content: 'Enter one hour for this timesheet',
     run: 'text 10',
 }, {
-    trigger: '.o_form_button_save',
-    content: _t('Save'),
-    position: 'bottom',
+    content: "save",
+    trigger: ".o_form_button_save",
 },
 ...tour.stepUtils.goBackBreadcrumbsMobile(
         _t('Back to the sale order'),
@@ -905,11 +890,6 @@ tour.stepUtils.mobileModifier(tour.stepUtils.autoExpandMoreButtons('.o_control_p
     edition: "enterprise",
     trigger: "div.o_account_kanban div.o_kanban_card_header a.oe_kanban_action span:contains('Bank')",
     content: _t("Open the bank reconciliation widget"),
-}, {
-    mobile: false,
-    edition: "enterprise",
-    trigger: "button.o_switch_view.o_list",
-    content: _t("Move to the list view"),
 }, {
     mobile: false,
     edition: "enterprise",
@@ -966,25 +946,6 @@ tour.stepUtils.mobileModifier(tour.stepUtils.autoExpandMoreButtons('.o_control_p
     trigger: "button[name='button_validate'].btn-primary",
     extra_trigger: "button[name='button_validate'].btn-primary",
     content: _t("Reconcile the bank transaction"),
-}, {
-    mobile: false,
-    edition: "enterprise",
-    trigger: ".o_control_panel .o_filter_menu .o_dropdown_title:contains('Filters'):first",
-    extra_trigger: "a.active[name='amls_tab']",
-    content: _t("Click on 'Filters'"),
-}, {
-    mobile: false,
-    edition: "enterprise",
-    trigger: ".o_control_panel .o_filter_menu .dropdown-item:contains('Matched')",
-    extra_trigger: ".o_control_panel .o_filter_menu .dropdown-item:contains('Matched')",
-    content: _t("Add the 'Matched' filters"),
-}, {
-    mobile: false,
-    edition: "enterprise",
-    trigger: "div.o_bank_rec_st_line_kanban_card span:contains('the_flow.customer')",
-    extra_trigger: "div.o_bank_rec_st_line_kanban_card span:contains('the_flow.customer')",
-    content: _t("Ensure the line is well reconciled"),
-    run: function(){},
 },
 // exit reconciliation widget
 {

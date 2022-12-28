@@ -331,12 +331,14 @@ var FieldHtml = basic_fields.DebouncedField.extend(DynamicPlaceholderFieldMixin)
      * when closing the wizard.
      *
      * @private
-     * @param {Object} attachments
+     * @param {Object} event the event containing attachment data
      */
-    _onAttachmentChange: function (attachments) {
-        if (!this.fieldNameAttachment) {
+    _onAttachmentChange: function (event) {
+        // This only needs to happen for the composer for now
+        if (!this.fieldNameAttachment || this.model !== 'mail.compose.message') {
             return;
         }
+        const attachments = event.data;
         this.trigger_up('field_changed', {
             dataPointID: this.dataPointID,
             changes: _.object([this.fieldNameAttachment], [{

@@ -102,7 +102,7 @@ ir.http._post_dispatch/Dispatcher.post_dispatch
 
 route_wrapper, closure of the http.route decorator
   Sanitize the request parameters, call the route endpoint and
-  optionaly coerce the endpoint result.
+  optionally coerce the endpoint result.
 
 endpoint
   The @route(...) decorated controller method.
@@ -207,21 +207,20 @@ CSRF_TOKEN_SALT = 60 * 60 * 24 * 365
 # The default lang to use when the browser doesn't specify it
 DEFAULT_LANG = 'en_US'
 
-# The dictionnary to initialise a new session with.
-DEFAULT_SESSION = {
-    'context': {
-        #'lang': request.default_lang()  # must be set at runtime
-    },
-    'db': None,
-    'debug': '',
-    'login': None,
-    'uid': None,
-    'session_token': None,
-    # profiling
-    'profile_session': None,
-    'profile_collectors': None,
-    'profile_params': None,
-}
+# The dictionary to initialise a new session with.
+def get_default_session():
+    return {
+        'context': {},  # 'lang': request.default_lang()  # must be set at runtime
+        'db': None,
+        'debug': '',
+        'login': None,
+        'uid': None,
+        'session_token': None,
+        # profiling
+        'profile_session': None,
+        'profile_collectors': None,
+        'profile_params': None,
+    }
 
 # The request mimetypes that transport JSON in their body.
 JSON_MIMETYPES = ('application/json', 'application/json-rpc')
@@ -231,7 +230,7 @@ No CSRF validation token provided for path %r
 
 Odoo URLs are CSRF-protected by default (when accessed with unsafe
 HTTP methods). See
-https://www.odoo.com/documentation/master/developer/reference/addons/http.html#csrf
+https://www.odoo.com/documentation/16.0/developer/reference/addons/http.html#csrf
 for more details.
 
 * if this endpoint is accessed through Odoo via py-QWeb form, embed a CSRF
@@ -343,6 +342,31 @@ def db_filter(dbs, host=None):
         return sorted(exposed_dbs.intersection(dbs))
 
     return list(dbs)
+
+
+def dispatch_rpc(service_name, method, params):
+    """
+    Perform a RPC call.
+
+    :param str service_name: either "common", "db" or "object".
+    :param str method: the method name of the given service to execute
+    :param Mapping params: the keyword arguments for method call
+    :return: the return value of the called method
+    :rtype: Any
+    """
+    rpc_dispatchers = {
+        'common': odoo.service.common.dispatch,
+        'db': odoo.service.db.dispatch,
+        'object': odoo.service.model.dispatch,
+    }
+
+    with borrow_request():
+        threading.current_thread().uid = None
+        threading.current_thread().dbname = None
+
+        dispatch = rpc_dispatchers[service_name]
+        return dispatch(method, params)
+
 
 def is_cors_preflight(request, endpoint):
     return request.httprequest.method == 'OPTIONS' and endpoint.routing.get('cors', False)
@@ -510,7 +534,7 @@ class Stream:
             should offer to save the file instead of displaying it.
         :param bool immutable: Add the ``immutable`` directive to the
             ``Cache-Control`` response header, allowing intermediary
-            proxies to aggresively cache the response. This option
+            proxies to aggressively cache the response. This option
             also set the ``max-age`` directive to 1 year.
         :param send_file_kwargs: Other keyword arguments to send to
             :func:`odoo.tools._vendor.send_file.send_file` instead of
@@ -755,10 +779,10 @@ def _generate_routing_rules(modules, nodb_only, converters=None):
                 'readonly': False,
             }
 
-            for cls in unique(reversed(type(ctrl).mro())):  # ancestors first
-                submethod = getattr(cls, method_name, None)
-                if submethod is None:
+            for cls in unique(reversed(type(ctrl).mro()[:-2])):  # ancestors first
+                if method_name not in cls.__dict__:
                     continue
+                submethod = getattr(cls, method_name)
 
                 if not hasattr(submethod, 'original_routing'):
                     _logger.warning("The endpoint %s is not decorated by @route(), decorating it myself.", f'{cls.__module__}.{cls.__name__}.{method_name}')
@@ -833,6 +857,7 @@ class FilesystemSessionStore(sessions.FilesystemSessionStore):
         session.sid = self.generate_key()
         if session.uid and env:
             session.session_token = security.compute_session_token(session, env)
+        session.should_rotate = False
         self.save(session)
 
     def vacuum(self):
@@ -890,6 +915,10 @@ class Session(collections.abc.MutableMapping):
             super().__setattr__(key, val)
         else:
             self[key] = val
+
+    def clear(self):
+        self.data.clear()
+        self.is_dirty = True
 
     #
     # Session methods
@@ -957,10 +986,10 @@ class Session(collections.abc.MutableMapping):
         })
 
     def logout(self, keep_db=False):
-        db = self.db if keep_db else DEFAULT_SESSION['db']  # None
+        db = self.db if keep_db else get_default_session()['db']  # None
         debug = self.debug
         self.clear()
-        self.update(DEFAULT_SESSION, db=db, debug=debug)
+        self.update(get_default_session(), db=db, debug=debug)
         self.context['lang'] = request.default_lang() if request else DEFAULT_LANG
         self.should_rotate = True
 
@@ -976,6 +1005,15 @@ class Session(collections.abc.MutableMapping):
 _request_stack = werkzeug.local.LocalStack()
 request = _request_stack()
 
+@contextlib.contextmanager
+def borrow_request():
+    """ Get the current request and unexpose it from the local stack. """
+    req = _request_stack.pop()
+    try:
+        yield req
+    finally:
+        _request_stack.push(req)
+
 
 class Response(werkzeug.wrappers.Response):
     """
@@ -984,7 +1022,7 @@ class Response(werkzeug.wrappers.Response):
     this class's constructor can take the following additional
     parameters for QWeb Lazy Rendering.
 
-    :param basestring template: template to render
+    :param str template: template to render
     :param dict qcontext: Rendering context to use
     :param int uid: User id to use for the ir.ui.view render call,
         ``None`` to use the request's user (the default)
@@ -1060,6 +1098,12 @@ class Response(werkzeug.wrappers.Response):
             self.response.append(self.render())
             self.template = None
 
+    def set_cookie(self, key, value='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None, cookie_type='required'):
+        if request.db and not request.env['ir.http']._is_allowed_cookie(cookie_type):
+            expires = 0
+            max_age = 0
+        super().set_cookie(key, value=value, max_age=max_age, expires=expires, path=path, domain=domain, secure=secure, httponly=httponly, samesite=samesite)
+
 
 class FutureResponse:
     """
@@ -1074,13 +1118,16 @@ class FutureResponse:
         self.headers = werkzeug.datastructures.Headers()
 
     @functools.wraps(werkzeug.Response.set_cookie)
-    def set_cookie(self, *args, **kwargs):
-        werkzeug.Response.set_cookie(self, *args, **kwargs)
+    def set_cookie(self, key, value='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None, cookie_type='required'):
+        if request.db and not request.env['ir.http']._is_allowed_cookie(cookie_type):
+            expires = 0
+            max_age = 0
+        werkzeug.Response.set_cookie(self, key, value=value, max_age=max_age, expires=expires, path=path, domain=domain, secure=secure, httponly=httponly, samesite=samesite)
 
 
 class Request:
     """
-    Wrapper around the incomming HTTP request with deserialized request
+    Wrapper around the incoming HTTP request with deserialized request
     parameters, session utilities and request dispatching logic.
     """
 
@@ -1090,9 +1137,11 @@ class Request:
         self.dispatcher = _dispatchers['http'](self)  # until we match
         #self.params = {}  # set by the Dispatcher
 
-        self.session, self.db = self._get_session_and_dbname()
         self.registry = None
         self.env = None
+
+    def _post_init(self):
+        self.session, self.db = self._get_session_and_dbname()
 
     def _get_session_and_dbname(self):
         # The session is explicit when it comes from the query-string or
@@ -1115,7 +1164,7 @@ class Request:
             session.sid = sid  # in case the session was not persisted
         session.is_explicit = is_explicit
 
-        for key, val in DEFAULT_SESSION.items():
+        for key, val in get_default_session().items():
             session.setdefault(key, val)
         if not session.context.get('lang'):
             session.context['lang'] = self.default_lang()
@@ -1142,7 +1191,13 @@ class Request:
     # Getters and setters
     # =====================================================
     def update_env(self, user=None, context=None, su=None):
-        """ Update the environment of the current request. """
+        """ Update the environment of the current request.
+
+        :param user: optional user/user id to change the current user
+        :type user: int or :class:`res.users record<~odoo.addons.base.models.res_users.Users>`
+        :param dict context: optional context dictionary to change the current context
+        :param bool su: optional boolean to change the superuser mode
+        """
         cr = None  # None is a sentinel, it keeps the same cursor
         self.env = self.env(cr, user, context, su)
         threading.current_thread().uid = self.env.uid
@@ -1151,7 +1206,7 @@ class Request:
         """
         Override the environment context of the current request with the
         values of ``overrides``. To replace the entire context, please
-        use :meth:`~update_env`: instead.
+        use :meth:`~update_env` instead.
         """
         self.update_env(context=dict(self.env.context, **overrides))
 
@@ -1189,7 +1244,7 @@ class Request:
         Get the remote address geolocalisation.
 
         When geolocalization is successful, the return value is a
-        dictionary whoose format is:
+        dictionary whose format is:
 
             {'city': str, 'country_code': str, 'country_name': str,
              'latitude': float, 'longitude': float, 'region': str,
@@ -1258,7 +1313,7 @@ class Request:
         return consteq(hm, hm_expected)
 
     def default_context(self):
-        return dict(DEFAULT_SESSION['context'], lang=self.default_lang())
+        return dict(get_default_session()['context'], lang=self.default_lang())
 
     def default_lang(self):
         """Returns default user language according to request specification
@@ -1413,11 +1468,11 @@ class Request:
         the dispatching. Meanwhile, the template and/or qcontext can be
         altered or even replaced by a static response.
 
-        :param basestring template: template to render
+        :param str template: template to render
         :param dict qcontext: Rendering context to use
         :param bool lazy: whether the template rendering should be deferred
                           until the last possible moment
-        :param kw: forwarded to werkzeug's Response object
+        :param dict kw: forwarded to werkzeug's Response object
         """
         response = Response(template=template, qcontext=qcontext, **kw)
         if not lazy:
@@ -1506,12 +1561,16 @@ class Request:
             # the registry. That means either
             #  - the database probably does not exists anymore, or
             #  - the database is corrupted, or
-            #  - the database version doesnt match the server version.
+            #  - the database version doesn't match the server version.
             # So remove the database from the cookie
             self.db = None
             self.session.db = None
             root.session_store.save(self.session)
-            return self.redirect('/web/database/selector')
+            if request.httprequest.path == '/web':
+                # Internal Server Error
+                raise
+            else:
+                return self._serve_nodb()
 
         with contextlib.closing(self.registry.cursor()) as cr:
             self.env = odoo.api.Environment(cr, self.session.uid, self.session.context)
@@ -1605,7 +1664,7 @@ class Dispatcher(ABC):
     def dispatch(self, endpoint, args):
         """
         Extract the params from the request's body and call the
-        endpoint. While it is prefered to override ir.http._pre_dispatch
+        endpoint. While it is preferred to override ir.http._pre_dispatch
         and ir.http._post_dispatch, this method can be override to have
         a tight control over the dispatching.
         """
@@ -1640,7 +1699,7 @@ class HttpDispatcher(Dispatcher):
         body and query-string and checking cors/csrf while dispatching a
         request to a ``type='http'`` route.
 
-        See :meth:`~odoo.http.Response.load`: method for the compatible
+        See :meth:`~odoo.http.Response.load` method for the compatible
         endpoint return types.
         """
         self.request.params = dict(self.request.get_http_params(), **args)
@@ -1671,9 +1730,9 @@ class HttpDispatcher(Dispatcher):
         could be delivered and that the request ``Content-Type`` was not
         json.
 
-        :param exc Exception: the exception that occured.
+        :param Exception exc: the exception that occurred.
         :returns: an HTTP error response
-        :rtype: werkzeug.wrapper.Response
+        :rtype: :class:`werkzeug.wrapper.Response`
         """
         if isinstance(exc, SessionExpiredException):
             session = self.request.session
@@ -1719,7 +1778,7 @@ class JsonRPCDispatcher(Dispatcher):
         the session context via a special ``context`` argument that is
         removed prior to calling the endpoint.
 
-        Sucessful request::
+        Successful request::
 
           --> {"jsonrpc": "2.0", "method": "call", "params": {"context": {}, "arg1": "val1" }, "id": null}
 
@@ -1740,7 +1799,7 @@ class JsonRPCDispatcher(Dispatcher):
         self.request.params = dict(self.jsonrequest.get('params', {}), **args)
         ctx = self.request.params.pop('context', None)
         if ctx is not None and self.request.db:
-            self.request.update_env(context=ctx)
+            self.request.update_context(**ctx)
 
         if self.request.db:
             result = self.request.registry['ir.http']._dispatch(endpoint)
@@ -1750,12 +1809,12 @@ class JsonRPCDispatcher(Dispatcher):
 
     def handle_error(self, exc):
         """
-        Handle any exception that occured while dispatching a request to
-        a `type='json'` route. Also handle exceptions that occured when
+        Handle any exception that occurred while dispatching a request to
+        a `type='json'` route. Also handle exceptions that occurred when
         no route matched the request path, that no fallback page could
         be delivered and that the request ``Content-Type`` was json.
 
-        :param exc Exception: the exception that occured.
+        :param exc Exception: the exception that occurred.
         :returns: an HTTP error response
         :rtype: Response
         """
@@ -1768,7 +1827,6 @@ class JsonRPCDispatcher(Dispatcher):
             'data': serialize_exception(exc),
         }
         if isinstance(exc, NotFound):
-            error['http_status'] = 404
             error['code'] = 404
             error['message'] = "404: Not Found"
         elif isinstance(exc, SessionExpiredException):
@@ -1779,11 +1837,9 @@ class JsonRPCDispatcher(Dispatcher):
 
     def _response(self, result=None, error=None):
         request_id = self.jsonrequest.get('id')
-        status = 200
         response = {'jsonrpc': '2.0', 'id': request_id}
         if error is not None:
             response['error'] = error
-            status = error.pop('http_status', 200)
         if result is not None:
             response['result'] = result
 
@@ -1913,20 +1969,13 @@ class Application:
                 return
             ProxyFix(fake_app)(environ, fake_start_response)
 
-        # Some URLs in website are concatened, first url ends with /,
-        # second url starts with /, resulting url contains two following
-        # slashes that must be merged.
-        if environ['REQUEST_METHOD'] == 'GET' and '//' in environ['PATH_INFO']:
-            response = werkzeug.utils.redirect(
-                environ['PATH_INFO'].replace('//', '/'), 301)
-            return response(environ, start_response)
-
         httprequest = werkzeug.wrappers.Request(environ)
         httprequest.user_agent_class = UserAgent  # use vendored userAgent since it will be removed in 2.1
         httprequest.parameter_storage_class = (
             werkzeug.datastructures.ImmutableOrderedMultiDict)
         request = Request(httprequest)
         _request_stack.push(request)
+        request._post_init()
         current_thread.url = httprequest.url
 
         try:

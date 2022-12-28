@@ -2,13 +2,14 @@
 
 import { isMobileOS } from "@web/core/browser/feature_detection";
 import { _lt } from "@web/core/l10n/translation";
+import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { url } from "@web/core/utils/urls";
-import { registry } from "@web/core/registry";
+import { isBinarySize } from "@web/core/utils/binary";
 import { FileUploader } from "../file_handler";
 import { standardFieldProps } from "../standard_field_props";
 
-const { Component, useState, onWillUpdateProps } = owl;
+import { Component, useState, onWillUpdateProps } from "@odoo/owl";
 const { DateTime } = luxon;
 
 export const fileTypeMagicWordMap = {
@@ -18,10 +19,6 @@ export const fileTypeMagicWordMap = {
     P: "svg+xml",
 };
 const placeholder = "/web/static/img/placeholder.png";
-
-function isBinarySize(value) {
-    return /^\d+(\.\d*)? [^0-9]+$/.test(value);
-}
 
 /**
  * Formats a value to be injected in the image's url in order for that url
@@ -79,6 +76,9 @@ export class ImageField extends Component {
     getUrl(previewFieldName) {
         if (this.state.isValid && this.props.value) {
             if (isBinarySize(this.props.value)) {
+                if (!this.rawCacheKey) {
+                    this.rawCacheKey = this.props.record.data.__last_update;
+                }
                 return url("/web/image", {
                     model: this.props.record.resModel,
                     id: this.props.record.resId,
@@ -99,6 +99,8 @@ export class ImageField extends Component {
     }
     onFileUploaded(info) {
         this.state.isValid = true;
+        // Invalidate the `rawCacheKey`.
+        this.rawCacheKey = null;
         this.props.update(info.data);
     }
     onLoadFailed() {
@@ -139,8 +141,14 @@ ImageField.extractProps = ({ attrs }) => {
         zoomDelay: attrs.options.zoom_delay,
         previewImage: attrs.options.preview_image,
         acceptedFileExtensions: attrs.options.accepted_file_extensions,
-        width: attrs.options.size && Boolean(attrs.options.size[0]) ? attrs.options.size[0] : attrs.width,
-        height: attrs.options.size && Boolean(attrs.options.size[1]) ? attrs.options.size[1] : attrs.height,
+        width:
+            attrs.options.size && Boolean(attrs.options.size[0])
+                ? attrs.options.size[0]
+                : attrs.width,
+        height:
+            attrs.options.size && Boolean(attrs.options.size[1])
+                ? attrs.options.size[1]
+                : attrs.height,
     };
 };
 

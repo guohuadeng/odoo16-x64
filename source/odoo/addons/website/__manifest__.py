@@ -103,6 +103,7 @@
         'views/ir_attachment_views.xml',
         'views/ir_model_views.xml',
         'views/res_partner_views.xml',
+        'views/neutralize_views.xml',
         'wizard/base_language_install_views.xml',
         'wizard/website_robots.xml',
     ],
@@ -114,6 +115,9 @@
     'post_init_hook': 'post_init_hook',
     'uninstall_hook': 'uninstall_hook',
     'assets': {
+        'mail.assets_messaging': [
+            'website/static/src/models/*.js',
+        ],
         'web.assets_frontend': [
             ('replace', 'web/static/src/legacy/js/public/public_root_instance.js', 'website/static/src/js/content/website_root_instance.js'),
             'website/static/src/scss/website.scss',
@@ -129,6 +133,7 @@
             'website/static/src/js/post_link.js',
             'website/static/src/js/plausible.js',
             'website/static/src/js/user_custom_javascript.js',
+            'website/static/src/js/http_cookie.js',
             'website/static/src/xml/website.xml',
             'website/static/src/xml/website.background.video.xml',
             'website/static/src/xml/website.share.xml',
@@ -177,6 +182,15 @@
             'website/static/src/components/views/*',
             'website/static/src/services/website_service.js',
             'website/static/src/js/utils.js',
+
+            # Don't include dark mode files in light mode
+            ('remove', 'website/static/src/client_actions/*/*.dark.scss'),
+        ],
+        "web.dark_mode_assets_backend": [
+            'website/static/src/components/dialog/*.dark.scss',
+            'website/static/src/scss/website.backend.dark.scss',
+            'website/static/src/client_actions/*/*.dark.scss',
+            'website/static/src/components/website_loader/website_loader.dark.scss'
         ],
         'web.assets_common': [
             'website/static/src/js/tours/tour_utils.js',
@@ -269,6 +283,9 @@
             'website/static/src/client_actions/*/*.xml',
             'website/static/src/components/website_loader/*.xml',
             'website/static/src/js/backend/**/*',
+
+            # Don't include dark mode files in light mode
+            ('remove', 'website/static/src/components/dialog/*.dark.scss'),
         ],
         'website.test_bundle': [
             '/web/static/lib/qweb/qweb2.js',

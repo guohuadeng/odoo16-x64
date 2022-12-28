@@ -18,7 +18,7 @@ import { KeepLast } from "@web/core/utils/concurrency";
  * @property {string} string
  */
 
-const { EventBus, markRaw } = owl;
+import { EventBus, markRaw } from "@odoo/owl";
 
 const FALSE = Symbol("false");
 
@@ -145,13 +145,13 @@ class KanbanGroup extends Group {
     /**
      * @override
      */
-    quickCreate(activeFields, context, atFirstPosition) {
+    quickCreate(activeFields, context) {
         const ctx = { ...context };
         if (this.hasActiveProgressValue && this.progressValue.active !== FALSE) {
             const { fieldName } = this.model.progressAttributes;
             ctx[`default_${fieldName}`] = this.progressValue.active;
         }
-        return super.quickCreate(activeFields, ctx, atFirstPosition);
+        return super.quickCreate(activeFields, ctx);
     }
 
     async load() {
@@ -263,8 +263,14 @@ class KanbanGroup extends Group {
      * @returns {Promise<void>}
      */
     async updateProgressData(progressData) {
+        let value = this.displayName || this.value;
+        if (value === true) {
+            value = "True";
+        } else if (value === false) {
+            value = "False";
+        }
         /** @type {Record<string, number>} */
-        const groupProgressData = progressData[this.displayName || this.value] || {};
+        const groupProgressData = progressData[value] || {};
         /** @type {Map<string | symbol, number>} */
         const counts = new Map(
             groupProgressData ? Object.entries(groupProgressData) : [[FALSE, this.count]]
@@ -281,12 +287,12 @@ class KanbanGroup extends Group {
      * @param {number} index
      * @returns {Promise<Record | false>}
      */
-    async validateQuickCreate(index) {
+    async validateQuickCreate() {
         const record = this.list.quickCreateRecord;
         if (record) {
             const saved = await record.save();
             if (saved) {
-                this.addRecord(this.removeRecord(record), index);
+                this.addRecord(this.removeRecord(record), 0);
                 this.count++;
                 this.list.count++;
                 return record;
@@ -327,8 +333,9 @@ class KanbanGroup extends Group {
 }
 
 export class KanbanDynamicGroupList extends DynamicGroupList {
-    setup() {
+    setup(params, state) {
         super.setup(...arguments);
+        this.previousParams = state.previousParams || "[]";
 
         this.groupBy = this.groupBy.slice(0, 1);
 
@@ -352,6 +359,17 @@ export class KanbanDynamicGroupList extends DynamicGroupList {
         return [...super.fieldNames, ...this.sumFields];
     }
 
+    get currentParams() {
+        return JSON.stringify([this.domain, this.groupBy]);
+    }
+
+    exportState() {
+        return {
+            ...super.exportState(),
+            previousParams: this.currentParams,
+        };
+    }
+
     /**
      * After a reload, empty groups are expcted to disappear from the web_read_group.
      * However, if the parameters are the same (domain + groupBy), we want to
@@ -360,7 +378,20 @@ export class KanbanDynamicGroupList extends DynamicGroupList {
      * @override
      */
     async load() {
-        await this._loadWithProgressData(super.load());
+        const load = async () => {
+            const previousGroups = this.groups.map((g, i) => [g, i]);
+            await super.load();
+            if (this.previousParams === this.currentParams) {
+                for (const [group, index] of previousGroups) {
+                    const newGroup = this.groups.find((g) => group.valueEquals(g.value));
+                    if (!group.deleted && !newGroup) {
+                        group.empty();
+                        this.groups.splice(index, 0, group);
+                    }
+                }
+            }
+        };
+        await this._loadWithProgressData(load());
     }
 
     /**
@@ -443,7 +474,9 @@ export class KanbanDynamicGroupList extends DynamicGroupList {
             const refIndex = targetGroup.list.records.findIndex((r) => r.id === refId);
             // Quick update: moves the record at the right position and notifies components
             targetGroup.addRecord(sourceGroup.removeRecord(record), refIndex + 1);
-            const value = isRelational(this.groupByField) ? [targetGroup.value] : targetGroup.value;
+            const value = isRelational(this.groupByField)
+                ? [targetGroup.value, targetGroup.displayName]
+                : targetGroup.value;
 
             const abort = () => {
                 this.model.transaction.abort(dataRecordId);

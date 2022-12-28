@@ -21,6 +21,7 @@ const pasteData = async function (editor, text, type) {
 
 const pasteText = async (editor, text) => pasteData(editor, text, 'text/plain');
 const pasteHtml = async (editor, html) => pasteData(editor, html, 'text/html');
+const pasteOdooEditorHtml = async (editor, html) => pasteData(editor, html, 'text/odoo-editor');
 
 describe('Copy and paste', () => {
     describe('Html Paste cleaning', () => {
@@ -1284,6 +1285,15 @@ describe('Copy and paste', () => {
                     contentAfter: '<p>a<a href="https://boom.com">boom[].com</a>d</p>',
                 });
             });
+            it('should paste and transform URL over the existing url', async () => {
+                await testEditor(BasicEditor, {
+                    contentBefore: '<p>ab[<a href="http://www.xyz.com">http://www.xyz.com</a>]cd</p>',
+                    stepFunction: async editor => {
+                        await pasteText(editor, 'https://www.xyz.xdc ');
+                    },
+                    contentAfter: '<p>ab<a href="https://www.xyz.xdc">https://www.xyz.xdc</a> []cd</p>',
+                });
+            });
         });
         describe('range not collapsed', async () => {
             it('should paste and transform an URL in a p', async () => {
@@ -1476,6 +1486,26 @@ describe('Copy and paste', () => {
                     },
                     contentAfter: '<p>a<a href="http://existing.com">bhttps://www.youtube.com/watch?v=dQw4w9WgXcQ[]c</a>d</p>',
                 });
+            });
+        });
+    });
+    describe('Odoo editor own html', () => {
+        it('should paste html as is', async () => {
+            await testEditor(BasicEditor, {
+                contentBefore: '<p>a[]b</p>',
+                stepFunction: async editor => {
+                    await pasteOdooEditorHtml(editor, '<div class="custom-paste">b</div>');
+                },
+                contentAfter: '<p>a</p><div class="custom-paste">b</div>[]<p>b</p>',
+            });
+        });
+        it('should not paste unsafe content', async () => {
+            await testEditor(BasicEditor, {
+                contentBefore: '<p>a[]b</p>',
+                stepFunction: async editor => {
+                    await pasteOdooEditorHtml(editor, `<script>console.log('xss attack')</script>`);
+                },
+                contentAfter: '<p>a[]b</p>',
             });
         });
     });

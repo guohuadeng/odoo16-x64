@@ -10,6 +10,8 @@ import {
 } from "@web/views/utils";
 import { Field } from "@web/views/fields/field";
 import { XMLParser } from "@web/core/utils/xml";
+import { Widget } from "@web/views/widgets/widget";
+import { encodeObjectForTemplate } from "@web/views/view_compiler";
 
 export class GroupListArchParser extends XMLParser {
     parse(arch, models, modelName, jsClass) {
@@ -35,6 +37,22 @@ export class GroupListArchParser extends XMLParser {
 }
 
 export class ListArchParser extends XMLParser {
+    isColumnVisible(columnInvisibleModifier) {
+        return columnInvisibleModifier !== true;
+    }
+
+    parseFieldNode(node, models, modelName) {
+        return Field.parseFieldNode(node, models, modelName, "list");
+    }
+
+    parseWidgetNode(node, models, modelName) {
+        return Widget.parseWidgetNode(node);
+    }
+
+    processButton(node) {
+        return processButton(node);
+    }
+
     parse(arch, models, modelName) {
         const xmlDoc = this.parseXML(arch);
         const fieldNodes = {};
@@ -60,9 +78,9 @@ export class ListArchParser extends XMLParser {
             }
             if (node.tagName === "button") {
                 const modifiers = JSON.parse(node.getAttribute("modifiers") || "{}");
-                if (modifiers.column_invisible !== true) {
+                if (this.isColumnVisible(modifiers.column_invisible)) {
                     const button = {
-                        ...processButton(node),
+                        ...this.processButton(node),
                         defaultRank: "btn-link",
                         type: "button",
                         id: buttonId++,
@@ -80,7 +98,7 @@ export class ListArchParser extends XMLParser {
                     }
                 }
             } else if (node.tagName === "field") {
-                const fieldInfo = Field.parseFieldNode(node, models, modelName, "list");
+                const fieldInfo = this.parseFieldNode(node, models, modelName);
                 fieldNodes[fieldInfo.name] = fieldInfo;
                 node.setAttribute("field_id", fieldInfo.name);
                 if (fieldInfo.widget === "handle") {
@@ -91,7 +109,7 @@ export class ListArchParser extends XMLParser {
                     models[modelName],
                     fieldInfo.FieldComponent.fieldDependencies
                 );
-                if (fieldInfo.modifiers.column_invisible !== true) {
+                if (this.isColumnVisible(fieldInfo.modifiers.column_invisible)) {
                     const label = fieldInfo.FieldComponent.label;
                     columns.push({
                         ...fieldInfo,
@@ -104,6 +122,27 @@ export class ListArchParser extends XMLParser {
                     });
                 }
                 return false;
+            } else if (node.tagName === "widget") {
+                const widgetInfo = this.parseWidgetNode(node);
+                addFieldDependencies(
+                    activeFields,
+                    models[modelName],
+                    widgetInfo.WidgetComponent.fieldDependencies
+                );
+
+                const widgetProps = {
+                    ...widgetInfo,
+                    // FIXME: this is dumb, we encode it into a weird object so that the widget
+                    // can decode it later...
+                    node: encodeObjectForTemplate({ attrs: widgetInfo.rawAttrs }).slice(1, -1),
+                    className: node.getAttribute("class"),
+                };
+                columns.push({
+                    ...widgetInfo,
+                    props: widgetProps,
+                    id: `column_${nextId++}`,
+                    type: "widget",
+                });
             } else if (node.tagName === "groupby" && node.getAttribute("name")) {
                 const fieldName = node.getAttribute("name");
                 const xmlSerializer = new XMLSerializer();

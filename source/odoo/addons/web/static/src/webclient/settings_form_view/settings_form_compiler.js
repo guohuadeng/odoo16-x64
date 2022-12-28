@@ -159,6 +159,8 @@ function highlightElement(el) {
 function compileForm() {
     const res = this.compileForm(...arguments);
     res.classList.remove("o_form_nosheet");
+    res.classList.remove("p-2");
+    res.classList.remove("px-lg-5");
     return res;
 }
 
@@ -177,7 +179,7 @@ export class SettingsFormCompiler extends FormCompiler {
             { selector: "h2", fn: compileSettingsGroupTitle },
             { selector: "h3.o_setting_tip", fn: compileSettingsGroupTip },
             // search terms and highlight :
-            { selector: "label", fn: compileLabel },
+            { selector: "label", fn: compileLabel, doNotCopyAttributes: true },
             { selector: "span.o_form_label", fn: compileGenericLabel },
             { selector: "div.text-muted", fn: compileGenericLabel },
             { selector: "field", fn: compileField }

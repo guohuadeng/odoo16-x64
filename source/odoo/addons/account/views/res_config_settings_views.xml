@@ -112,7 +112,7 @@
                                 </div>
                                 <div class="o_setting_right_pane" name="l10n_eu_oss_right_pane">
                                     <label for="module_l10n_eu_oss"/>
-                                    <a href="https://www.odoo.com/documentation/master/applications/finance/accounting/taxation/taxes/eu_distance_selling.html" title="Documentation" class="o_doc_link" target="_blank"></a>
+                                    <a href="https://www.odoo.com/documentation/16.0/applications/finance/accounting/taxation/taxes/eu_distance_selling.html" title="Documentation" class="o_doc_link" target="_blank"></a>
                                     <div class="text-muted">
                                         Apply VAT of the EU country to which goods and services are delivered.
                                     </div>
@@ -152,7 +152,7 @@
                                         Domestic country of your accounting
                                     </div>
                                     <div class="text-muted">
-                                        <field name="account_fiscal_country_id"/>
+                                        <field name="account_fiscal_country_id" options="{'no_create': True, 'no_open': True}"/>
                                     </div>
                                 </div>
                             </div>
@@ -236,7 +236,7 @@
                                 </div>
                                 <div class="o_setting_right_pane">
                                     <label for="group_sale_delivery_address"/>
-                                    <a href="https://www.odoo.com/documentation/master/applications/sales/sales/send_quotations/different_addresses.html" title="Documentation" class="o_doc_link" target="_blank"></a>
+                                    <a href="https://www.odoo.com/documentation/16.0/applications/sales/sales/send_quotations/different_addresses.html" title="Documentation" class="o_doc_link" target="_blank"></a>
                                     <div class="text-muted">
                                         Select specific invoice and delivery addresses
                                     </div>
@@ -536,6 +536,10 @@
                                                 <field name="account_journal_payment_credit_account_id"/>
                                             </div>
                                             <div class="row mt8">
+                                                <label for="transfer_account_id" class="col-lg-5 o_light_label"/>
+                                                <field name="transfer_account_id"/>
+                                            </div>
+                                            <div class="row mt8">
                                                 <label for="account_journal_early_pay_discount_gain_account_id" class="col-lg-5 o_light_label"/>
                                                 <field name="account_journal_early_pay_discount_gain_account_id"/>
                                             </div>
@@ -681,8 +685,9 @@
                             <div class="col-12 col-lg-12 o_setting_box">
                                 <div class="text-muted">
                                     <p style="margin-bottom: 0">Accounting firm mode will change invoice/bill encoding:</p>
-                                    <p style="margin-bottom: 0"> - The sequence’s document becomes manageable for each document.</p>
+                                    <p style="margin-bottom: 0"> - The document's sequence becomes editable on all documents.</p>
                                     <p style="margin-bottom: 0"> - A new field « Total (tax inc.) » to speed up and control the encoding by automating line creation with the right account &amp; tax.</p>
+                                    <p style="margin-bottom: 0"> - A default Customer Invoice / Vendor Bill date will be suggested.</p>
                                 </div>
                                 <div class="o_setting_right_pane mt16">
                                     <label for="quick_edit_mode"/>

@@ -45,12 +45,12 @@ tour.register('crm_tour', {
     position: "right",
     run: "drag_and_drop_native .o_opportunity_kanban .o_kanban_group:eq(2) ",
 }, {
-    trigger: ".o_kanban_record:not(.o_updating) .o_activity_color_default",
+    trigger: ".o_kanban_record:not(.o_updating) .o_ActivityButtonView",
     extra_trigger: ".o_opportunity_kanban",
     content: Markup(_t("Looks like nothing is planned. :(<br><br><i>Tip : Schedule activities to keep track of everything you have to do!</i>")),
     position: "bottom",
 }, {
-    trigger: ".o_schedule_activity",
+    trigger: ".o_ActivityListView_addActivityButton",
     extra_trigger: ".o_opportunity_kanban",
     content: Markup(_t("Let's <b>Schedule an Activity.</b>")),
     position: "bottom",
@@ -78,11 +78,11 @@ tour.register('crm_tour', {
     },
 }, {
     trigger: ".o_lead_opportunity_form .o_statusbar_status",
-    content: _t("This bar also allows you to switch stage."),
+    content: _t("You can make your opportunity advance through your pipeline from here."),
     position: "bottom"
 }, {
     trigger: ".breadcrumb-item:not(.active):first",
-    content: _t("Click on the breadcrumb to go back to the Pipeline."),
+    content: _t("Click on the breadcrumb to go back to your Pipeline. Odoo will save all modifications as you navigate."),
     position: "bottom",
     run: function (actions) {
         actions.auto(".breadcrumb-item:not(.active):last");

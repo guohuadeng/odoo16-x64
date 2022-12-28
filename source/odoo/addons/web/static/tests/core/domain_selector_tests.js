@@ -9,10 +9,10 @@ import { registry } from "@web/core/registry";
 import { uiService } from "@web/core/ui/ui_service";
 import { viewService } from "@web/views/view_service";
 import { makeTestEnv } from "../helpers/mock_env";
-import { click, getFixture, mount, triggerEvent } from "../helpers/utils";
+import { click, editInput, editSelect, getFixture, mount, triggerEvent } from "../helpers/utils";
 import { makeFakeLocalizationService } from "../helpers/mock_services";
 
-const { Component, xml } = owl;
+import { Component, xml } from "@odoo/owl";
 
 let serverData;
 let target;
@@ -94,14 +94,7 @@ QUnit.module("Components", (hooks) => {
         `;
 
         // Create the domain selector and its mock environment
-        await mountComponent(Parent, {
-            props: {
-                resModel: "partner",
-                value: "[]",
-                readonly: false,
-                isDebugMode: true,
-            },
-        });
+        await mountComponent(Parent);
 
         // As we gave an empty domain, there should be a visible button to add
         // the first domain part
@@ -125,10 +118,11 @@ QUnit.module("Components", (hooks) => {
         );
 
         // The field selector popover should contain the list of "partner"
-        // fields. "Bar" should be among them.
+        // fields. "Bar" should be among them. "Bar" result li will display the
+        // name of the field and some debug info.
         assert.strictEqual(
             document.body.querySelector(".o_field_selector_popover li").textContent,
-            "Bar",
+            "Barbar (boolean)",
             "field selector popover should contain the 'Bar' field"
         );
 
@@ -499,5 +493,118 @@ QUnit.module("Components", (hooks) => {
         });
 
         assert.verifySteps(["fields_get"]);
+    });
+
+    QUnit.test("selection field with operator change from 'is set' to '='", async (assert) => {
+        serverData.models.partner.fields.state = {
+            string: "State",
+            type: "selection",
+            selection: [
+                ["abc", "ABC"],
+                ["def", "DEF"],
+                ["ghi", "GHI"],
+            ],
+        };
+
+        class Parent extends Component {
+            setup() {
+                this.value = `[['state', '!=', false]]`;
+            }
+            onUpdate(newValue) {
+                this.value = newValue;
+                this.render();
+            }
+        }
+        Parent.components = { DomainSelector };
+        Parent.template = xml`
+            <DomainSelector
+                resModel="'partner'"
+                value="value"
+                readonly="false"
+                update="(newValue) => this.onUpdate(newValue)"
+            />
+        `;
+
+        // Create the domain selector and its mock environment
+        await mountComponent(Parent);
+
+        assert.strictEqual(target.querySelector(".o_field_selector_chain_part").innerText, "State");
+        assert.strictEqual(target.querySelector(".o_domain_leaf_operator_select").value, "2"); // option "!="
+
+        await editSelect(target, ".o_domain_leaf_operator_select", 0);
+
+        assert.strictEqual(target.querySelector(".o_field_selector_chain_part").innerText, "State");
+        assert.strictEqual(target.querySelector(".o_domain_leaf_operator_select").value, "0"); // option "="
+        assert.strictEqual(target.querySelector(".o_domain_leaf_value_input").value, "abc");
+    });
+
+    QUnit.test("show correct operator", async (assert) => {
+        serverData.models.partner.fields.state = {
+            string: "State",
+            type: "selection",
+            selection: [
+                ["abc", "ABC"],
+                ["def", "DEF"],
+                ["ghi", "GHI"],
+            ],
+        };
+
+        await mountComponent(DomainSelector, {
+            props: {
+                resModel: "partner",
+                value: `[['state', 'in', ['abc']]]`,
+                readonly: false,
+            },
+        });
+
+        const select = target.querySelector(".o_domain_leaf_operator_select");
+        assert.strictEqual(select.options[select.options.selectedIndex].text, "in");
+    });
+
+    QUnit.test("multi selection", async (assert) => {
+        serverData.models.partner.fields.state = {
+            string: "State",
+            type: "selection",
+            selection: [
+                ["a", "A"],
+                ["b", "B"],
+                ["c", "C"],
+            ],
+        };
+
+        class Parent extends Component {
+            setup() {
+                this.value = `[("state", "in", ["a", "b", "c"])]`;
+            }
+            onUpdate(newValue) {
+                this.value = newValue;
+                this.render();
+            }
+        }
+        Parent.components = { DomainSelector };
+        Parent.template = xml`
+            <DomainSelector
+                resModel="'partner'"
+                value="value"
+                readonly="false"
+                update="(newValue) => this.onUpdate(newValue)"
+            />
+        `;
+
+        // Create the domain selector and its mock environment
+        const comp = await mountComponent(Parent);
+
+        assert.containsOnce(target, ".o_domain_leaf_value_input");
+        assert.strictEqual(comp.value, `[("state", "in", ["a", "b", "c"])]`);
+        assert.strictEqual(
+            target.querySelector(".o_domain_leaf_value_input").value,
+            `["a", "b", "c"]`
+        );
+
+        await editInput(target, ".o_domain_leaf_value_input", `[]`);
+        assert.strictEqual(comp.value, `[("state", "in", [])]`);
+
+        await editInput(target, ".o_domain_leaf_value_input", `["b"]`);
+        assert.strictEqual(comp.value, `[("state", "in", ["b"])]`);
     });
 });
