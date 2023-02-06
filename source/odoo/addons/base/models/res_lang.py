@@ -139,6 +139,8 @@ class Lang(models.Model):
         iso_lang = tools.get_iso_codes(lang)
         for ln in tools.get_locales(lang):
             try:
+                if ln.find('.') >= 0:
+                    ln = ln[0:ln.index('.')]
                 locale.setlocale(locale.LC_ALL, str(ln))
                 fail = False
                 break
