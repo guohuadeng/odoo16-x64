@@ -27,9 +27,10 @@ from difflib import get_close_matches
 from hashlib import sha256
 
 from .tools import (
-    float_repr, float_round, float_compare, float_is_zero, html_sanitize, human_size,
+    float_repr, float_round, float_compare, float_is_zero, human_size,
     pg_varchar, ustr, OrderedSet, pycompat, sql, date_utils, unique,
     image_process, merge_sequences, SQL_ORDER_BY_TYPE, is_list_of, has_list_types,
+    html_normalize, html_sanitize,
 )
 from .tools import DEFAULT_SERVER_DATE_FORMAT as DATE_FORMAT
 from .tools import DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
@@ -799,7 +800,7 @@ class Field(MetaField('DummyField', (object,), {})):
                 if not (field is self and not index):
                     yield tuple(field_seq)
 
-                if field.type in ('one2many', 'many2many'):
+                if field.type == 'one2many':
                     for inv_field in Model.pool.field_inverses[field]:
                         yield tuple(field_seq) + (inv_field,)
 
@@ -1798,14 +1799,17 @@ class _String(Field):
                 continue
             from_lang_value = old_translations.get(lang, old_translations.get('en_US'))
             translation_dictionary = self.get_translation_dictionary(from_lang_value, old_translations)
-            text2term = {self.get_text_content(term): term for term in new_terms}
+            text2terms = defaultdict(list)
+            for term in new_terms:
+                text2terms[self.get_text_content(term)].append(term)
 
             for old_term in list(translation_dictionary.keys()):
                 if old_term not in new_terms:
                     old_term_text = self.get_text_content(old_term)
-                    matches = get_close_matches(old_term_text, text2term, 1, 0.9)
+                    matches = get_close_matches(old_term_text, text2terms, 1, 0.9)
                     if matches:
-                        translation_dictionary[text2term[matches[0]]] = translation_dictionary.pop(old_term)
+                        closest_term = get_close_matches(old_term, text2terms[matches[0]], 1, 0)[0]
+                        translation_dictionary[closest_term] = translation_dictionary.pop(old_term)
             # pylint: disable=not-callable
             new_translations = {
                 l: self.translate(lambda term: translation_dictionary.get(term, {l: None})[l], cache_value)
@@ -1982,21 +1986,25 @@ class Html(_String):
 
             original_value = record[self.name]
             if original_value:
-                initial_value_sanitized = html_sanitize(original_value, **sanitize_vals)
+                # Note that sanitize also normalize
+                original_value_sanitized = html_sanitize(original_value, **sanitize_vals)
+                original_value_normalized = html_normalize(original_value)
 
-                def get_parsed(val):
-                    return etree.tostring(html.fromstring(val))
-
-                # could have been emptied by the sanitizer
                 if (
-                    not initial_value_sanitized
-                    or get_parsed(original_value) != get_parsed(initial_value_sanitized)
+                    not original_value_sanitized  # sanitizer could empty it
+                    or original_value_normalized != original_value_sanitized
                 ):
                     # The field contains element(s) that would be removed if
                     # sanitized. It means that someone who was part of a group
                     # allowing to bypass the sanitation saved that field
                     # previously.
-                    raise UserError(_("Someone with escalated rights previously modified this field (%s %s), you are therefore not able to modify it yourself.", record._description, self.string))
+                    raise UserError(_(
+                        "The field value you're saving (%s %s) includes content that is "
+                        "restricted for security reasons. It is possible that someone "
+                        "with higher privileges previously modified it, and you are therefore "
+                        "not able to modify it yourself while preserving the content.",
+                        record._description, self.string,
+                    ))
 
         return html_sanitize(value, **sanitize_vals)
 
@@ -4807,6 +4815,9 @@ class Many2many(_RelationalMulti):
         for record in records:
             cache.set(record, self, tuple(new_relation[record.id]))
 
+        # determine the corecords for which the relation has changed
+        modified_corecord_ids = set()
+
         # process pairs to add (beware of duplicates)
         pairs = [(x, y) for x, ys in new_relation.items() for y in ys - old_relation[x]]
         if pairs:
@@ -4820,6 +4831,7 @@ class Many2many(_RelationalMulti):
             y_to_xs = defaultdict(set)
             for x, y in pairs:
                 y_to_xs[y].add(x)
+                modified_corecord_ids.add(y)
             for invf in records.pool.field_inverses[self]:
                 domain = invf.get_domain_list(comodel)
                 valid_ids = set(records.filtered_domain(domain)._ids)
@@ -4840,6 +4852,7 @@ class Many2many(_RelationalMulti):
             y_to_xs = defaultdict(set)
             for x, y in pairs:
                 y_to_xs[y].add(x)
+                modified_corecord_ids.add(y)
 
             if self.store:
                 # express pairs as the union of cartesian products:
@@ -4867,6 +4880,16 @@ class Many2many(_RelationalMulti):
                         cache.set(corecord, invf, ids1)
                     except KeyError:
                         pass
+
+        if modified_corecord_ids:
+            # trigger the recomputation of fields that depend on the inverse
+            # fields of self on the modified corecords
+            corecords = comodel.browse(modified_corecord_ids)
+            corecords.modified([
+                invf.name
+                for invf in model.pool.field_inverses[self]
+                if invf.model_name == self.comodel_name
+            ])
 
         return records.filtered(
             lambda record: new_relation[record.id] != old_relation[record.id]
@@ -4927,6 +4950,9 @@ class Many2many(_RelationalMulti):
         for record in records:
             cache.set(record, self, tuple(new_relation[record.id]))
 
+        # determine the corecords for which the relation has changed
+        modified_corecord_ids = set()
+
         # process pairs to add (beware of duplicates)
         pairs = [(x, y) for x, ys in new_relation.items() for y in ys - old_relation[x]]
         if pairs:
@@ -4934,6 +4960,7 @@ class Many2many(_RelationalMulti):
             y_to_xs = defaultdict(set)
             for x, y in pairs:
                 y_to_xs[y].add(x)
+                modified_corecord_ids.add(y)
             for invf in records.pool.field_inverses[self]:
                 domain = invf.get_domain_list(comodel)
                 valid_ids = set(records.filtered_domain(domain)._ids)
@@ -4955,6 +4982,7 @@ class Many2many(_RelationalMulti):
             y_to_xs = defaultdict(set)
             for x, y in pairs:
                 y_to_xs[y].add(x)
+                modified_corecord_ids.add(y)
             for invf in records.pool.field_inverses[self]:
                 for y, xs in y_to_xs.items():
                     corecord = comodel.browse([y])
@@ -4964,6 +4992,16 @@ class Many2many(_RelationalMulti):
                         cache.set(corecord, invf, ids1)
                     except KeyError:
                         pass
+
+        if modified_corecord_ids:
+            # trigger the recomputation of fields that depend on the inverse
+            # fields of self on the modified corecords
+            corecords = comodel.browse(modified_corecord_ids)
+            corecords.modified([
+                invf.name
+                for invf in model.pool.field_inverses[self]
+                if invf.model_name == self.comodel_name
+            ])
 
         return records.filtered(
             lambda record: new_relation[record.id] != old_relation[record.id]

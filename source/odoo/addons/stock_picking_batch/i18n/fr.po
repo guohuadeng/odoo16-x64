@@ -5,6 +5,7 @@
 # Translators:
 # Martin Trigaux, 2022
 # Cécile Collart <cco@odoo.com>, 2022
+# Jolien De Paepe, 2023
 # 
 msgid ""
 msgstr ""
@@ -12,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-10 10:23+0000\n"
 "PO-Revision-Date: 2022-09-22 05:55+0000\n"
-"Last-Translator: Cécile Collart <cco@odoo.com>, 2022\n"
+"Last-Translator: Jolien De Paepe, 2023\n"
 "Language-Team: French (https://www.transifex.com/odoo/teams/41243/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -201,8 +202,8 @@ msgstr ""
 msgid ""
 "Automatically put pickings into batches as they are confirmed when possible."
 msgstr ""
-"Mettez automatiquement les transferts en lots au fur et à mesure qu'ils sont"
-" confirmés lorsque cela est possible."
+"Mettez automatiquement les transferts par lots au fur et à mesure qu'ils "
+"sont confirmés lorsque cela est possible."
 
 #. module: stock_picking_batch
 #: model_terms:ir.ui.view,arch_db:stock_picking_batch.report_picking_batch
@@ -227,24 +228,24 @@ msgstr "Mode groupé"
 #: model_terms:ir.ui.view,arch_db:stock_picking_batch.view_picking_internal_search_inherit
 #, python-format
 msgid "Batch Transfer"
-msgstr "Transfert en lot"
+msgstr "Transfert par lot"
 
 #. module: stock_picking_batch
 #: model:ir.model,name:stock_picking_batch.model_stock_picking_to_batch
 msgid "Batch Transfer Lines"
-msgstr "Lignes de transfert en lot"
+msgstr "Lignes de transfert par lot"
 
 #. module: stock_picking_batch
 #: model:ir.actions.act_window,name:stock_picking_batch.stock_picking_batch_action
 #: model:ir.ui.menu,name:stock_picking_batch.stock_picking_batch_menu
 #: model_terms:ir.ui.view,arch_db:stock_picking_batch.view_picking_type_form_inherit
 msgid "Batch Transfers"
-msgstr "Transferts en lot"
+msgstr "Transferts par lot"
 
 #. module: stock_picking_batch
 #: model_terms:ir.ui.view,arch_db:stock_picking_batch.stock_picking_batch_filter
 msgid "Batch Transfers not finished"
-msgstr "Transfert en lot non terminé"
+msgstr "Transferts par lot non terminés"
 
 #. module: stock_picking_batch
 #: model:ir.model.fields,help:stock_picking_batch.field_stock_move_line__batch_id
@@ -318,7 +319,7 @@ msgstr "Contact"
 #. module: stock_picking_batch
 #: model:ir.model.fields,field_description:stock_picking_batch.field_stock_picking_type__count_picking_batch
 msgid "Count Picking Batch"
-msgstr "Nombre de transferts du batch"
+msgstr "Nombre de pickings par lot"
 
 #. module: stock_picking_batch
 #: model:ir.model.fields,field_description:stock_picking_batch.field_stock_picking_type__count_picking_wave
@@ -615,8 +616,8 @@ msgstr "Type de transfert"
 msgid ""
 "Please add 'Done' quantities to the batch picking to create a new pack."
 msgstr ""
-"Ajoutez les quantités 'faites' au transfert en lot pour créer un nouveau "
-"colis"
+"Ajoutez les quantités 'faites' au picking par lot pour créer un nouveau "
+"colis."
 
 #. module: stock_picking_batch
 #: model_terms:ir.ui.view,arch_db:stock_picking_batch.stock_picking_batch_form
@@ -631,12 +632,12 @@ msgstr "Imprimer les étiquettes"
 #. module: stock_picking_batch
 #: model_terms:ir.ui.view,arch_db:stock_picking_batch.report_picking_batch
 msgid "Product"
-msgstr "Article"
+msgstr "Produit"
 
 #. module: stock_picking_batch
 #: model:ir.model,name:stock_picking_batch.model_stock_move_line
 msgid "Product Moves (Stock Move Line)"
-msgstr "Mouvements d'article (Ligne de mouvement de stock)"
+msgstr "Mouvements de produit (Ligne de mouvement de stock)"
 
 #. module: stock_picking_batch
 #: model_terms:ir.ui.view,arch_db:stock_picking_batch.stock_picking_batch_form
@@ -954,7 +955,7 @@ msgstr "Vous ne pouvez pas supprimer des transferts par lots finalisés"
 #: code:addons/stock_picking_batch/models/stock_picking_batch.py:0
 #, python-format
 msgid "You have to set some pickings to batch."
-msgstr "Vous devez assigner des transferts au lot"
+msgstr "Vous devez assigner des pickings au lot"
 
 #. module: stock_picking_batch
 #: model:ir.model.fields.selection,name:stock_picking_batch.selection__stock_picking_to_batch__mode__new

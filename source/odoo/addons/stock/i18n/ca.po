@@ -20,18 +20,18 @@
 # Arnau Ros, 2022
 # ericrolo, 2022
 # Jonatan Gk, 2022
-# Josep Anton Belchi, 2022
-# Óscar Fonseca <tecnico@extreme-micro.com>, 2022
-# Ivan Espinola, 2022
+# jabelchi, 2022
 # Farouk Jabiri, 2022
+# Ivan Espinola, 2023
+# Óscar Fonseca <tecnico@extreme-micro.com>, 2023
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:48+0000\n"
+"POT-Creation-Date: 2023-02-02 10:33+0000\n"
 "PO-Revision-Date: 2022-09-22 05:55+0000\n"
-"Last-Translator: Farouk Jabiri, 2022\n"
+"Last-Translator: Óscar Fonseca <tecnico@extreme-micro.com>, 2023\n"
 "Language-Team: Catalan (https://www.transifex.com/odoo/teams/41243/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -284,6 +284,7 @@ msgstr ""
 
 #. module: stock
 #. odoo-python
+#: code:addons/stock/models/stock_rule.py:0
 #: code:addons/stock/models/stock_rule.py:0
 #, python-format
 msgid "+ %d day(s)"
@@ -1884,7 +1885,10 @@ msgid "Count Picking Waiting"
 msgstr "Comptador de recollida esperant"
 
 #. module: stock
+#. odoo-javascript
+#: code:addons/stock/static/src/views/list/inventory_report_list_controller.js:0
 #: model:ir.actions.report,name:stock.action_report_inventory
+#, python-format
 msgid "Count Sheet"
 msgstr "Compte de full"
 
@@ -2326,8 +2330,8 @@ msgid ""
 "quotations or confirmed manufacturing orders to resupply your stock."
 msgstr ""
 "Definiu una regla d'estoc mínima de manera que l'Odoo creï automàticament "
-"peticions de citacions o comandes de fabricació confirmades per a reabastir "
-"l'estoc."
+"peticions de pressupost o comandes de fabricació confirmades per a "
+"reaprovisionar l'estoc."
 
 #. module: stock
 #: model_terms:ir.actions.act_window,help:stock.action_warehouse_form
@@ -2776,7 +2780,7 @@ msgstr "Fet"
 #: model_terms:ir.ui.view,arch_db:stock.view_move_line_form
 #: model_terms:ir.ui.view,arch_db:stock.view_move_line_tree
 msgid "Done By"
-msgstr ""
+msgstr "Fet per"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_package_level__state__draft
@@ -3275,6 +3279,13 @@ msgstr ""
 #: model:ir.model.fields,help:stock.field_stock_warehouse__sequence
 msgid "Gives the sequence of this line when displaying the warehouses."
 msgstr "Dóna la seqüència d'aquesta línia quan es mostren els magatzems."
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_rule.py:0
+#, python-format
+msgid "Global Visibility Days"
+msgstr "Dies globals de visibilitat"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.search_product_lot_filter
@@ -3840,6 +3851,15 @@ msgstr "Domini invàlid per l'operant %s"
 #, python-format
 msgid "Invalid domain right operand %s"
 msgstr "Domini invàlid per l'operant dret %s"
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/product.py:0
+#, python-format
+msgid ""
+"Invalid rule's configuration, the following rule causes an endless loop: %s"
+msgstr ""
+"Configuració de regla no vàlida, la següent regla causa un bucle infinit: %s"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_quant__inventory_quantity_auto_apply
@@ -4604,7 +4624,7 @@ msgstr "Adjunt principal"
 #: code:addons/stock/models/stock_warehouse.py:0
 #, python-format
 msgid "Make To Order"
-msgstr "Sota comanda"
+msgstr "Fabricar sota comanda"
 
 #. module: stock
 #: model:res.groups,name:stock.group_tracking_owner
@@ -6089,7 +6109,6 @@ msgstr "Categories de producte"
 #: model:ir.model.fields,field_description:stock.field_stock_putaway_rule__category_id
 #: model:ir.model.fields,field_description:stock.field_stock_quant__product_categ_id
 #: model:ir.model.fields,field_description:stock.field_stock_warehouse_orderpoint__product_category_id
-#: model_terms:ir.ui.view,arch_db:stock.quant_search_view
 #: model_terms:ir.ui.view,arch_db:stock.stock_putaway_list
 msgid "Product Category"
 msgstr "Categoria del producte"
@@ -6989,18 +7008,18 @@ msgstr "Usuari responsable"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_warehouse
 msgid "Resupply"
-msgstr "Abastiment"
+msgstr "Reaprovisionar"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_warehouse__resupply_wh_ids
 msgid "Resupply From"
-msgstr "Formulari d'abastiment"
+msgstr "Reaprovisionar des de"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_replenishment_info__warehouseinfo_ids
 #: model:ir.model.fields,field_description:stock.field_stock_warehouse__resupply_route_ids
 msgid "Resupply Routes"
-msgstr "Rutes d'abastiment"
+msgstr "Rutes de reaprovisionament"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
@@ -7124,8 +7143,8 @@ msgid ""
 "Routes will be created automatically to resupply this warehouse from the "
 "warehouses ticked"
 msgstr ""
-"Les rutes es crearan automàticament per abastir aquest magatzem del magatzem"
-" marcat"
+"Les rutes es crearan automàticament per reaprovisionar aquest magatzem des "
+"dels magatzems seleccionats"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_replenishment_info__warehouseinfo_ids
@@ -7134,8 +7153,8 @@ msgid ""
 "Routes will be created for these resupply warehouses and you can select them"
 " on products and product categories"
 msgstr ""
-"Les rutes es crearan per aquest magatzem d'abastiment i és podrà seleccionar"
-" als productes i les categories de producte"
+"Es crearan rutes per a aquests magatzems de reaprovisionament i podreu "
+"activar-les en els productes i categories de productes"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_rule__rule_message
@@ -7488,8 +7507,11 @@ msgstr ""
 "La ubicació de la font d'aquest moviment es canviarà a %s"
 
 #. module: stock
+#. odoo-javascript
+#: code:addons/stock/static/src/views/list/inventory_report_list_controller.js:0
 #: model:ir.actions.server,name:stock.action_view_set_quants_tree
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_quant_tree_inventory_editable
+#, python-format
 msgid "Set"
 msgstr "Estableix"
 
@@ -8467,9 +8489,9 @@ msgid ""
 "different of the warehouse this rule is for (e.g for resupplying rules from "
 "another warehouse)"
 msgstr ""
-"El magatzem a propagar al moviment/proveïment creat, que pot ser diferent "
-"del magatzem per a què és aquesta regla (per exemple, per regles "
-"d'abastiment magatzem)"
+"El magatzem a propagar al moviment/aprovisionament creat, que pot ser "
+"diferent del magatzem per al qual es fa aquesta regla (p. ex.: per a les "
+"regles de reaprovisionament des d'un altre magatzem)"
 
 #. module: stock
 #. odoo-python
@@ -8654,6 +8676,17 @@ msgstr ""
 "Aquest producte s'ha utilitzat com a mínim en un moviment d'inventari. No es"
 " recomana canviar el tipus de producte ja que pot provocar inconsistències. "
 "Una millor solució podria ser arxivar el producte i crear-ne un de nou."
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/product.py:0
+#, python-format
+msgid ""
+"This product's company cannot be changed as long as there are quantities of "
+"it belonging to another company."
+msgstr ""
+"L'empresa d'aquest producte no es pot canviar mentre hi hagi quantitats que "
+"pertanyin a una altra empresa."
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_change_product_qty__new_quantity
@@ -9164,7 +9197,7 @@ msgstr "Anul·lar la reserva"
 #: code:addons/stock/models/stock_move.py:0
 #, python-format
 msgid "Unsafe unit of measure"
-msgstr ""
+msgstr "Unitat de mesura insegura"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__product_uom
@@ -9836,8 +9869,8 @@ msgstr "No pots introduir quantitats negatives."
 #. odoo-python
 #: code:addons/stock/models/stock_move.py:0
 #, python-format
-msgid "You can only delete draft moves."
-msgstr "Només pot eliminar moviments esborrany."
+msgid "You can only delete draft or cancelled moves."
+msgstr "Només podeu suprimir esborranys o moviments cancel·lats."
 
 #. module: stock
 #. odoo-python
@@ -9883,6 +9916,15 @@ msgid ""
 msgstr ""
 "No podeu cancel· lar un moviment d' accions que s' ha establert a 'Done'. "
 "Crea un retorn per a revertir els moviments que han tingut lloc."
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_move.py:0
+#, python-format
+msgid "You cannot change a cancelled stock move, create a new line instead."
+msgstr ""
+"No podeu canviar un moviment d'estoc cancel·lat, creeu una línia nova com "
+"alternativa."
 
 #. module: stock
 #. odoo-python

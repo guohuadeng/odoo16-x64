@@ -3,7 +3,7 @@
 # 	* portal
 # 
 # Translators:
-# Mehjabin Farsana, 2022
+# Mehjabin Farsana, 2023
 # 
 msgid ""
 msgstr ""
@@ -11,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-15 12:45+0000\n"
 "PO-Revision-Date: 2022-09-22 05:53+0000\n"
-"Last-Translator: Mehjabin Farsana, 2022\n"
+"Last-Translator: Mehjabin Farsana, 2023\n"
 "Language-Team: Malay (https://www.transifex.com/odoo/teams/41243/ms/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -284,7 +284,7 @@ msgstr ""
 #: code:addons/portal/static/src/xml/portal_chatter.xml:0
 #, python-format
 msgid "Avatar"
-msgstr ""
+msgstr "Avatar"
 
 #. module: portal
 #. odoo-javascript
@@ -293,7 +293,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:portal.portal_share_wizard
 #, python-format
 msgid "Cancel"
-msgstr ""
+msgstr "Batal"
 
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.portal_my_security
@@ -343,7 +343,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:portal.wizard_view
 #, python-format
 msgid "Close"
-msgstr ""
+msgstr "Tutup"
 
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.portal_my_details_fields
@@ -353,14 +353,14 @@ msgstr ""
 #. module: portal
 #: model:ir.model,name:portal.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Tetapan Konfigurasi"
 
 #. module: portal
 #. odoo-javascript
 #: code:addons/portal/static/src/js/portal.js:0
 #, python-format
 msgid "Confirm"
-msgstr ""
+msgstr "Sahkan"
 
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.portal_my_details
@@ -390,7 +390,7 @@ msgstr ""
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.wizard_view
 msgid "Contacts"
-msgstr ""
+msgstr "Kenalan"
 
 #. module: portal
 #. odoo-javascript
@@ -402,12 +402,12 @@ msgstr ""
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.portal_my_details_fields
 msgid "Country"
-msgstr ""
+msgstr "Negara"
 
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.portal_my_details_fields
 msgid "Country..."
-msgstr ""
+msgstr "Negara..."
 
 #. module: portal
 #: model:ir.model.fields,field_description:portal.field_portal_share__create_uid
@@ -531,7 +531,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:portal.field_portal_wizard_user__email
 #: model_terms:ir.ui.view,arch_db:portal.portal_my_details_fields
 msgid "Email"
-msgstr ""
+msgstr "E-mel"
 
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.wizard_view
@@ -597,7 +597,7 @@ msgstr ""
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.portal_breadcrumbs
 msgid "Home"
-msgstr ""
+msgstr "Rumah"
 
 #. module: portal
 #: model:ir.model.fields,field_description:portal.field_portal_share__id
@@ -618,7 +618,7 @@ msgstr ""
 #: code:addons/portal/static/src/xml/portal_chatter.xml:0
 #, python-format
 msgid "Internal Note"
-msgstr ""
+msgstr "Nota Dalaman"
 
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.wizard_view
@@ -731,7 +731,7 @@ msgstr ""
 #. module: portal
 #: model:ir.model,name:portal.model_mail_message
 msgid "Message"
-msgstr ""
+msgstr "Mesej"
 
 #. module: portal
 #. odoo-python
@@ -791,7 +791,7 @@ msgstr ""
 #. module: portal
 #: model:ir.model.fields,field_description:portal.field_portal_share__note
 msgid "Note"
-msgstr ""
+msgstr "Nota"
 
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.portal_record_sidebar
@@ -893,7 +893,7 @@ msgstr ""
 #: code:addons/portal/static/src/xml/portal_chatter.xml:0
 #, python-format
 msgid "Previous"
-msgstr ""
+msgstr "Sebelumnya"
 
 #. module: portal
 #. odoo-javascript
@@ -922,7 +922,7 @@ msgstr ""
 #. module: portal
 #: model:ir.model.fields,field_description:portal.field_portal_share__partner_ids
 msgid "Recipients"
-msgstr ""
+msgstr "Penerima"
 
 #. module: portal
 #: model:ir.model.fields,field_description:portal.field_portal_share__resource_ref
@@ -952,7 +952,7 @@ msgstr ""
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.portal_searchbar
 msgid "Search"
-msgstr ""
+msgstr "Cari"
 
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.portal_my_security
@@ -985,7 +985,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:portal.portal_share_wizard
 #, python-format
 msgid "Send"
-msgstr ""
+msgstr "Hantar"
 
 #. module: portal
 #: model:ir.actions.act_window,name:portal.portal_share_action
@@ -1027,12 +1027,12 @@ msgstr ""
 #. module: portal
 #: model:ir.model.fields,field_description:portal.field_portal_wizard_user__email_state
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.portal_my_details_fields
 msgid "Street"
-msgstr ""
+msgstr "Jalan"
 
 #. module: portal
 #. odoo-javascript
@@ -1189,12 +1189,12 @@ msgstr "pengguna"
 #. module: portal
 #: model:ir.model.fields,field_description:portal.field_portal_wizard__user_ids
 msgid "Users"
-msgstr ""
+msgstr "Pengguna"
 
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.portal_my_details_fields
 msgid "VAT Number"
-msgstr ""
+msgstr "Nombor VAT"
 
 #. module: portal
 #: model:ir.model.fields.selection,name:portal.selection__portal_wizard_user__email_state__ok
@@ -1214,7 +1214,7 @@ msgstr ""
 #. module: portal
 #: model:ir.model,name:portal.model_ir_ui_view
 msgid "View"
-msgstr ""
+msgstr "Lihat"
 
 #. module: portal
 #. odoo-javascript
@@ -1237,7 +1237,7 @@ msgstr "Kelihatan"
 #: model:ir.model.fields,field_description:portal.field_res_partner__website_message_ids
 #: model:ir.model.fields,field_description:portal.field_res_users__website_message_ids
 msgid "Website Messages"
-msgstr ""
+msgstr "Mesej Laman Web"
 
 #. module: portal
 #: model:ir.model.fields,help:portal.field_calendar_event__website_message_ids
@@ -1253,7 +1253,7 @@ msgstr ""
 #: model:ir.model.fields,help:portal.field_res_partner__website_message_ids
 #: model:ir.model.fields,help:portal.field_res_users__website_message_ids
 msgid "Website communication history"
-msgstr ""
+msgstr "Sejarah komunikasi laman web"
 
 #. module: portal
 #. odoo-javascript
@@ -1359,7 +1359,7 @@ msgstr ""
 #: code:addons/portal/static/src/xml/portal_chatter.xml:0
 #, python-format
 msgid "comments"
-msgstr ""
+msgstr "komen"
 
 #. module: portal
 #. odoo-javascript

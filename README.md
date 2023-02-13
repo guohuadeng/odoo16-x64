@@ -15,7 +15,7 @@ http://nightly.odoocdn.com/15.0/nightly/src/odoo_15.0.latest.zip
 1. python 3.7.5, 64位
 2. postgresql 13.4 ,64位
 3. Nginx 1.15.5， 64位
-4. Odoo 16社区版，20220923版
+4. Odoo 16社区版，20230213版
 5. 增加 sphinx 及 tx_client，用于文档及翻译
 6. 本地执行 gi.bat，会将原始odoo的最新版clone到本地 .\source_git，执行 gu.bat 更新
 7. 对断点调试的处理， 如果更新了新版odoo，将 .\fixed 目录内容覆盖 .\source 内容
@@ -42,8 +42,8 @@ http://demo.erpapp.cn
 - 重新初始化数据库：执行 init.bat
 - 如多版本并存，请自行调整nginx的映射端口
 - Odoo16下载地址 https://codeload.github.com/odoo/odoo/zip/16.0
-- 高速Odoo16下载地址 http://nightly.odoo.com/master/nightly/src/odoo_16.1alpha1.latest.zip
-http://nightly.odoocdn.com/master/nightly/src/odoo_16.1alpha1.latest.zip
+- 高速Odoo16下载地址
+https://nightly.odoocdn.com/16.0/nightly/src/odoo_16.0.latest.zip
 - pycharm配置说明： http://www.sunpop.cn/odoo_12_11_10_dev_with_pycharm_setup/
 
 

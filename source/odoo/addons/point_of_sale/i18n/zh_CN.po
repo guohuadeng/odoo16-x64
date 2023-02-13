@@ -3,19 +3,19 @@
 # 	* point_of_sale
 # 
 # Translators:
-# 陕西_jack, 2022
 # Raymond Yu <cl_yu@hotmail.com>, 2022
-# digitalliuzg8888, 2022
-# Jeffery CHEN <jeffery9@gmail.com>, 2022
-# Martin Trigaux, 2022
+# Jeffery CHEN Fan <jeffery9@gmail.com>, 2022
+# Emily Jia <eji@odoo.com>, 2023
+# Martin Trigaux, 2023
+# digitalliuzg8888, 2023
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:48+0000\n"
+"POT-Creation-Date: 2023-02-02 10:33+0000\n"
 "PO-Revision-Date: 2022-09-22 05:53+0000\n"
-"Last-Translator: Martin Trigaux, 2022\n"
+"Last-Translator: digitalliuzg8888, 2023\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/odoo/teams/41243/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -454,7 +454,7 @@ msgstr "添加提示"
 msgid ""
 "Add a QR code on the ticket, which the user can scan to request the invoice "
 "linked to its order."
-msgstr "在小票上添加QR码，用户可以扫描该QR码以请求链接到其订单的发票。"
+msgstr "在小票上添加QR码，用户可以扫描该QR码以请求链接到其订单的结算。"
 
 #. module: point_of_sale
 #. odoo-javascript
@@ -655,7 +655,7 @@ msgstr "POS的内部确认。"
 #: code:addons/point_of_sale/static/src/js/ChromeWidgets/HeaderButton.js:0
 #, python-format
 msgid "An unknown error prevents us from getting closing information."
-msgstr ""
+msgstr "未知错误阻止我们获取关闭信息。"
 
 #. module: point_of_sale
 #. odoo-javascript
@@ -663,7 +663,7 @@ msgstr ""
 #: code:addons/point_of_sale/static/src/js/Screens/ProductScreen/ProductItem.js:0
 #, python-format
 msgid "An unknown error prevents us from loading product information."
-msgstr ""
+msgstr "未知错误阻止我们加载产品信息。"
 
 #. module: point_of_sale
 #. odoo-python
@@ -866,7 +866,7 @@ msgstr "结束前的差异"
 #. module: point_of_sale
 #: model_terms:ir.ui.view,arch_db:point_of_sale.ticket_validation_screen
 msgid "Billing address:"
-msgstr "账单地址"
+msgstr "账单地址:"
 
 #. module: point_of_sale
 #: model_terms:ir.ui.view,arch_db:point_of_sale.view_pos_bill_form
@@ -1825,7 +1825,7 @@ msgstr "默认临时帐户"
 #. module: point_of_sale
 #: model_terms:ir.ui.view,arch_db:point_of_sale.res_config_settings_view_form
 msgid "Default journals for orders and invoices"
-msgstr "订单和发票的默认日记帐"
+msgstr "订单和结算的默认日记帐"
 
 #. module: point_of_sale
 #: model_terms:ir.ui.view,arch_db:point_of_sale.res_config_settings_view_form
@@ -2373,7 +2373,7 @@ msgstr "强制完成"
 #. module: point_of_sale
 #: model:ir.model.fields,field_description:point_of_sale.field_account_payment__force_outstanding_account_id
 msgid "Forced Outstanding Account"
-msgstr "强制未结账户"
+msgstr "强制未完成账户"
 
 #. module: point_of_sale
 #: model:ir.model.fields,help:point_of_sale.field_pos_payment_method__split_transactions
@@ -2402,7 +2402,7 @@ msgstr "订单参考的生成"
 #. module: point_of_sale
 #: model_terms:ir.ui.view,arch_db:point_of_sale.ticket_validation_screen
 msgid "Get my invoice"
-msgstr "获取我的发票"
+msgstr "获取我的结算"
 
 #. module: point_of_sale
 #: model:ir.model.fields,help:point_of_sale.field_pos_category__sequence
@@ -3009,7 +3009,7 @@ msgid ""
 "Account used as outstanding account when creating accounting payment records for bank payments."
 msgstr ""
 "留空以使用公司设置中的默认账户。\n"
-"当创建银行支付的账户支付记录时，账户将用作未结账户。"
+"当创建银行支付的账户支付记录时，账户将用作未完成账户。"
 
 #. module: point_of_sale
 #: model:ir.model.fields,help:point_of_sale.field_pos_payment_method__receivable_account_id
@@ -3037,7 +3037,7 @@ msgstr ""
 "留空以使用客户的应收账款。\n"
 "定义在结束门店会话后在何处记录累计支付（或个人支付，如果客户正确）的凭证。\n"
 "对于现金凭证，我們通过报表行直接写入凭证的的默认账户。\n"
-"对于银行凭证，我们会写入此支付方式中指定的未结账户。\n"
+"对于银行凭证，我们会写入此支付方式中指定的未完成账户。\n"
 "只允许现金和银行凭证。"
 
 #. module: point_of_sale
@@ -3240,6 +3240,13 @@ msgstr "支付方式"
 #: model:pos.category,name:point_of_sale.pos_category_miscellaneous
 msgid "Miscellaneous"
 msgstr "杂项"
+
+#. module: point_of_sale
+#. odoo-javascript
+#: code:addons/point_of_sale/static/src/js/Chrome.js:0
+#, python-format
+msgid "Missing barcode nomenclature"
+msgstr "缺少条码命名规则"
 
 #. module: point_of_sale
 #. odoo-javascript
@@ -3882,7 +3889,7 @@ msgstr "其它"
 #. module: point_of_sale
 #: model:ir.model.fields,field_description:point_of_sale.field_pos_payment_method__outstanding_account_id
 msgid "Outstanding Account"
-msgstr "未结账户"
+msgstr "未完成账户"
 
 #. module: point_of_sale
 #: model:ir.model.fields,field_description:point_of_sale.field_procurement_group__pos_order_id
@@ -4263,6 +4270,8 @@ msgid ""
 "Please close and validate the following open PoS Sessions before modifying this payment method.\n"
 "Open sessions: %s"
 msgstr ""
+"在修改此付款方式前，请关闭并验证以下打开的销售点（PoS）会话。\n"
+"打开会话：%s"
 
 #. module: point_of_sale
 #. odoo-javascript
@@ -4724,7 +4733,7 @@ msgstr "打印收据"
 msgid ""
 "Print a QR code on the receipt to allow the user to easily request the "
 "invoice for an order."
-msgstr "在收据上打印一个二维码，让用户轻松索取订单的发票"
+msgstr "在收据上打印二维码，以便用户轻松索取订单发票。"
 
 #. module: point_of_sale
 #. odoo-javascript
@@ -5335,7 +5344,7 @@ msgstr "扫描EAN-13"
 #: code:addons/point_of_sale/static/src/xml/Screens/ReceiptScreen/OrderReceipt.xml:0
 #, python-format
 msgid "Scan me to request an invoice for your purchase."
-msgstr "扫描我以请求为您的购买开具发票。"
+msgstr "扫描我以请求为您的购买开具结算。"
 
 #. module: point_of_sale
 #: model:ir.model.fields,field_description:point_of_sale.field_pos_config__iface_scan_via_proxy
@@ -6059,7 +6068,7 @@ msgstr "营业点仅支持“添加舍入明细”舍入策略."
 msgid ""
 "The amount cannot be higher than the due amount if you don't have a cash "
 "payment method configured."
-msgstr ""
+msgstr "如果未配置现金付款方式，则金额不得高于到期应付金额。"
 
 #. module: point_of_sale
 #. odoo-javascript
@@ -6069,6 +6078,15 @@ msgid ""
 "The amount of your payment lines must be rounded to validate the "
 "transaction."
 msgstr "您的支付明细金额必须四舍五入以验证交易."
+
+#. module: point_of_sale
+#. odoo-javascript
+#: code:addons/point_of_sale/static/src/js/Chrome.js:0
+#, python-format
+msgid ""
+"The barcode nomenclature setting is not configured. Make sure to configure "
+"it on your Point of Sale configuration settings"
+msgstr ""
 
 #. module: point_of_sale
 #. odoo-python
@@ -6433,8 +6451,8 @@ msgstr "本门店未设收银机。"
 #. odoo-python
 #: code:addons/point_of_sale/models/pos_config.py:0
 #, python-format
-msgid "There is no products linked to your PoS"
-msgstr "没有产品链接到您的POS"
+msgid "There is no product linked to your PoS"
+msgstr "没有产品链接到您的 PoS"
 
 #. module: point_of_sale
 #. odoo-javascript
@@ -6474,7 +6492,7 @@ msgstr "该字段用于将销售点用户组的 ID 传递到销售点客户端�
 #: code:addons/point_of_sale/models/pos_order.py:0
 #, python-format
 msgid "This invoice has been created from the point of sale session: %s"
-msgstr "此发票是从销售点会话创建的：%s"
+msgstr "此结算是从销售点会话创建的：%s"
 
 #. module: point_of_sale
 #: model:ir.model.fields,help:point_of_sale.field_pos_config__fiscal_position_ids
@@ -7102,6 +7120,13 @@ msgstr ""
 
 #. module: point_of_sale
 #. odoo-python
+#: code:addons/point_of_sale/models/pos_config.py:0
+#, python-format
+msgid "You can only have one cash payment method."
+msgstr "您只能使用一种现金付款方式。"
+
+#. module: point_of_sale
+#. odoo-python
 #: code:addons/point_of_sale/models/pos_order.py:0
 #, python-format
 msgid ""
@@ -7109,6 +7134,8 @@ msgid ""
 "pricelist, or create a pos.order in a python test with Form tool, or edit "
 "the form view in studio if no PoS order exist"
 msgstr ""
+"您不能：从后端界面创建 pos 订单，或取消设置价目表，或使用表单工具在 python 测试中创建 "
+"pos.order，或者在工作室中编辑表单视图（如果不存在 PoS 订单）"
 
 #. module: point_of_sale
 #. odoo-python

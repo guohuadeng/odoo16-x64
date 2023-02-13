@@ -6,16 +6,16 @@
 # Abdullah Mohamed, 2022
 # Farid Fox, 2022
 # Martin Trigaux, 2022
-# Malaz Abuidris <msea@odoo.com>, 2022
 # Mehjabin Farsana, 2022
+# Malaz Abuidris <msea@odoo.com>, 2023
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:48+0000\n"
+"POT-Creation-Date: 2023-02-02 10:33+0000\n"
 "PO-Revision-Date: 2022-09-22 05:53+0000\n"
-"Last-Translator: Mehjabin Farsana, 2022\n"
+"Last-Translator: Malaz Abuidris <msea@odoo.com>, 2023\n"
 "Language-Team: Arabic (https://www.transifex.com/odoo/teams/41243/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3304,6 +3304,13 @@ msgstr "متنوعة"
 
 #. module: point_of_sale
 #. odoo-javascript
+#: code:addons/point_of_sale/static/src/js/Chrome.js:0
+#, python-format
+msgid "Missing barcode nomenclature"
+msgstr ""
+
+#. module: point_of_sale
+#. odoo-javascript
 #: code:addons/point_of_sale/static/src/xml/Screens/PartnerListScreen/PartnerDetailsEdit.xml:0
 #, python-format
 msgid "Mobile"
@@ -6172,6 +6179,15 @@ msgid ""
 msgstr "يجب أن يتم تقريب مبلغ بنود الدفع لتصديق المعاملة. "
 
 #. module: point_of_sale
+#. odoo-javascript
+#: code:addons/point_of_sale/static/src/js/Chrome.js:0
+#, python-format
+msgid ""
+"The barcode nomenclature setting is not configured. Make sure to configure "
+"it on your Point of Sale configuration settings"
+msgstr ""
+
+#. module: point_of_sale
 #. odoo-python
 #: code:addons/point_of_sale/models/pos_config.py:0
 #, python-format
@@ -6567,8 +6583,8 @@ msgstr "لا يوجد صندوق لتسجيل النقد في هذه الجلس�
 #. odoo-python
 #: code:addons/point_of_sale/models/pos_config.py:0
 #, python-format
-msgid "There is no products linked to your PoS"
-msgstr "لا توجد أي منتجات مرتبطة بنقطة بيعك "
+msgid "There is no product linked to your PoS"
+msgstr ""
 
 #. module: point_of_sale
 #. odoo-javascript
@@ -7263,6 +7279,13 @@ msgid ""
 msgstr ""
 "يمكنك إضافة بعضها من قائمة المنتجات، أو ربط الموجودة منها عن طريق وضع علامة \"متاح في نقطة البيع\".\n"
 "                    أو بإمكانك إضافة البيانات التوضيحية لأغراض الاختبار. يرجى العلم بأن هذا الإجراء لا يمكن التراجع عنه. "
+
+#. module: point_of_sale
+#. odoo-python
+#: code:addons/point_of_sale/models/pos_config.py:0
+#, python-format
+msgid "You can only have one cash payment method."
+msgstr ""
 
 #. module: point_of_sale
 #. odoo-python

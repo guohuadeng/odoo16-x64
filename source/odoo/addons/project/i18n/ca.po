@@ -21,21 +21,21 @@
 # Cristian Cruz, 2022
 # Óscar Fonseca <tecnico@extreme-micro.com>, 2022
 # Farouk Jabiri, 2022
-# Ivan Espinola, 2022
 # Arnau Ros, 2022
 # marcescu, 2022
-# Josep Anton Belchi, 2022
+# jabelchi, 2022
 # Martin Trigaux, 2022
 # M Palau <mpalau@tda.ad>, 2022
 # Quim - eccit <quim@eccit.com>, 2022
+# Ivan Espinola, 2023
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:48+0000\n"
+"POT-Creation-Date: 2023-02-02 10:33+0000\n"
 "PO-Revision-Date: 2022-09-22 05:54+0000\n"
-"Last-Translator: Quim - eccit <quim@eccit.com>, 2022\n"
+"Last-Translator: Ivan Espinola, 2023\n"
 "Language-Team: Catalan (https://www.transifex.com/odoo/teams/41243/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -666,6 +666,11 @@ msgid "<span class=\"o_stat_text\">Sub-tasks</span>"
 msgstr "<span class=\"o_stat_text\">Subtasques</span>"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_milestone_view_form
+msgid "<span class=\"o_stat_text\">Tasks</span>"
+msgstr ""
+
+#. module: project
 #: model_terms:ir.ui.view,arch_db:project.view_task_form2
 msgid "<span class=\"o_stat_text\">in Recurrence</span>"
 msgstr "<span class=\"o_stat_text\">en Recurrència</span>"
@@ -1119,7 +1124,7 @@ msgstr "Assigna un responsable a la teva tasca"
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.res_config_settings_view_form
 msgid "Assign each new project to this plan"
-msgstr ""
+msgstr "Assigna cada projecte nou a aquest pla"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.project_sharing_project_task_view_form
@@ -2228,7 +2233,7 @@ msgstr "Menú desplegable"
 #: model_terms:ir.ui.view,arch_db:project.project_sharing_project_task_view_kanban
 #: model_terms:ir.ui.view,arch_db:project.view_task_kanban
 msgid "Edit"
-msgstr "Modifica"
+msgstr "Modificar"
 
 #. module: project
 #. odoo-javascript
@@ -2474,6 +2479,7 @@ msgstr "Divendres"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.project_sharing_project_task_view_search
+#: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Future Activities"
 msgstr "Activitats futures"
@@ -3135,6 +3141,7 @@ msgid "Last Updated on"
 msgstr "Última actualització el"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Late Activities"
 msgstr "Activitats endarrerides"
@@ -4206,6 +4213,11 @@ msgid "Project Collaborators"
 msgstr "Col·laboradors del projecte"
 
 #. module: project
+#: model:ir.model.fields,field_description:project.field_project_task__project_color
+msgid "Project Color"
+msgstr "Color del projecte"
+
+#. module: project
 #: model:ir.model.fields,field_description:project.field_account_analytic_account__project_count
 msgid "Project Count"
 msgstr "Comte de projecte"
@@ -4301,14 +4313,9 @@ msgid "Project Visibility"
 msgstr "Visibilitat del projecte"
 
 #. module: project
-#: model:ir.model.fields,field_description:project.field_project_task__project_color
-msgid "Project color"
-msgstr "Color del projecte"
-
-#. module: project
 #: model_terms:ir.ui.view,arch_db:project.edit_project
 msgid "Project description..."
-msgstr ""
+msgstr "Descripció del projecte..."
 
 #. module: project
 #: model:mail.template,subject:project.project_done_email_template
@@ -5034,6 +5041,7 @@ msgid "Show Project on Dashboard"
 msgstr "Mostra el projecte al tauler de control"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Show all records which has next action date is before today"
 msgstr ""
@@ -5402,7 +5410,7 @@ msgstr "Tasca bloquejada"
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.view_task_form2
 msgid "Task description..."
-msgstr ""
+msgstr "Descripció de la tasca..."
 
 #. module: project
 #: model:mail.message.subtype,name:project.mt_task_progress
@@ -5535,6 +5543,8 @@ msgid ""
 "The end date should be after the day of the month or the last day of the "
 "month"
 msgstr ""
+"La data de finalització hauria de ser posterior al dia del mes o l'últim dia"
+" del mes"
 
 #. module: project
 #. odoo-python
@@ -5825,6 +5835,7 @@ msgstr "Avui"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.project_sharing_project_task_view_search
+#: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Today Activities"
 msgstr "Activitats d'avui"
@@ -5866,6 +5877,9 @@ msgid ""
 "timesheets are linked to an analytic account and any analytic account "
 "belongs to a plan."
 msgstr ""
+"Seguiu la rendibilitat dels vostres projectes. Qualsevol projecte, les seves"
+" tasques i fulls de temps estan enllaçats a un compte analític i qualsevol "
+"compte analític pertany a un pla."
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.res_config_settings_view_form
@@ -6264,13 +6278,6 @@ msgstr "Només es pot establir una etapa personal en una tasca privada."
 
 #. module: project
 #. odoo-python
-#: code:addons/project/models/project.py:0
-#, python-format
-msgid "You cannot %s %s fields in task."
-msgstr "No podeu %s %s camps en la tasca."
-
-#. module: project
-#. odoo-python
 #: code:addons/project/models/analytic_account.py:0
 #, python-format
 msgid ""
@@ -6307,6 +6314,20 @@ msgid ""
 msgstr ""
 "No pots esborrar les fases que conté tasques. Primer hauries d'esborrar "
 "totes les tasques."
+
+#. module: project
+#. odoo-python
+#: code:addons/project/models/project.py:0
+#, python-format
+msgid "You cannot read %s fields in task."
+msgstr "No podeu llegir els %s camps de la tasca."
+
+#. module: project
+#. odoo-python
+#: code:addons/project/models/project.py:0
+#, python-format
+msgid "You cannot write on %s fields in task."
+msgstr "No podeu escriure en %s camps de la tasca."
 
 #. module: project
 #. odoo-python

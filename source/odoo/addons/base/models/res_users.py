@@ -133,7 +133,7 @@ class Groups(models.Model):
     users = fields.Many2many('res.users', 'res_groups_users_rel', 'gid', 'uid')
     model_access = fields.One2many('ir.model.access', 'group_id', string='Access Controls', copy=True)
     rule_groups = fields.Many2many('ir.rule', 'rule_group_rel',
-        'group_id', 'rule_group_id', string='Rules', domain=[('global', '=', False)])
+        'group_id', 'rule_group_id', string='Rules', domain="[('global', '=', False)]")
     menu_access = fields.Many2many('ir.ui.menu', 'ir_ui_menu_group_rel', 'gid', 'menu_id', string='Access Menu')
     view_access = fields.Many2many('ir.ui.view', 'ir_ui_view_group_rel', 'group_id', 'view_id', string='Views')
     comment = fields.Text(translate=True)
@@ -488,6 +488,14 @@ class Users(models.Model):
         action_open_website = self.env.ref('base.action_open_website', raise_if_not_found=False)
         if action_open_website and any(user.action_id.id == action_open_website.id for user in self):
             raise ValidationError(_('The "App Switcher" action cannot be selected as home action.'))
+        # Prevent using reload actions.
+        # We use sudo() because  "Access rights" admins can't read action models
+        for user in self.sudo():
+            if user.action_id.type == "ir.actions.client":
+                action = self.env["ir.actions.client"].browse(user.action_id.id)  # magic
+                if action.tag == "reload":
+                    raise ValidationError(_('The "%s" action cannot be selected as home action.', action.name))
+
 
     @api.constrains('groups_id')
     def _check_one_user_type(self):
@@ -685,12 +693,19 @@ class Users(models.Model):
             for name, key in name_to_key.items()
         }
 
-        # ensure the language is set and is compatible with the web client
-        lang = context.get('lang') or (request and request.default_lang()) or DEFAULT_LANG
-        if lang == 'ar_AR':
-            context['lang'] = 'ar'
-        if lang in babel.core.LOCALE_ALIASES:
-            context['lang'] = babel.core.LOCALE_ALIASES[lang]
+        # ensure lang is set and available
+        # context > request > company > english > any lang installed
+        langs = [code for code, _ in self.env['res.lang'].get_installed()]
+        lang = context.get('lang')
+        if lang not in langs:
+            lang = request.best_lang if request else None
+            if lang not in langs:
+                lang = self.env.user.company_id.partner_id.lang
+                if lang not in langs:
+                    lang = DEFAULT_LANG
+                    if lang not in langs:
+                        lang = langs[0] if langs else DEFAULT_LANG
+        context['lang'] = lang
 
         # ensure uid is set
         context['uid'] = self.env.uid
@@ -1618,12 +1633,12 @@ class UsersView(models.Model):
             )
             if missing_implied_groups:
                 # prepare missing group message, by categories
-                missing_groups[group] = ", ".join(f'"{missing_group.category_id.name}: {missing_group.name}"'
+                missing_groups[group] = ", ".join(f'"{missing_group.category_id.name or _("Other")}: {missing_group.name}"'
                                                   for missing_group in missing_implied_groups)
         return "\n".join(
             _('Since %(user)s is a/an "%(category)s: %(group)s", they will at least obtain the right %(missing_group_message)s',
               user=user.name,
-              category=group.category_id.name,
+              category=group.category_id.name or _('Other'),
               group=group.name,
               missing_group_message=missing_group_message
              ) for group, missing_group_message in missing_groups.items()
@@ -2046,7 +2061,7 @@ class APIKeyDescription(models.TransientModel):
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'res.users.apikeys.show',
-            'name': 'API Key Ready',
+            'name': _('API Key Ready'),
             'views': [(False, 'form')],
             'target': 'new',
             'context': {

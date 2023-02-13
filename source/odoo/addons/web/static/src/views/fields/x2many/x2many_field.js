@@ -86,6 +86,7 @@ export class X2ManyField extends Component {
             activeActions: this.activeActions,
             onSelected: (resIds) => saveRecord(resIds),
             onCreateEdit: ({ context }) => this._openRecord({ context }),
+            onUnselect: this.isMany2Many ? false : () => saveRecord(),
         });
 
         this.selectCreate = (params) => {
@@ -184,6 +185,7 @@ export class X2ManyField extends Component {
         props.archInfo = { ...archInfo, columns };
         props.cycleOnTab = false;
         props.editable = !this.props.readonly && editable;
+        props.readonly = this.props.readonly;
         props.nestedKeyOptionalFieldsData = this.nestedKeyOptionalFieldsData;
         props.onAdd = (params) => {
             params.editable =

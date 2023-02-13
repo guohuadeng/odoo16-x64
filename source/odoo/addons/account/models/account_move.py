@@ -44,6 +44,8 @@ TYPE_REVERSE_MAP = {
     'in_receipt': 'entry',
 }
 
+EMPTY = object()
+
 
 class AccountMove(models.Model):
     _name = "account.move"
@@ -235,7 +237,7 @@ class AccountMove(models.Model):
 
     # === Hash Fields === #
     restrict_mode_hash_table = fields.Boolean(related='journal_id.restrict_mode_hash_table')
-    secure_sequence_number = fields.Integer(string="Inalteralbility No Gap Sequence #", readonly=True, copy=False)
+    secure_sequence_number = fields.Integer(string="Inalteralbility No Gap Sequence #", readonly=True, copy=False, index=True)
     inalterable_hash = fields.Char(string="Inalterability Hash", readonly=True, copy=False)
     string_to_hash = fields.Char(compute='_compute_string_to_hash', readonly=True)
 
@@ -664,7 +666,7 @@ class AccountMove(models.Model):
         highest_name = self[0]._get_last_sequence(lock=False) if self else False
 
         for move in self:
-            if not highest_name and move == self[0] and not move.posted_before and move.date:
+            if not highest_name and move == self[0] and not move.posted_before and move.date and (not move.name or move.name == '/'):
                 # In the form view, we need to compute a default sequence so that the user can edit
                 # it. We only check the first move as an approximation (enough for new in form view)
                 move._set_next_sequence()
@@ -769,6 +771,8 @@ class AccountMove(models.Model):
                 move.invoice_payment_term_id = move.partner_id.property_payment_term_id
             elif move.is_purchase_document(include_receipts=True) and move.partner_id.property_supplier_payment_term_id:
                 move.invoice_payment_term_id = move.partner_id.property_supplier_payment_term_id
+            else:
+                move.invoice_payment_term_id = False
 
     @api.depends('needed_terms')
     def _compute_invoice_date_due(self):
@@ -1130,7 +1134,7 @@ class AccountMove(models.Model):
 
                 kwargs = {
                     'base_lines': base_line_values_list,
-                    'currency': move.currency_id,
+                    'currency': move.currency_id or move.journal_id.currency_id or move.journal_id.company_id.currency_id,
                 }
 
                 if move.id:
@@ -1168,6 +1172,10 @@ class AccountMove(models.Model):
                             handle_price_include=False,
                         ))
                 move.tax_totals = self.env['account.tax']._prepare_tax_totals(**kwargs)
+                rounding_line = move.line_ids.filtered(lambda l: l.display_type == 'rounding')
+                if rounding_line:
+                    amount_total_rounded = move.tax_totals['amount_total'] - rounding_line.balance
+                    move.tax_totals['formatted_amount_total_rounded'] = formatLang(self.env, amount_total_rounded, currency_obj=move.currency_id) or ''
             else:
                 # Non-invoice moves don't support that field (because of multicurrency: all lines of the invoice share the same currency)
                 move.tax_totals = None
@@ -1263,7 +1271,7 @@ class AccountMove(models.Model):
     @api.depends('currency_id')
     def _compute_display_inactive_currency_warning(self):
         for move in self.with_context(active_test=False):
-            move.display_inactive_currency_warning = not move.currency_id.active
+            move.display_inactive_currency_warning = move.currency_id and not move.currency_id.active
 
     @api.depends('company_id.account_fiscal_country_id', 'fiscal_position_id', 'fiscal_position_id.country_id', 'fiscal_position_id.foreign_vat')
     def _compute_tax_country_id(self):
@@ -1499,6 +1507,11 @@ class AccountMove(models.Model):
     # -------------------------------------------------------------------------
     # ONCHANGE METHODS
     # -------------------------------------------------------------------------
+
+    @api.onchange('date')
+    def _onchange_date(self):
+        if not self.is_invoice(True):
+            self.line_ids._inverse_amount_currency()
 
     @api.onchange('invoice_vendor_bill_id')
     def _onchange_invoice_vendor_bill(self):
@@ -1882,8 +1895,13 @@ class AccountMove(models.Model):
         # Skip posted moves.
         for invoice in (x for x in container['records'] if x.state != 'posted'):
 
-            # Unlink tax lines if all tax tags have been removed.
+            # Unlink tax lines if all taxes have been removed.
             if not invoice.line_ids.tax_ids:
+                # if there isn't any tax but there remains a tax_line_id, it means we are currently in the process of
+                # removing the taxes from the entry. Thus, we want the automatic balancing to happen in order  to have
+                # a smooth process for tax deletion
+                if not invoice.line_ids.filtered('tax_line_id'):
+                    continue
                 invoice.line_ids.filtered('tax_line_id').unlink()
 
             # Set the balancing line's balance and amount_currency to zero,
@@ -1898,13 +1916,8 @@ class AccountMove(models.Model):
             unbalanced_moves = self._get_unbalanced_moves({'records': invoice})
             if isinstance(unbalanced_moves, list) and len(unbalanced_moves) == 1:
                 dummy, debit, credit = unbalanced_moves[0]
-                balance = debit - credit
 
-                vals = {
-                    'debit': -balance if balance < 0.0 else 0.0,
-                    'credit': balance if balance > 0.0 else 0.0,
-                }
-
+                vals = {'balance': credit - debit}
                 if existing_balancing_line:
                     existing_balancing_line.write(vals)
                 else:
@@ -1914,7 +1927,7 @@ class AccountMove(models.Model):
                         'account_id': invoice.company_id.account_journal_suspense_account_id.id,
                         'currency_id': invoice.currency_id.id,
                     })
-                    container['records'].env['account.move.line'].create(vals)
+                    self.env['account.move.line'].create(vals)
 
     @contextmanager
     def _sync_rounding_lines(self, container):
@@ -2060,14 +2073,14 @@ class AccountMove(models.Model):
             if disabled:
                 yield
                 return
-            # Only invoice-like and journal entries in "auto tax mode" are synced
-            tax_filter = lambda m: (m.is_invoice(True) or m.line_ids.tax_ids and not m.tax_cash_basis_origin_move_id)
-            invoice_filter = lambda m: (m.is_invoice(True))
-            misc_filter = lambda m: (m.move_type == 'entry' and not m.tax_cash_basis_origin_move_id)
-            tax_container = {'records': container['records'].filtered(tax_filter)}
-            invoice_container = {'records': container['records'].filtered(invoice_filter)}
-            misc_container = {'records': container['records'].filtered(misc_filter)}
+            def update_containers():
+                # Only invoice-like and journal entries in "auto tax mode" are synced
+                tax_container['records'] = container['records'].filtered(lambda m: (m.is_invoice(True) or m.line_ids.tax_ids and not m.tax_cash_basis_origin_move_id))
+                invoice_container['records'] = container['records'].filtered(lambda m: m.is_invoice(True))
+                misc_container['records'] = container['records'].filtered(lambda m: m.move_type == 'entry' and not m.tax_cash_basis_origin_move_id)
 
+            tax_container, invoice_container, misc_container = ({} for __ in range(3))
+            update_containers()
             with ExitStack() as stack:
                 stack.enter_context(self._sync_dynamic_line(
                     existing_key_fname='term_key',
@@ -2097,16 +2110,7 @@ class AccountMove(models.Model):
                 with self.line_ids._sync_invoice(line_container):
                     yield
                     line_container['records'] = self.line_ids
-                tax_container['records'] = container['records'].filtered(tax_filter)
-                invoice_container['records'] = container['records'].filtered(invoice_filter)
-                misc_container['records'] = container['records'].filtered(misc_filter)
-
-            # Delete the tax lines if the journal entry is not in "auto tax mode" anymore
-            for move in container['records']:
-                if move.move_type == 'entry' and not move.line_ids.tax_ids:
-                    move.line_ids.filtered(
-                        lambda l: l.display_type == 'tax'
-                    ).with_context(dynamic_unlink=True).unlink()
+                update_containers()
 
     # -------------------------------------------------------------------------
     # LOW-LEVEL METHODS
@@ -2170,7 +2174,7 @@ class AccountMove(models.Model):
     def create(self, vals_list):
         if any('state' in vals and vals.get('state') == 'posted' for vals in vals_list):
             raise UserError(_('You cannot create a move already in the posted state. Please create a draft move and post it after.'))
-        container = {'records': self, 'self': self}
+        container = {'records': self}
         with self._check_balanced(container):
             with self._sync_dynamic_lines(container):
                 moves = super().create([self._sanitize_vals(vals) for vals in vals_list])
@@ -2250,17 +2254,6 @@ class AccountMove(models.Model):
                     super(AccountMove, move).write({'tax_totals': vals['tax_totals']})
 
         return res
-
-    @api.ondelete(at_uninstall=False)
-    def _unlink_forbid_parts_of_chain(self):
-        """ Moves with a sequence number can only be deleted if they are the last element of a chain of sequence.
-        If they are not, deleting them would create a gap. If the user really wants to do this, he still can
-        explicitly empty the 'name' field of the move; but we discourage that practice.
-        """
-        if not self._context.get('force_delete') and not self.filtered(lambda move: move.name != '/')._is_end_of_seq_chain():
-            raise UserError(_(
-                "You cannot delete this entry, as it has already consumed a sequence number and is not the last one in the chain. You should probably revert it instead."
-            ))
 
     def unlink(self):
         self = self.with_context(skip_invoice_sync=True, dynamic_unlink=True)  # no need to sync to delete everything
@@ -2535,7 +2528,7 @@ class AccountMove(models.Model):
         for that partner as the default one, otherwise the default of the journal.
         """
         self.ensure_one()
-        if not self.quick_edit_total_amount:
+        if not self.quick_edit_mode or not self.quick_edit_total_amount:
             return False
         count, account_id, tax_ids = self._get_frequent_account_and_taxes(
             self.company_id.id,
@@ -2636,7 +2629,7 @@ class AccountMove(models.Model):
         """ Returns the hash to write on journal entries when they get posted"""
         self.ensure_one()
         #get the only one exact previous move in the securisation sequence
-        prev_move = self.search([('state', '=', 'posted'),
+        prev_move = self.sudo().search([('state', '=', 'posted'),
                                  ('company_id', '=', self.company_id.id),
                                  ('journal_id', '=', self.journal_id.id),
                                  ('secure_sequence_number', '!=', 0),
@@ -2769,6 +2762,8 @@ class AccountMove(models.Model):
 
         product_lines = self.line_ids.filtered(lambda x: x.display_type == 'product')
         base_lines = [x._convert_to_tax_base_line_dict() for x in product_lines]
+        for base_line in base_lines:
+            base_line['taxes'] = base_line['taxes'].filtered(lambda t: t.amount_type != 'fixed')
 
         if self.is_inbound(include_receipts=True):
             cash_discount_account = self.company_id.account_journal_early_pay_discount_loss_account_id
@@ -3044,6 +3039,10 @@ class AccountMove(models.Model):
         if not reconciled_lines:
             return {}
 
+        self.env['account.partial.reconcile'].flush_model([
+            'credit_amount_currency', 'credit_move_id', 'debit_amount_currency',
+            'debit_move_id', 'exchange_move_id',
+        ])
         query = '''
             SELECT
                 part.id,
@@ -3080,6 +3079,7 @@ class AccountMove(models.Model):
                 exchange_move_ids.add(values['exchange_move_id'])
 
         if exchange_move_ids:
+            self.env['account.move.line'].flush_model(['move_id'])
             query = '''
                 SELECT
                     part.id,
@@ -3344,6 +3344,10 @@ class AccountMove(models.Model):
 
         return to_post
 
+    def _find_and_set_purchase_orders(self, po_references, partner_id, amount_total, prefer_purchase_line=False, timeout=10):
+        # hook to be used with purchase, so that vendor bills are sync/autocompleted with purchase orders
+        self.ensure_one()
+
     # -------------------------------------------------------------------------
     # PUBLIC ACTIONS
     # -------------------------------------------------------------------------
@@ -3373,10 +3377,6 @@ class AccountMove(models.Model):
             'views': [(False, 'form')],
             'res_model': res_model,
             'res_id': res_id,
-            'context': {
-                'create': False,
-                'delete': False,
-            },
             'target': 'current',
         }
 
@@ -3571,8 +3571,31 @@ class AccountMove(models.Model):
             move.to_check = False
 
     def button_draft(self):
+        exchange_move_ids = set()
+        if self:
+            self.env['account.full.reconcile'].flush_model(['exchange_move_id'])
+            self.env['account.partial.reconcile'].flush_model(['exchange_move_id'])
+            self._cr.execute(
+                """
+                    SELECT DISTINCT sub.exchange_move_id
+                    FROM (
+                        SELECT exchange_move_id
+                        FROM account_full_reconcile
+                        WHERE exchange_move_id IN %s
+
+                        UNION ALL
+
+                        SELECT exchange_move_id
+                        FROM account_partial_reconcile
+                        WHERE exchange_move_id IN %s
+                    ) AS sub
+                """,
+                [tuple(self.ids), tuple(self.ids)],
+            )
+            exchange_move_ids = set([row[0] for row in self._cr.fetchall()])
+
         for move in self:
-            if move in move.line_ids.mapped('full_reconcile_id.exchange_move_id'):
+            if move.id in exchange_move_ids:
                 raise UserError(_('You cannot reset to draft an exchange difference journal entry.'))
             if move.tax_cash_basis_rec_id or move.tax_cash_basis_origin_move_id:
                 # If the reconciliation was undone, move.tax_cash_basis_rec_id will be empty;
@@ -3733,7 +3756,7 @@ class AccountMove(models.Model):
             line[2]['credit'] = currency_id and formatLang(self.env, line[2]['credit'], currency_obj=currency_id) or line[2]['debit']
         return preview_vals
 
-    def _generate_qr_code(self):
+    def _generate_qr_code(self, silent_errors=False):
         """ Generates and returns a QR-code generation URL for this invoice,
         raising an error message if something is misconfigured.
 
@@ -3755,7 +3778,7 @@ class AccountMove(models.Model):
         else:
             # Else we find one that's eligible and assign it to the invoice
             for candidate_method, _candidate_name in self.env['res.partner.bank'].get_available_qr_methods_in_sequence():
-                if self.partner_bank_id._eligible_for_qr_code(candidate_method, self.partner_id, self.currency_id):
+                if self.partner_bank_id._eligible_for_qr_code(candidate_method, self.partner_id, self.currency_id, raises_error=False):
                     qr_code_method = candidate_method
                     break
 
@@ -3764,7 +3787,7 @@ class AccountMove(models.Model):
             return None
 
         unstruct_ref = self.ref if self.ref else self.name
-        rslt = self.partner_bank_id.build_qr_code_base64(self.amount_residual, unstruct_ref, self.payment_reference, self.currency_id, self.partner_id, qr_code_method, silent_errors=False)
+        rslt = self.partner_bank_id.build_qr_code_base64(self.amount_residual, unstruct_ref, self.payment_reference, self.currency_id, self.partner_id, qr_code_method, silent_errors=silent_errors)
 
         # We only set qr_code_method after generating the url; otherwise, it
         # could be set even in case of a failure in the QR code generation
@@ -3840,16 +3863,39 @@ class AccountMove(models.Model):
 
     @contextmanager
     def _disable_recursion(self, container, key, default=None, target=True):
-        previous_env = {key: container[key].env for key in container}
-        previous_key = previous_env['records'].context.get(key, default)
+        """Apply the context key to all environments inside this context manager.
 
-        for recordset in container.values():
-            recordset.env = recordset.with_context(**{key: target}).env
+        If this context key is already set on the recordsets, yield `True`.
+        The recordsets modified are the one in the container, as well as all the
+        `self` recordsets of the calling stack.
+        This more or less gives the wanted context to all records inside of the
+        context manager.
+
+        :param container: A mutable dict that needs to at least contain the key
+                          `records`. Can contain other items if changing the env
+                          is needed.
+        :param key: The context key to apply to the recordsets.
+        :param default: the default value of the context key, if it isn't defined
+                        yet in the context
+        :param target: the value of the context key meaning that we shouldn't
+                       recurse
+        :return: True iff we should just exit the context manager
+        """
+
+        disabled = container['records'].env.context.get(key, default) == target
+        previous_values = {}
+        if not disabled:  # it wasn't disabled yet, disable it now
+            for env in self.env.transaction.envs:
+                previous_values[env] = env.context.get(key, EMPTY)
+                env.context = frozendict({**env.context, key: target})
         try:
-            yield previous_key == target
+            yield disabled
         finally:
-            for key, recordset in container.items():
-                recordset.env = previous_env[key]
+            for env, val in previous_values.items():
+                if val != EMPTY:
+                    env.context = frozendict({**env.context, key: val})
+                else:
+                    env.context = frozendict({k: v for k, v in env.context.items() if k != key})
 
     # ------------------------------------------------------------
     # MAIL.THREAD

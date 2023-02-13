@@ -114,7 +114,7 @@ class StockMoveLine(models.Model):
             if not line.location_id:
                 line.location_id = line.move_id.location_id or line.picking_id.location_id
             if not line.location_dest_id:
-                line.location_dest_id = line.move_id.location_dest_id or line.picking_id.location_id
+                line.location_dest_id = line.move_id.location_dest_id or line.picking_id.location_dest_id
 
     def _search_picking_type_id(self, operator, value):
         return [('picking_id.picking_type_id', operator, value)]
@@ -234,7 +234,7 @@ class StockMoveLine(models.Model):
             smls = self.env['stock.move.line'].concat(*smls)
             excluded_smls = smls
             if package.package_type_id:
-                best_loc = smls.move_id.location_dest_id.with_context(exclude_sml_ids=excluded_smls.ids)._get_putaway_strategy(self.env['product.product'], package=package)
+                best_loc = smls.move_id.location_dest_id.with_context(exclude_sml_ids=excluded_smls.ids, products=smls.product_id)._get_putaway_strategy(self.env['product.product'], package=package)
                 smls.location_dest_id = smls.package_level_id.location_dest_id = best_loc
             elif package:
                 used_locations = set()
@@ -250,8 +250,9 @@ class StockMoveLine(models.Model):
                     smls.package_level_id.location_dest_id = smls.location_dest_id
             else:
                 for sml in smls:
+                    qty = max(sml.reserved_uom_qty, sml.qty_done)
                     sml.location_dest_id = sml.move_id.location_dest_id.with_context(exclude_sml_ids=excluded_smls.ids)._get_putaway_strategy(
-                        sml.product_id, quantity=sml.reserved_uom_qty, packaging=sml.move_id.product_packaging_id,
+                        sml.product_id, quantity=qty, packaging=sml.move_id.product_packaging_id,
                     )
                     excluded_smls -= sml
 
@@ -314,7 +315,7 @@ class StockMoveLine(models.Model):
                     ml.move_id.picking_id.immediate_transfer and \
                     ml.move_id.state != 'done' and \
                     'qty_done' in vals:
-                ml.move_id.product_uom_qty = ml.move_id.quantity_done
+                ml.move_id.with_context(avoid_putaway_rules=True).product_uom_qty = ml.move_id.quantity_done
             if ml.state == 'done':
                 if 'qty_done' in vals:
                     ml.move_id.product_uom_qty = ml.move_id.quantity_done
@@ -566,7 +567,7 @@ class StockMoveLine(models.Model):
             raise UserError(_('You need to supply a Lot/Serial Number for product: \n - ') +
                               '\n - '.join(mls_tracked_without_lot.mapped('product_id.display_name')))
         ml_to_create_lot = self.env['stock.move.line'].browse(ml_ids_to_create_lot)
-        ml_to_create_lot.with_context(do_not_unreserve=True)._create_and_assign_production_lot()
+        ml_to_create_lot.with_context(bypass_reservation_update=True)._create_and_assign_production_lot()
 
         mls_to_delete = self.env['stock.move.line'].browse(ml_ids_to_delete)
         mls_to_delete.unlink()
@@ -843,6 +844,7 @@ class StockMoveLine(models.Model):
             'picking_type_id': self.picking_id.picking_type_id.id,
             'restrict_partner_id': self.picking_id.owner_id.id,
             'company_id': self.picking_id.company_id.id,
+            'partner_id': self.picking_id.partner_id.id,
         }
 
     def action_open_reference(self):

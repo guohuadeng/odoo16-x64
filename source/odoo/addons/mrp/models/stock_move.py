@@ -38,6 +38,14 @@ class StockMoveLine(models.Model):
             else:
                 return expression.OR([[('production_id.picking_type_id', operator, value)], res])
 
+    def _prepare_stock_move_vals(self):
+        res = super()._prepare_stock_move_vals()
+        if self.product_id.is_kits and res.get('state') not in ('draft', 'cancel', 'done'):
+            # We need to force the state to draft, so the SM will go through the confirmation process and, thus,
+            # will be exploded
+            res['state'] = 'draft'
+        return res
+
     @api.model_create_multi
     def create(self, values):
         res = super(StockMoveLine, self).create(values)
@@ -107,7 +115,7 @@ class StockMoveLine(models.Model):
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
-    created_production_id = fields.Many2one('mrp.production', 'Created Production Order', check_company=True)
+    created_production_id = fields.Many2one('mrp.production', 'Created Production Order', check_company=True, index=True)
     production_id = fields.Many2one(
         'mrp.production', 'Production Order for finished products', check_company=True, index='btree_not_null')
     raw_material_production_id = fields.Many2one(
@@ -316,6 +324,7 @@ class StockMove(models.Model):
 
     def _action_confirm(self, merge=True, merge_into=False):
         moves = self.action_explode()
+        merge_into = merge_into and merge_into.action_explode()
         # we go further with the list of ids potentially changed by action_explode
         return super(StockMove, moves)._action_confirm(merge=merge, merge_into=merge_into)
 
@@ -335,20 +344,23 @@ class StockMove(models.Model):
             if not bom:
                 moves_ids_to_return.add(move.id)
                 continue
-            if move.picking_id.immediate_transfer:
+            if move.picking_id.immediate_transfer or float_is_zero(move.product_uom_qty, precision_rounding=move.product_uom.rounding):
                 factor = move.product_uom._compute_quantity(move.quantity_done, bom.product_uom_id) / bom.product_qty
             else:
                 factor = move.product_uom._compute_quantity(move.product_uom_qty, bom.product_uom_id) / bom.product_qty
             boms, lines = bom.sudo().explode(move.product_id, factor, picking_type=bom.picking_type_id)
             for bom_line, line_data in lines:
-                if move.picking_id.immediate_transfer:
+                if move.picking_id.immediate_transfer or float_is_zero(move.product_uom_qty, precision_rounding=move.product_uom.rounding):
                     phantom_moves_vals_list += move._generate_move_phantom(bom_line, 0, line_data['qty'])
                 else:
                     phantom_moves_vals_list += move._generate_move_phantom(bom_line, line_data['qty'], 0)
             # delete the move with original product which is not relevant anymore
             moves_ids_to_unlink.add(move.id)
 
-        self.env['stock.move'].browse(moves_ids_to_unlink).sudo().unlink()
+        move_to_unlink = self.env['stock.move'].browse(moves_ids_to_unlink).sudo()
+        move_to_unlink.quantity_done = 0
+        move_to_unlink._action_cancel()
+        move_to_unlink.unlink()
         if phantom_moves_vals_list:
             phantom_moves = self.env['stock.move'].create(phantom_moves_vals_list)
             phantom_moves._adjust_procure_method()
@@ -404,7 +416,8 @@ class StockMove(models.Model):
         if bom_line.product_id.type in ['product', 'consu']:
             vals = self.copy_data(default=self._prepare_phantom_move_values(bom_line, product_qty, quantity_done))
             if self.state == 'assigned':
-                vals['state'] = 'assigned'
+                for v in vals:
+                    v['state'] = 'assigned'
         return vals
 
     def _is_consuming(self):
@@ -549,12 +562,6 @@ class StockMove(models.Model):
         res = super()._prepare_procurement_values()
         res['bom_line_id'] = self.bom_line_id.id
         return res
-
-    def _get_mto_procurement_date(self):
-        date = super()._get_mto_procurement_date()
-        if 'manufacture' in self.product_id._get_rules_from_location(self.location_id).mapped('action'):
-            date -= relativedelta(days=self.company_id.manufacturing_lead)
-        return date
 
     def action_open_reference(self):
         res = super().action_open_reference()

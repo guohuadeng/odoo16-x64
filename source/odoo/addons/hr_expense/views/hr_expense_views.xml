@@ -99,7 +99,7 @@
                 <xpath expr="//tree" position="attributes">
                     <!-- Display the tree dashboard view with the header -->
                     <attribute name="js_class">hr_expense_dashboard_tree</attribute>
-                    <attribute name="class">hr_expense h-auto</attribute>
+                    <attribute name="class">hr_expense h-auto o_forbidden_tooltip_parent</attribute>
                 </xpath>
             </field>
         </record>
@@ -752,6 +752,7 @@
                                     <field name="product_id"/>
                                     <field name="name"/>
                                     <field name="description" optional="hide"/>
+                                    <field name="employee_id" invisible="1"/>
                                     <field name="state" invisible="1"/>
                                     <field name="attachment_number" invisible="1"/>
                                     <button name="action_get_attachment_view" type="object" icon="fa-paperclip" aria-label="View Attachments" title="View Attachments" class="float-end pe-0" readonly="True" attrs="{'invisible': [('attachment_number', '=', 0)]}"/>

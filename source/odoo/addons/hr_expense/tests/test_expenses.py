@@ -4,6 +4,7 @@ from odoo.addons.hr_expense.tests.common import TestExpenseCommon
 from odoo.tests import tagged, Form
 from odoo.tools.misc import formatLang
 from odoo import fields, Command
+from odoo.exceptions import UserError
 
 
 @tagged('-at_install', 'post_install')
@@ -401,6 +402,7 @@ class TestExpenses(TestExpenseCommon):
         sheet.action_sheet_move_create()
         action_data = sheet.action_register_payment()
         wizard = Form(self.env['account.payment.register'].with_context(action_data['context'])).save()
+        wizard.group_payment = False
         action = wizard.action_create_payments()
         self.assertEqual(sheet.state, 'done', 'all account.move.line linked to expenses must be reconciled after payment')
         move = self.env['account.payment'].search(action['domain']).move_id
@@ -610,6 +612,7 @@ class TestExpenses(TestExpenseCommon):
         payment_method_line = self.env.company.bank_journal_ids.outbound_payment_method_line_ids.filtered(lambda m: m.code == 'check_printing')
         with Form(self.env[action_data['res_model']].with_context(action_data['context'])) as wiz_form:
             wiz_form.payment_method_line_id = payment_method_line
+            wiz_form.group_payment = False
         wizard = wiz_form.save()
         action = wizard.action_create_payments()
         self.assertEqual(sheet.state, 'done', 'all account.move.line linked to expenses must be reconciled after payment')
@@ -742,3 +745,28 @@ class TestExpenses(TestExpenseCommon):
                 'analytic_distribution': {str(self.analytic_account_2.id): 100},
             }
         ])
+
+    def test_analytic_account_deleted(self):
+        """ Test that an analytic account cannot be deleted if it is used in an expense """
+
+        expense = self.env['hr.expense.sheet'].create({
+            'name': 'Expense for Dick Tracy',
+            'employee_id': self.expense_employee.id,
+        })
+        expense = self.env['hr.expense'].create({
+            'name': 'Choucroute Saucisse',
+            'employee_id': self.expense_employee.id,
+            'product_id': self.product_a.id,
+            'unit_amount': 700.00,
+            'sheet_id': expense.id,
+            'analytic_distribution': {
+                self.analytic_account_1.id: 50,
+                self.analytic_account_2.id: 50,
+            },
+        })
+
+        with self.assertRaises(UserError):
+            (self.analytic_account_1 | self.analytic_account_2).unlink()
+
+        expense.unlink()
+        self.analytic_account_1.unlink()

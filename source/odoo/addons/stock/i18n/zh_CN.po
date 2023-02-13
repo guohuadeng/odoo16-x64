@@ -10,16 +10,16 @@
 # 226408 台北 <226408@so8d.com>, 2022
 # 徐 文郁, 2022
 # digitalliuzg8888, 2022
-# Raymond Yu <cl_yu@hotmail.com>, 2022
-# Jeffery CHEN <jeffery9@gmail.com>, 2022
+# Jeffery CHEN Fan <jeffery9@gmail.com>, 2022
+# Raymond Yu <cl_yu@hotmail.com>, 2023
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:48+0000\n"
+"POT-Creation-Date: 2023-02-02 10:33+0000\n"
 "PO-Revision-Date: 2022-09-22 05:55+0000\n"
-"Last-Translator: Jeffery CHEN <jeffery9@gmail.com>, 2022\n"
+"Last-Translator: Raymond Yu <cl_yu@hotmail.com>, 2023\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/odoo/teams/41243/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -265,6 +265,7 @@ msgstr ""
 
 #. module: stock
 #. odoo-python
+#: code:addons/stock/models/stock_rule.py:0
 #: code:addons/stock/models/stock_rule.py:0
 #, python-format
 msgid "+ %d day(s)"
@@ -1806,7 +1807,10 @@ msgid "Count Picking Waiting"
 msgstr "等待拣货计数"
 
 #. module: stock
+#. odoo-javascript
+#: code:addons/stock/static/src/views/list/inventory_report_list_controller.js:0
 #: model:ir.actions.report,name:stock.action_report_inventory
+#, python-format
 msgid "Count Sheet"
 msgstr "计数表"
 
@@ -2678,7 +2682,7 @@ msgstr "完成"
 #: model_terms:ir.ui.view,arch_db:stock.view_move_line_form
 #: model_terms:ir.ui.view,arch_db:stock.view_move_line_tree
 msgid "Done By"
-msgstr ""
+msgstr "完成者"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_package_level__state__draft
@@ -3168,6 +3172,13 @@ msgid "Gives the sequence of this line when displaying the warehouses."
 msgstr "给出显示仓库时这一行的顺序。"
 
 #. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_rule.py:0
+#, python-format
+msgid "Global Visibility Days"
+msgstr ""
+
+#. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.search_product_lot_filter
 #: model_terms:ir.ui.view,arch_db:stock.stock_move_line_view_search
 #: model_terms:ir.ui.view,arch_db:stock.stock_reorder_report_search
@@ -3346,7 +3357,7 @@ msgid ""
 "payment date, My Company (Chicago) reserves the right to call on the "
 "services of a debt recovery company. All legal expenses will be payable by "
 "the client."
-msgstr "如果在到期付款日期后超过六十（60）天仍未付款，我公司（芝加哥）预留要求债务追讨公司提供服务的权利。所有法律费用将由客户支付。"
+msgstr "如果在到期付款日期后超过六十（60）天仍未完成款，我公司（芝加哥）预留要求债务追讨公司提供服务的权利。所有法律费用将由客户支付。"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_storage_category__allow_new_product__same
@@ -3688,6 +3699,14 @@ msgstr "非法的域操作符 %s"
 #, python-format
 msgid "Invalid domain right operand %s"
 msgstr "非法的域右操作符 %s"
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/product.py:0
+#, python-format
+msgid ""
+"Invalid rule's configuration, the following rule causes an endless loop: %s"
+msgstr ""
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_quant__inventory_quantity_auto_apply
@@ -5899,7 +5918,6 @@ msgstr "产品类别"
 #: model:ir.model.fields,field_description:stock.field_stock_putaway_rule__category_id
 #: model:ir.model.fields,field_description:stock.field_stock_quant__product_categ_id
 #: model:ir.model.fields,field_description:stock.field_stock_warehouse_orderpoint__product_category_id
-#: model_terms:ir.ui.view,arch_db:stock.quant_search_view
 #: model_terms:ir.ui.view,arch_db:stock.stock_putaway_list
 msgid "Product Category"
 msgstr "产品类别"
@@ -7269,8 +7287,11 @@ msgstr ""
 "此举的源位置将被改为%s。"
 
 #. module: stock
+#. odoo-javascript
+#: code:addons/stock/static/src/views/list/inventory_report_list_controller.js:0
 #: model:ir.actions.server,name:stock.action_view_set_quants_tree
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_quant_tree_inventory_editable
+#, python-format
 msgid "Set"
 msgstr "设置"
 
@@ -8347,6 +8368,15 @@ msgid ""
 "better solution could be to archive the product and create a new one "
 "instead."
 msgstr "该产品已至少在库存调拨中使用过一次。 不建议更改产品类型，因为它可能导致不一致。 更好的解决方案是将产品存档，然后创建一个新产品。"
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/product.py:0
+#, python-format
+msgid ""
+"This product's company cannot be changed as long as there are quantities of "
+"it belonging to another company."
+msgstr ""
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_change_product_qty__new_quantity
@@ -9467,8 +9497,8 @@ msgstr "不能输入负数数量"
 #. odoo-python
 #: code:addons/stock/models/stock_move.py:0
 #, python-format
-msgid "You can only delete draft moves."
-msgstr "您只能删除草稿状态的移动。"
+msgid "You can only delete draft or cancelled moves."
+msgstr ""
 
 #. module: stock
 #. odoo-python
@@ -9508,6 +9538,13 @@ msgid ""
 "You cannot cancel a stock move that has been set to 'Done'. Create a return "
 "in order to reverse the moves which took place."
 msgstr "您无法取消已设置为“完成”的库存调拨。 创建退货以撤消已发生的调拨。"
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_move.py:0
+#, python-format
+msgid "You cannot change a cancelled stock move, create a new line instead."
+msgstr ""
 
 #. module: stock
 #. odoo-python

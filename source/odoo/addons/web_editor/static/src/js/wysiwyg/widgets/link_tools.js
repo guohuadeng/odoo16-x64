@@ -44,9 +44,18 @@ const LinkTools = Link.extend({
     /**
      * @override
      */
-    start: function () {
+    start: async function () {
         this._addHintClasses();
-        return this._super(...arguments);
+        const ret = await this._super(...arguments);
+        const link = this.$link[0];
+        const customStyleProps = ['color', 'background-color', 'background-image', 'border-width', 'border-style', 'border-color'];
+        if (customStyleProps.some(s => link.style[s])) {
+            // Force custom style if style exists on the link.
+            const customOption = this.el.querySelector('[name="link_style_color"] we-button[data-value="custom"]');
+            this._setSelectOption($(customOption), true);
+            await this._updateOptionsUI();
+        }
+        return ret;
     },
     destroy: function () {
         if (!this.el) {
@@ -103,6 +112,12 @@ const LinkTools = Link.extend({
      */
     _doStripDomain: function () {
         return this.$('we-checkbox[name="do_strip_domain"]').closest('we-button.o_we_checkbox_wrapper').hasClass('active');
+    },
+    /**
+     * @override
+     */
+    _getIsNewWindowFormRow() {
+        return this.$('we-checkbox[name="is_new_window"]').closest('we-row');
     },
     /**
      * @override
@@ -363,15 +378,6 @@ const LinkTools = Link.extend({
         if ($target.closest('[name="link_border_style"]').length) {
             return;
         }
-        if ($target.closest('[name="link_style_color"]')) {
-            // Reset custom styles when changing link style.
-            this.$link.css('color', '');
-            this.$link.css('background-color', '');
-            this.$link.css('background-image', '');
-            this.$link.css('border-width', '');
-            this.$link.css('border-style', '');
-            this.$link.css('border-color', '');
-        }
         const $select = $target.closest('we-select');
         $select.find('we-selection-items we-button').toggleClass('active', false);
         this._setSelectOption($target, true);
@@ -420,6 +426,15 @@ const LinkTools = Link.extend({
             $target.siblings('we-button').removeClass("active");
             this.options.wysiwyg.odooEditor.historyStep();
         }
+    },
+    /**
+     * @override
+     */
+    __onURLInput() {
+        this._super(...arguments);
+        this.options.wysiwyg.odooEditor.historyPauseSteps('_onURLInput');
+        this._adaptPreview();
+        this.options.wysiwyg.odooEditor.historyUnpauseSteps('_onURLInput');
     },
 });
 

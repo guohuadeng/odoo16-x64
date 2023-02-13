@@ -313,7 +313,6 @@ var SnippetEditor = Widget.extend({
         if (this.isDestroyed()) {
             return;
         }
-        this.willDestroyEditors = true;
         await this.toggleTargetVisibility(!this.$target.hasClass('o_snippet_invisible')
             && !this.$target.hasClass('o_snippet_mobile_invisible')
             && !this.$target.hasClass('o_snippet_desktop_invisible'));
@@ -986,7 +985,14 @@ var SnippetEditor = Widget.extend({
         this.trigger_up('user_value_widget_request', {
             name: 'grid_mode',
             allowParentOption: true,
-            onSuccess: () => hasGridLayoutOption = true,
+            onSuccess: (widget) => {
+                // The grid option is considered as present only if the
+                // container element having it is the same as the container of
+                // the column we are dragging.
+                if (widget.$target[0] === rowEl.parentElement) {
+                    hasGridLayoutOption = true;
+                }
+            },
         });
         const allowGridMode = hasGridLayoutOption || rowEl.classList.contains('o_grid_mode');
 
@@ -1045,7 +1051,7 @@ var SnippetEditor = Widget.extend({
             this.trigger_up('deactivate_snippet', {$snippet: self.$target});
         }
 
-        const isPopup = this.$target[0].closest('div.s_popup');
+        const openModalEl = this.$target[0].closest('.modal');
 
         this.dropped = false;
         this._dropSiblings = {
@@ -1056,6 +1062,7 @@ var SnippetEditor = Widget.extend({
             width: self.$target.width(),
             height: self.$target.height()
         };
+        const closestFormEl = this.$target[0].closest('form');
         self.$target.after('<div class="oe_drop_clone" style="display: none;"/>');
         self.$target.detach();
         self.$el.addClass('d-none');
@@ -1083,30 +1090,53 @@ var SnippetEditor = Widget.extend({
         if (this.$target[0].classList.contains('s_table_of_content')) {
             $selectorChildren = $selectorChildren.filter((i, el) => !el.closest('.s_table_of_content'));
         }
-        const canBeSanitizedUnless = this._canBeSanitizedUnless(this.$target[0]);
-
-        // Remove the siblings that belong to a snippet in grid mode
-        // and put the identified grid mode snippets in their own "selector".
-        const selectorGrids = new Set();
-        if (rowEl.classList.contains('row')) {
+        // Disallow dropping form fields outside of their form.
+        // TODO this can probably be implemented by reviewing data-drop-near
+        // definitions in master but we should find a better to define those and
+        // such cases.
+        if (this.$target[0].classList.contains('s_website_form_field')) {
+            const filterFunc = (i, el) => el.closest('form') === closestFormEl;
             if ($selectorSiblings) {
-                // Looping backwards because elements are removed, so the
-                // indexes are not lost.
-                for (let i = $selectorSiblings.length - 1; i >= 0; i--) {
-                    if (isPopup && !$selectorSiblings[i].closest('div.s_popup')) {
-                        // Removing the siblings that are outside the popup if
-                        // the grid item is in a popup.
-                        $selectorSiblings.splice(i, 1);
-                    } else {
-                        const gridSnippet = $selectorSiblings[i].closest('div.o_grid_mode');
-                        if (gridSnippet) {
-                            $selectorSiblings.splice(i, 1);
-                            selectorGrids.add(gridSnippet);
-                        }
-                    }
-                }
+                $selectorSiblings = $selectorSiblings.filter(filterFunc);
+            }
+            if ($selectorChildren) {
+                $selectorChildren = $selectorChildren.filter(filterFunc);
             }
         }
+
+        // Remove the siblings/children outside the open popup.
+        if (openModalEl) {
+            const filterFunc = (i, el) => el.closest('.modal') === openModalEl;
+            if ($selectorSiblings) {
+                $selectorSiblings = $selectorSiblings.filter(filterFunc);
+            }
+            if ($selectorChildren) {
+                $selectorChildren = $selectorChildren.filter(filterFunc);
+            }
+        }
+
+        const canBeSanitizedUnless = this._canBeSanitizedUnless(this.$target[0]);
+
+        // Remove the siblings/children that would add a dropzone as direct
+        // child of a grid area and make a dedicated set out of the identified
+        // grid areas.
+        const selectorGrids = new Set();
+        const filterOutSelectorGrids = ($selectorItems, getDropzoneParent) => {
+            if (!$selectorItems) {
+                return;
+            }
+            // Looping backwards because elements are removed, so the
+            // indexes are not lost.
+            for (let i = $selectorItems.length - 1; i >= 0; i--) {
+                const el = getDropzoneParent($selectorItems[i]);
+                if (el.classList.contains('o_grid_mode')) {
+                    $selectorItems.splice(i, 1);
+                    selectorGrids.add(el);
+                }
+            }
+        };
+        filterOutSelectorGrids($selectorSiblings, el => el.parentElement);
+        filterOutSelectorGrids($selectorChildren, el => el);
 
         this.trigger_up('activate_snippet', {$snippet: this.$target.parent()});
         this.trigger_up('activate_insertion_zones', {
@@ -1500,7 +1530,7 @@ var SnippetEditor = Widget.extend({
      * @param {OdooEvent} ev
      */
     _onSnippetOptionVisibilityUpdate: function (ev) {
-        if (this.willDestroyEditors) {
+        if (this.options.wysiwyg.isSaving()) {
             // Do not update the option visibilities if we are destroying them.
             return;
         }
@@ -1924,10 +1954,14 @@ var SnippetsMenu = Widget.extend({
         this._activateSnippet($autoFocusEls.length ? $autoFocusEls.first() : false);
 
         // Add tooltips on we-title elements whose text overflows
-        this.$el.tooltip({
+        new Tooltip(this.el, {
             selector: 'we-title',
             placement: 'bottom',
             delay: 100,
+            // Ensure the tooltips have a good position when in iframe.
+            container: this.el,
+            // Prevent horizontal scroll when tooltip is displayed.
+            boundary: this.el.ownerDocument.body,
             title: function () {
                 const el = this;
                 if (el.tagName !== 'WE-TITLE') {
@@ -2017,7 +2051,6 @@ var SnippetsMenu = Widget.extend({
         // when hidden, destroying the widget hides it.)
         await this._mutex.getUnlockedDef();
 
-        this.willDestroyEditors = true;
         // Then destroy all snippet editors, making them call their own
         // "clean for save" methods (and options ones).
         await this._destroyEditors();
@@ -2689,6 +2722,17 @@ var SnippetsMenu = Widget.extend({
             var selector = $style.data('selector');
             var exclude = $style.data('exclude') || '';
             const excludeParent = $style.attr('id') === "so_content_addition" ? snippetAdditionDropIn : '';
+
+            // TODO to remove in master: the Carousel snippet has a `content`
+            // class in its `.row` elements which makes dropzones appear when
+            // dragging inner content, allowing them to be dropped in the row,
+            // where it should not be the case.
+            if ($style[0].getAttribute('id') === 'so_content_addition') {
+                let dropInPatch = $style[0].dataset.dropIn.split(', ');
+                dropInPatch = dropInPatch.map(selector => selector === '.content' ? '.content:not(.row)' : selector);
+                $style[0].dataset.dropIn = dropInPatch.join(', ');
+            }
+
             var target = $style.data('target');
             var noCheck = $style.data('no-check');
             var optionID = $style.data('js') || $style.data('option-name'); // used in tour js as selector
@@ -2795,6 +2839,10 @@ var SnippetsMenu = Widget.extend({
             trigger: 'manual',
             placement: 'bottom',
             title: _t("Drag and drop the building block."),
+            // Ensure the tooltips have a good position when in iframe.
+            container: this.el,
+            // Prevent horizontal scroll when tooltip is displayed.
+            boundary: this.el.ownerDocument.body,
         });
 
         // Hide scroll if no snippets defined
@@ -3408,6 +3456,11 @@ var SnippetsMenu = Widget.extend({
      * @private
      */
     _onClick(ev) {
+        // Clicking in the page should be ignored on save
+        if (this.options.wysiwyg.isSaving()) {
+            return;
+        }
+
         var srcElement = ev.target || (ev.originalEvent && (ev.originalEvent.target || ev.originalEvent.originalTarget)) || ev.srcElement;
         if (!srcElement || this.lastElement === srcElement) {
             return;
@@ -3940,7 +3993,7 @@ var SnippetsMenu = Widget.extend({
      * @param {OdooEvent} ev
      */
     _onSnippetOptionVisibilityUpdate: async function (ev) {
-        if (this.willDestroyEditors) {
+        if (this.options.wysiwyg.isSaving()) {
             // Do not update the option visibilities if we are destroying them.
             return;
         }

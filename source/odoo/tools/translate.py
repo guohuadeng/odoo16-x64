@@ -37,7 +37,7 @@ PYTHON_TRANSLATION_COMMENT = 'odoo-python'
 # translation used for javascript code in web client
 JAVASCRIPT_TRANSLATION_COMMENT = 'odoo-javascript'
 # used to notify web client that these translations should be loaded in the UI
-# depreciated comment since Odoo 16.0
+# deprecated comment since Odoo 16.0
 WEB_TRANSLATION_COMMENT = "openerp-web"
 
 SKIPPED_ELEMENTS = ('script', 'style', 'title')
@@ -358,7 +358,8 @@ def html_term_converter(value):
 
 def get_text_content(term):
     """ Return the textual content of the given term. """
-    return html.fromstring(term).text_content()
+    content = html.fromstring(term).text_content()
+    return " ".join(content.split())
 
 xml_translate.get_text_content = get_text_content
 html_translate.get_text_content = get_text_content
@@ -1370,7 +1371,7 @@ class TranslationImporter:
                     # [xmlid, translations, xmlid, translations, ...]
                     params = []
                     for xmlid, translations in sub_field_dictionary:
-                        params.extend([xmlid.split('.')[-1], Json(translations)])
+                        params.extend([*xmlid.split('.'), Json(translations)])
                     if not force_overwrite:
                         value_query = f"""CASE WHEN {overwrite} IS TRUE AND imd.noupdate IS FALSE
                         THEN m."{field_name}" || t.value
@@ -1381,10 +1382,10 @@ class TranslationImporter:
                         UPDATE "{model_table}" AS m
                         SET "{field_name}" = {value_query}
                         FROM (
-                            VALUES {', '.join(['(%s, %s::jsonb)'] * (len(params) // 2))}
-                        ) AS t(imd_name, value)
+                            VALUES {', '.join(['(%s, %s, %s::jsonb)'] * (len(params) // 3))}
+                        ) AS t(imd_module, imd_name, value)
                         JOIN "ir_model_data" AS imd
-                        ON imd."model" = '{model_name}' AND imd.name = t.imd_name
+                        ON imd."model" = '{model_name}' AND imd.name = t.imd_name AND imd.module = t.imd_module
                         WHERE imd."res_id" = m."id"
                     """, params)
 
@@ -1411,7 +1412,7 @@ def trans_load_data(cr, fileobj, fileformat, lang, verbose=True, overwrite=False
 
 def get_locales(lang=None):
     if lang is None:
-        lang = locale.getdefaultlocale()[0]
+        lang = locale.getlocale()[0]
 
     if os.name == 'nt':
         lang = _LOCALE2WIN32.get(lang, lang)
@@ -1444,8 +1445,6 @@ def resetlocale():
     # locale.resetlocale is bugged with some locales.
     for ln in get_locales():
         try:
-            if ln.find('.') >= 0:
-                ln = ln[0:ln.index('.')]
             return locale.setlocale(locale.LC_ALL, ln)
         except locale.Error:
             continue
@@ -1517,7 +1516,7 @@ class CodeTranslations:
         def filter_func(row):
             # In the pot files with new translations, a code translation should have either
             # PYTHON_TRANSLATION_COMMENT or JAVASCRIPT_TRANSLATION_COMMENT for comments.
-            # If a comment has neither the above comments, the pot file uses the depreciated
+            # If a comment has neither the above comments, the pot file uses the deprecated
             # comments. And all code translations are stored as python translations.
             return row.get('value') and (
                     PYTHON_TRANSLATION_COMMENT in row['comments']

@@ -1047,7 +1047,8 @@ actual arch.
         """
 
         for node in tree.xpath('//*[@groups]'):
-            if not self.user_has_groups(node.attrib.pop('groups')):
+            attrib_groups = node.attrib.pop('groups')
+            if attrib_groups and not self.user_has_groups(attrib_groups):
                 node.getparent().remove(node)
             elif node.tag == 't' and (not node.attrib or node.get('postprocess_added')):
                 # Move content of <t groups=""> blocks
@@ -2847,7 +2848,7 @@ class NameManager:
         field_info = self.model.fields_get(attributes=['invisible', 'states', 'readonly', 'required'])
         has_access = functools.partial(self.model.check_access_rights, raise_exception=False)
         if not (has_access('write') or has_access('create')):
-            for info in field_info.vals():
+            for info in field_info.values():
                 info['readonly'] = True
                 info['states'] = {}
         return field_info

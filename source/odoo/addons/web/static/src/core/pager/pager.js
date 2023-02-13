@@ -54,7 +54,7 @@ export class Pager extends Component {
      * @returns {boolean} true if there is only one page
      */
     get isSinglePage() {
-        return this.minimum === 1 && this.maximum === this.props.total;
+        return !this.props.updateTotal && this.minimum === 1 && this.maximum === this.props.total;
     }
     /**
      * @param {-1 | 1} direction
@@ -111,6 +111,14 @@ export class Pager extends Component {
         await this.props.onUpdate({ offset, limit }, hasNavigated);
         this.state.isDisabled = false;
         this.state.isEditing = false;
+    }
+
+    async updateTotal() {
+        if (!this.state.isDisabled) {
+            this.state.isDisabled = true;
+            await this.props.updateTotal();
+            this.state.isDisabled = false;
+        }
     }
 
     /**

@@ -294,10 +294,10 @@ class PosSession(models.Model):
                 self._create_picking_at_end_of_session()
                 self.order_ids.filtered(lambda o: not o.is_total_cost_computed)._compute_total_cost_at_session_closing(self.picking_ids.move_ids)
             try:
-                data = self.with_company(self.company_id)._create_account_move(balancing_account, amount_to_balance, bank_payment_method_diffs)
+                data = self.with_company(self.company_id).with_context(check_move_validity=False, skip_invoice_sync=True)._create_account_move(balancing_account, amount_to_balance, bank_payment_method_diffs)
             except AccessError as e:
                 if sudo:
-                    data = self.sudo().with_company(self.company_id)._create_account_move(balancing_account, amount_to_balance, bank_payment_method_diffs)
+                    data = self.sudo().with_company(self.company_id).with_context(check_move_validity=False, skip_invoice_sync=True)._create_account_move(balancing_account, amount_to_balance, bank_payment_method_diffs)
                 else:
                     raise e
 
@@ -316,7 +316,7 @@ class PosSession(models.Model):
                 self.env.cr.rollback()
                 return self._close_session_action(balance)
 
-            self._post_statement_difference(cash_difference_before_statements)
+            self.sudo()._post_statement_difference(cash_difference_before_statements)
             if self.move_id.line_ids:
                 self.move_id.sudo().with_company(self.company_id)._post()
                 # Set the uninvoiced orders' state to 'done'
@@ -325,7 +325,7 @@ class PosSession(models.Model):
                 self.move_id.sudo().unlink()
             self.sudo().with_company(self.company_id)._reconcile_account_move_lines(data)
         else:
-            self._post_statement_difference(self.cash_register_difference)
+            self.sudo()._post_statement_difference(self.cash_register_difference)
 
         self.write({'state': 'closed'})
         return True
@@ -340,7 +340,7 @@ class PosSession(models.Model):
                     'pos_session_id': self.id,
                 }
 
-            if self.cash_register_difference < 0.0:
+            if amount < 0.0:
                 if not self.cash_journal_id.loss_account_id:
                     raise UserError(
                         _('Please go on the %s journal and define a Loss Account. This account will be used to record cash difference.',
@@ -757,9 +757,12 @@ class PosSession(models.Model):
                     for move in stock_moves:
                         exp_key = move.product_id._get_product_accounts()['expense']
                         out_key = move.product_id.categ_id.property_stock_account_output_categ_id
-                        amount = -sum(move.sudo().stock_valuation_layer_ids.mapped('value'))
+                        signed_product_qty = move.product_qty
+                        if move._is_in():
+                            signed_product_qty *= -1
+                        amount = signed_product_qty * move.product_id._compute_average_price(0, move.product_qty, move)
                         stock_expense[exp_key] = self._update_amounts(stock_expense[exp_key], {'amount': amount}, move.picking_id.date, force_company_currency=True)
-                        if move.location_id.usage == 'customer':
+                        if move._is_in():
                             stock_return[out_key] = self._update_amounts(stock_return[out_key], {'amount': amount}, move.picking_id.date, force_company_currency=True)
                         else:
                             stock_output[out_key] = self._update_amounts(stock_output[out_key], {'amount': amount}, move.picking_id.date, force_company_currency=True)
@@ -783,9 +786,12 @@ class PosSession(models.Model):
                 for move in stock_moves:
                     exp_key = move.product_id._get_product_accounts()['expense']
                     out_key = move.product_id.categ_id.property_stock_account_output_categ_id
-                    amount = -sum(move.stock_valuation_layer_ids.mapped('value'))
+                    signed_product_qty = move.product_qty
+                    if move._is_in():
+                        signed_product_qty *= -1
+                    amount = signed_product_qty * move.product_id._compute_average_price(0, move.product_qty, move)
                     stock_expense[exp_key] = self._update_amounts(stock_expense[exp_key], {'amount': amount}, move.picking_id.date, force_company_currency=True)
-                    if move.location_id.usage == 'customer':
+                    if move._is_in():
                         stock_return[out_key] = self._update_amounts(stock_return[out_key], {'amount': amount}, move.picking_id.date, force_company_currency=True)
                     else:
                         stock_output[out_key] = self._update_amounts(stock_output[out_key], {'amount': amount}, move.picking_id.date, force_company_currency=True)
@@ -1470,7 +1476,7 @@ class PosSession(models.Model):
         self.opening_notes = notes
         difference = cashbox_value - self.cash_register_balance_start
         self.cash_register_balance_start = cashbox_value
-        self._post_statement_difference(difference)
+        self.sudo()._post_statement_difference(difference)
         self._post_cash_details_message('Opening', difference, notes)
 
     def _post_cash_details_message(self, state, difference, notes):
@@ -1879,7 +1885,7 @@ class PosSession(models.Model):
                 'fields': [
                     'display_name', 'lst_price', 'standard_price', 'categ_id', 'pos_categ_id', 'taxes_id', 'barcode',
                     'default_code', 'to_weight', 'uom_id', 'description_sale', 'description', 'product_tmpl_id', 'tracking',
-                    'write_date', 'available_in_pos', 'attribute_line_ids', 'active'
+                    'available_in_pos', 'attribute_line_ids', 'active', '__last_update'
                 ],
                 'order': 'sequence,default_code,name',
             },

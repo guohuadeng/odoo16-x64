@@ -4,15 +4,15 @@
 # 
 # Translators:
 # Niyas Raphy, 2022
-# Mehjabin Farsana, 2022
+# Mehjabin Farsana, 2023
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:48+0000\n"
+"POT-Creation-Date: 2023-02-02 10:33+0000\n"
 "PO-Revision-Date: 2022-09-22 05:44+0000\n"
-"Last-Translator: Mehjabin Farsana, 2022\n"
+"Last-Translator: Mehjabin Farsana, 2023\n"
 "Language-Team: Malay (https://www.transifex.com/odoo/teams/41243/ms/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1262,6 +1262,11 @@ msgid ""
 msgstr ""
 "<strong>Mata wang ini telah pun digunakan untuk menjana entri perakaunan.</strong> <br/>\n"
 "                        Menukar faktor pembundarannya sekarang tidak akan mengubah pembundaran yang dibuat pada entri sebelumnya; mungkin menyebabkan ketidakselarasan dengan yang baru."
+
+#. module: account
+#: model_terms:ir.ui.view,arch_db:account.document_tax_totals
+msgid "<strong>Total Rounded</strong>"
+msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.bill_preview
@@ -2865,11 +2870,6 @@ msgid "Attach a file"
 msgstr "Lampirkan fail"
 
 #. module: account
-#: model:ir.model.fields,field_description:account.field_account_bank_statement__attachment_ids
-msgid "Attachment"
-msgstr "Lampiran"
-
-#. module: account
 #: model:ir.model.fields,field_description:account.field_account_account__message_attachment_count
 #: model:ir.model.fields,field_description:account.field_account_account_template__message_attachment_count
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__message_attachment_count
@@ -2884,6 +2884,7 @@ msgid "Attachment Count"
 msgstr "Kiraan Lampiran"
 
 #. module: account
+#: model:ir.model.fields,field_description:account.field_account_bank_statement__attachment_ids
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__attachment_ids
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__attachment_ids
 #: model:ir.model.fields,field_description:account.field_account_move__attachment_ids
@@ -3535,7 +3536,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_register_form
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 msgid "Cancel"
-msgstr ""
+msgstr "Batal"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
@@ -3547,7 +3548,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account.selection__account_move__state__cancel
 #: model_terms:ir.ui.view,arch_db:account.view_account_invoice_filter
 msgid "Cancelled"
-msgstr ""
+msgstr "Dibatalkan"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.report_invoice_document
@@ -3621,7 +3622,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_account_move_line_filter
 #, python-format
 msgid "Cash"
-msgstr ""
+msgstr "Tunai"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_journal_form
@@ -3977,13 +3978,13 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_terms_conditions_setting_banner
 msgid "Close"
-msgstr ""
+msgstr "Tutup"
 
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__res_company__account_dashboard_onboarding_state__closed
 #: model:ir.model.fields.selection,name:account.selection__res_company__account_invoice_onboarding_state__closed
 msgid "Closed"
-msgstr ""
+msgstr "Tertutup"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_account__code
@@ -3996,7 +3997,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_report_line__code
 #: model_terms:ir.ui.view,arch_db:account.view_account_form
 msgid "Code"
-msgstr ""
+msgstr "Kod"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_group_form
@@ -4065,7 +4066,7 @@ msgstr ""
 #. module: account
 #: model:ir.model,name:account.model_res_company
 msgid "Companies"
-msgstr ""
+msgstr "Syarikat"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_partner__ref_company_ids
@@ -4162,7 +4163,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__composition_mode
 msgid "Composition mode"
-msgstr ""
+msgstr "Mod komposisi"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_report_expression__engine
@@ -4199,13 +4200,13 @@ msgstr ""
 #. module: account
 #: model:ir.model,name:account.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Tetapan Konfigurasi"
 
 #. module: account
 #: model:ir.ui.menu,name:account.menu_finance_configuration
 #: model_terms:ir.ui.view,arch_db:account.account_journal_dashboard_kanban_view
 msgid "Configuration"
-msgstr ""
+msgstr "Konfigurasi"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.report_hash_integrity
@@ -4226,7 +4227,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 #, python-format
 msgid "Confirm"
-msgstr ""
+msgstr "Sahkan"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_invoice_onboarding_panel
@@ -4267,7 +4268,7 @@ msgstr "Kenalan"
 #: model:ir.model.fields.selection,name:account.selection__account_reconcile_model_template__match_note__contains
 #: model:ir.model.fields.selection,name:account.selection__account_reconcile_model_template__match_transaction_type__contains
 msgid "Contains"
-msgstr ""
+msgstr "Mengandungi"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__body
@@ -4308,7 +4309,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account.selection__account_account__account_type__expense_direct_cost
 #: model:ir.model.fields.selection,name:account.selection__account_account_template__account_type__expense_direct_cost
 msgid "Cost of Revenue"
-msgstr ""
+msgstr "Kos Hasil"
 
 #. module: account
 #. odoo-python
@@ -4359,7 +4360,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_tax_group__country_id
 #: model_terms:ir.ui.view,arch_db:account.account_tax_group_view_search
 msgid "Country"
-msgstr ""
+msgstr "Negara"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__country_code
@@ -4400,7 +4401,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.onboarding_create_invoice_step
 #: model_terms:ir.ui.view,arch_db:account.setup_bank_account_wizard
 msgid "Create"
-msgstr ""
+msgstr "Buat"
 
 #. module: account
 #: model:ir.model,name:account.model_account_automatic_entry_wizard
@@ -4699,7 +4700,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account.selection__account_account__account_type__liability_credit_card
 #: model:ir.model.fields.selection,name:account.selection__account_account_template__account_type__liability_credit_card
 msgid "Credit Card"
-msgstr ""
+msgstr "Kad kredit"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_partner__credit_limit
@@ -4813,7 +4814,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_move_line_form
 #: model_terms:ir.ui.view,arch_db:account.view_move_line_tree
 msgid "Currency"
-msgstr ""
+msgstr "Mata wang"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_automatic_entry_wizard__display_currency_helper
@@ -4864,7 +4865,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account.selection__account_account__account_type__asset_current
 #: model:ir.model.fields.selection,name:account.selection__account_account_template__account_type__asset_current
 msgid "Current Assets"
-msgstr ""
+msgstr "Aset semasa"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_account__current_balance
@@ -4911,7 +4912,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_invoice_tree
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 msgid "Customer"
-msgstr ""
+msgstr "Pelanggan"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_config_settings__group_sale_delivery_address
@@ -4938,6 +4939,7 @@ msgstr "Invois Pelanggan"
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/account_analytic_account.py:0
 #: code:addons/account/models/chart_template.py:0
 #: model:ir.model.fields.selection,name:account.selection__res_company__quick_edit_mode__out_invoices
 #: model_terms:ir.ui.view,arch_db:account.account_analytic_account_view_form_inherit
@@ -5020,7 +5022,7 @@ msgstr ""
 #: model:ir.ui.menu,name:account.menu_finance_receivables
 #: model_terms:ir.ui.view,arch_db:account.view_account_invoice_report_search
 msgid "Customers"
-msgstr ""
+msgstr "Pelanggan"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.onboarding_invoice_layout_step
@@ -5067,7 +5069,7 @@ msgstr ""
 #. module: account
 #: model:ir.ui.menu,name:account.menu_board_journal_1
 msgid "Dashboard"
-msgstr ""
+msgstr "Papan pemuka"
 
 #. module: account
 #: model:ir.actions.server,name:account.action_check_hash_integrity
@@ -5101,7 +5103,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 #, python-format
 msgid "Date"
-msgstr ""
+msgstr "Tarikh"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_resequence_wizard__first_date
@@ -5164,7 +5166,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_payment_term_line__days
 msgid "Days"
-msgstr ""
+msgstr "Hari"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_payment_term_line__days_after
@@ -5223,6 +5225,7 @@ msgstr ""
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_journal__default_account_id
+#: model_terms:ir.ui.view,arch_db:account.view_account_journal_form
 msgid "Default Account"
 msgstr ""
 
@@ -5276,7 +5279,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_res_company__account_sale_tax_id
 #: model:ir.model.fields,field_description:account.field_res_config_settings__sale_tax_id
 msgid "Default Sale Tax"
-msgstr ""
+msgstr "Cukai Jualan Lalai"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_account__tax_ids
@@ -5487,7 +5490,7 @@ msgstr ""
 #. module: account
 #: model:ir.model,name:account.model_digest_digest
 msgid "Digest"
-msgstr ""
+msgstr "Hadam"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
@@ -5528,7 +5531,7 @@ msgstr "Buang"
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.report_invoice_document
 msgid "Discount"
-msgstr ""
+msgstr "Diskaun"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_payment_term_line__discount_percentage
@@ -5538,7 +5541,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__discount
 msgid "Discount (%)"
-msgstr ""
+msgstr "Diskaun (%)"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
@@ -5566,7 +5569,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__discount_percentage
 msgid "Discount Percentage"
-msgstr ""
+msgstr "Peratusan Diskaun"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__discount_amount_currency
@@ -5580,11 +5583,12 @@ msgstr ""
 msgid ""
 "Discount percentages on the Payment Terms lines must be between 0 and 100."
 msgstr ""
+"Peratusan diskaun pada baris Syarat Pembayaran mestilah antara 0 dan 100."
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_accrued_orders_wizard__display_amount
 msgid "Display Amount"
-msgstr ""
+msgstr "Jumlah Paparan"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__display_inactive_currency_warning
@@ -5668,7 +5672,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_currency__display_rounding_warning
 msgid "Display Rounding Warning"
-msgstr ""
+msgstr "Paparan Amaran Pembundaran"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_config_settings__qr_code
@@ -5678,7 +5682,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__display_type
 msgid "Display Type"
-msgstr ""
+msgstr "Jenis Paparan"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_tax_template__description
@@ -5748,7 +5752,7 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
 msgid "Documentation"
-msgstr ""
+msgstr "Dokumentasi"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_analytic_applicability__business_domain
@@ -5905,7 +5909,7 @@ msgstr ""
 #. module: account
 #: model:ir.actions.server,name:account.action_duplicate_account
 msgid "Duplicate"
-msgstr ""
+msgstr "Pendua"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_partner__duplicated_bank_account_partners_count
@@ -5990,7 +5994,7 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_line_tree
 msgid "Edit"
-msgstr ""
+msgstr "Sunting"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_bank_statement_line__tax_totals
@@ -6002,7 +6006,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__is_email
 msgid "Email"
-msgstr ""
+msgstr "E-mel"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__email_add_signature
@@ -6057,7 +6061,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_resequence_wizard__end_date
 msgid "End Date"
-msgstr ""
+msgstr "Tarikh tamat"
 
 #. module: account
 #: model:account.payment.term,name:account.account_payment_term_end_following_month
@@ -6248,7 +6252,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account.selection__account_automatic_entry_wizard__account_type__expense
 #, python-format
 msgid "Expense"
-msgstr ""
+msgstr "Perbelanjaan"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_product_category__property_account_expense_categ_id
@@ -6589,7 +6593,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_res_company__message_follower_ids
 #: model:ir.model.fields,field_description:account.field_res_partner_bank__message_follower_ids
 msgid "Followers"
-msgstr ""
+msgstr "Pengikut"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_account__message_partner_ids
@@ -6710,7 +6714,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__email_from
 #: model_terms:ir.ui.view,arch_db:account.view_account_group_form
 msgid "From"
-msgstr ""
+msgstr "Daripada"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_move_line_filter
@@ -6866,7 +6870,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_account__group_id
 msgid "Group"
-msgstr ""
+msgstr "Kumpulan"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_report_line__groupby
@@ -7005,7 +7009,7 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.portal_invoice_page
 msgid "History"
-msgstr ""
+msgstr "Sejarah"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
@@ -7087,7 +7091,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_setup_bank_manual_config__activity_exception_icon
 #: model:ir.model.fields,field_description:account.field_res_partner_bank__activity_exception_icon
 msgid "Icon"
-msgstr ""
+msgstr "Ikon"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_bank_statement_line__activity_exception_icon
@@ -7562,12 +7566,12 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_account__note
 msgid "Internal Notes"
-msgstr ""
+msgstr "Nota Dalaman"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__internal_index
 msgid "Internal Reference"
-msgstr ""
+msgstr "Rujukan Dalaman"
 
 #. module: account
 #. odoo-python
@@ -7673,7 +7677,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 #, python-format
 msgid "Invoice"
-msgstr ""
+msgstr "Invois"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.portal_my_invoices
@@ -7711,7 +7715,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_invoice_tree
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 msgid "Invoice Date"
-msgstr ""
+msgstr "Tarikh invois"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__invoice_filter_type_domain
@@ -7875,7 +7879,7 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_invoice_report_search
 msgid "Invoiced"
-msgstr ""
+msgstr "Diinvois"
 
 #. module: account
 #. odoo-python
@@ -7893,7 +7897,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_invoice_tree
 #, python-format
 msgid "Invoices"
-msgstr ""
+msgstr "Invois"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.portal_my_home_invoice
@@ -7910,7 +7914,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_account_invoice_report_pivot
 #: model_terms:ir.ui.view,arch_db:account.view_account_invoice_report_search
 msgid "Invoices Analysis"
-msgstr ""
+msgstr "Analisis Invois"
 
 #. module: account
 #: model:ir.model,name:account.model_account_invoice_report
@@ -8464,7 +8468,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__lang
 msgid "Language"
-msgstr ""
+msgstr "Bahasa"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.report_hash_integrity
@@ -8539,7 +8543,7 @@ msgstr "Terakhir Diubah suai pada"
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_report__default_opening_date_filter__last_month
 msgid "Last Month"
-msgstr ""
+msgstr "Bulan lepas"
 
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_report__default_opening_date_filter__last_quarter
@@ -8747,7 +8751,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_report_line__hierarchy_level
 msgid "Level"
-msgstr ""
+msgstr "Tahap"
 
 #. module: account
 #. odoo-javascript
@@ -8767,7 +8771,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_reconcile_model__line_ids
 #: model:ir.model.fields,field_description:account.field_account_reconcile_model_template__line_ids
 msgid "Line"
-msgstr ""
+msgstr "Talian"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_config_settings__show_line_subtotals_tax_selection
@@ -8829,7 +8833,7 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.bill_preview
 msgid "Logo"
-msgstr ""
+msgstr "Logo"
 
 #. module: account
 #. odoo-javascript
@@ -8887,7 +8891,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_res_company__message_main_attachment_id
 #: model:ir.model.fields,field_description:account.field_res_partner_bank__message_main_attachment_id
 msgid "Main Attachment"
-msgstr ""
+msgstr "Lampiran Utama"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_report__commercial_partner_id
@@ -8927,7 +8931,7 @@ msgstr ""
 #: model:account.payment.method,name:account.account_payment_method_manual_in
 #: model:account.payment.method,name:account.account_payment_method_manual_out
 msgid "Manual"
-msgstr ""
+msgstr "Manual"
 
 #. module: account
 #. odoo-python
@@ -9109,7 +9113,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_res_company__message_has_error
 #: model:ir.model.fields,field_description:account.field_res_partner_bank__message_has_error
 msgid "Message Delivery error"
-msgstr ""
+msgstr "Ralat Penyampaian Mesej"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__record_name
@@ -9141,7 +9145,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_res_company__message_ids
 #: model:ir.model.fields,field_description:account.field_res_partner_bank__message_ids
 msgid "Messages"
-msgstr ""
+msgstr "Mesej"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_payment__payment_method_id
@@ -9386,7 +9390,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_setup_bank_manual_config__activity_calendar_event_id
 #: model:ir.model.fields,field_description:account.field_res_partner_bank__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
-msgstr ""
+msgstr "Acara Kalendar Aktiviti Seterusnya"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__activity_date_deadline
@@ -9585,7 +9589,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_account_reconcile_model_form
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 msgid "Note"
-msgstr ""
+msgstr "Nota"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_reconcile_model__match_note_param
@@ -9611,7 +9615,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_fiscal_position__note
 #: model:ir.model.fields,field_description:account.field_account_fiscal_position_template__note
 msgid "Notes"
-msgstr ""
+msgstr "Nota"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__notify
@@ -10210,7 +10214,7 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
 msgid "Package"
-msgstr ""
+msgstr "Pakej"
 
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_move__payment_state__paid
@@ -10322,7 +10326,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_account_various_payment_tree
 #, python-format
 msgid "Partner"
-msgstr ""
+msgstr "Rakan kongsi"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_partner__contract_ids
@@ -10668,7 +10672,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_search
 #, python-format
 msgid "Payments"
-msgstr ""
+msgstr "Pembayaran"
 
 #. module: account
 #: model_terms:ir.actions.act_window,help:account.action_account_payments
@@ -10741,6 +10745,16 @@ msgstr "Tempoh"
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_report__filter_period_comparison
 msgid "Period Comparison"
+msgstr ""
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/chart_template.py:0
+#, python-format
+msgid ""
+"Please check these taxes. They might be outdated. We did not update them. "
+"Indeed, they do not exactly match the taxes of the original version of the "
+"localization module.<br/>You might want to archive or adapt them.<br/><ul>"
 msgstr ""
 
 #. module: account
@@ -10821,7 +10835,7 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 msgid "Post"
-msgstr ""
+msgstr "Jawatan"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_journal_dashboard_kanban_view
@@ -10855,7 +10869,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_account_move_line_filter
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_search
 msgid "Posted"
-msgstr ""
+msgstr "Disiarkan"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__posted_before
@@ -10983,7 +10997,7 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 msgid "Price"
-msgstr ""
+msgstr "Harga"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__is_print
@@ -10991,7 +11005,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.account_invoice_send_wizard_form
 #: model_terms:ir.ui.view,arch_db:account.portal_invoice_page
 msgid "Print"
-msgstr ""
+msgstr "Cetak"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_report_line__print_on_new_page
@@ -11018,7 +11032,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_account_analytic_line_filter_inherit_account
 #: model_terms:ir.ui.view,arch_db:account.view_move_line_form
 msgid "Product"
-msgstr ""
+msgstr "Produk"
 
 #. module: account
 #: model:ir.ui.menu,name:account.menu_product_product_categories
@@ -11032,7 +11046,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_invoice_report__product_categ_id
 #: model_terms:ir.ui.view,arch_db:account.view_account_invoice_report_search
 msgid "Product Category"
-msgstr ""
+msgstr "Kategori Produk"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_report__quantity
@@ -11042,7 +11056,7 @@ msgstr ""
 #. module: account
 #: model:ir.model,name:account.model_product_product
 msgid "Product Variant"
-msgstr ""
+msgstr "Varian Produk"
 
 #. module: account
 #: model:ir.actions.act_window,name:account.product_product_action_purchasable
@@ -11052,7 +11066,7 @@ msgstr ""
 #: model:ir.ui.menu,name:account.product_product_menu_sellable
 #: model_terms:ir.ui.view,arch_db:account.product_template_view_tree
 msgid "Products"
-msgstr ""
+msgstr "Produk"
 
 #. module: account
 #. odoo-javascript
@@ -11127,7 +11141,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__quantity
 msgid "Quantity"
-msgstr ""
+msgstr "Kuantiti"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
@@ -11193,7 +11207,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_account_move_line_filter
 #: model_terms:ir.ui.view,arch_db:account.view_account_search
 msgid "Receivable"
-msgstr ""
+msgstr "Boleh diterima"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_chart_template__property_account_receivable_id
@@ -11235,7 +11249,7 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_invoice_send_wizard_form
 msgid "Recipients"
-msgstr ""
+msgstr "Penerima"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_automatic_entry_wizard_form
@@ -11323,7 +11337,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_account_reconcile_model_form
 #, python-format
 msgid "Reference"
-msgstr ""
+msgstr "Rujukan"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_payment__payment_reference
@@ -11336,7 +11350,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account.selection__account_tax_repartition_line__document_type__refund
 #: model_terms:ir.ui.view,arch_db:account.account_journal_dashboard_kanban_view
 msgid "Refund"
-msgstr ""
+msgstr "Bayaran balik"
 
 #. module: account
 #. odoo-python
@@ -11498,7 +11512,7 @@ msgstr ""
 #: model:ir.ui.menu,name:account.account_report_folder
 #: model:ir.ui.menu,name:account.menu_finance_reports
 msgid "Reporting"
-msgstr ""
+msgstr "Pelaporan"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_cash_rounding__rounding
@@ -11524,7 +11538,7 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_form
 msgid "Reset To Draft"
-msgstr ""
+msgstr "Tetapkan Semula Kepada Draf"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
@@ -11568,7 +11582,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_setup_bank_manual_config__activity_user_id
 #: model:ir.model.fields,field_description:account.field_res_partner_bank__activity_user_id
 msgid "Responsible User"
-msgstr ""
+msgstr "Pengguna Bertanggungjawab"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_reconcile_model_template__match_partner_category_ids
@@ -11600,7 +11614,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account.selection__account_automatic_entry_wizard__account_type__income
 #, python-format
 msgid "Revenue"
-msgstr ""
+msgstr "Hasil"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_automatic_entry_wizard__revenue_accrual_account
@@ -11792,7 +11806,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_res_company__message_has_sms_error
 #: model:ir.model.fields,field_description:account.field_res_partner_bank__message_has_sms_error
 msgid "SMS Delivery error"
-msgstr ""
+msgstr "Ralat Penghantaran SMS"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_default_terms_and_conditions
@@ -11861,7 +11875,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_account_invoice_report_search
 #: model_terms:ir.ui.view,arch_db:account.view_invoice_tree
 msgid "Salesperson"
-msgstr ""
+msgstr "Jurujual"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_reconcile_model__match_same_currency
@@ -11993,7 +12007,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account.selection__account_move_line__display_type__line_section
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 msgid "Section"
-msgstr ""
+msgstr "Bahagian"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_journal__secure_sequence_id
@@ -12099,7 +12113,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account.selection__account_payment__payment_type__outbound
 #: model_terms:ir.ui.view,arch_db:account.account_invoice_send_wizard_form
 msgid "Send"
-msgstr ""
+msgstr "Hantar"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_invoice_send_wizard_form
@@ -12115,7 +12129,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_config_settings__invoice_is_email
 msgid "Send Email"
-msgstr ""
+msgstr "Menghantar e-mel"
 
 #. module: account
 #. odoo-python
@@ -12263,13 +12277,13 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_tax_template__tax_scope__service
 msgid "Service"
-msgstr ""
+msgstr "Perkhidmatan"
 
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_tax__tax_scope__service
 #: model_terms:ir.ui.view,arch_db:account.view_account_tax_search
 msgid "Services"
-msgstr ""
+msgstr "Perkhidmatan"
 
 #. module: account
 #. odoo-javascript
@@ -12346,7 +12360,7 @@ msgstr ""
 #. module: account
 #: model:ir.actions.server,name:account.model_account_move_action_share
 msgid "Share"
-msgstr ""
+msgstr "Kongsi"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_journal__code
@@ -12669,7 +12683,7 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_line_form
 msgid "States"
-msgstr ""
+msgstr "Negeri"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_fiscal_position__states_count
@@ -12690,7 +12704,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_search
 #, python-format
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_bank_statement_line__activity_state
@@ -12744,7 +12758,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__subject
 msgid "Subject"
-msgstr ""
+msgstr "Subjek"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_invoice_send_wizard_form
@@ -12755,7 +12769,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_move_line__price_subtotal
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 msgid "Subtotal"
-msgstr ""
+msgstr "Jumlah kecil"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__subtype_id
@@ -12800,7 +12814,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_account_tag__name
 msgid "Tag Name"
-msgstr ""
+msgstr "Nama Tag"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_account__tag_ids
@@ -13197,7 +13211,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_move_line_form
 #, python-format
 msgid "Taxes"
-msgstr ""
+msgstr "Cukai"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
@@ -13267,7 +13281,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_config_settings__chart_template_id
 msgid "Template"
-msgstr ""
+msgstr "Templat"
 
 #. module: account
 #: model:ir.model,name:account.model_account_group_template
@@ -13335,7 +13349,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_payment__narration
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 msgid "Terms and Conditions"
-msgstr ""
+msgstr "Terma dan syarat"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_res_company__account_opening_date
@@ -13397,6 +13411,15 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_payment_term_form
 #, python-format
 msgid "The Payment Term must have one Balance line."
+msgstr ""
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_move_line.py:0
+#, python-format
+msgid ""
+"The Unit of Measure (UoM) '%s' you have selected for product '%s', is "
+"incompatible with its category : %s."
 msgstr ""
 
 #. module: account
@@ -14296,12 +14319,12 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_report__default_opening_date_filter__this_month
 msgid "This Month"
-msgstr ""
+msgstr "Bulan ini"
 
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_report__default_opening_date_filter__this_quarter
 msgid "This Quarter"
-msgstr ""
+msgstr "Suku Tahun ini"
 
 #. module: account
 #. odoo-python
@@ -14537,6 +14560,15 @@ msgstr ""
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/product.py:0
+#, python-format
+msgid ""
+"This product is already being used in posted Journal Entries.\n"
+"If you want to change its Unit of Measure, please archive this product and create a new one."
+msgstr ""
+
+#. module: account
+#. odoo-python
 #: code:addons/account/models/account_reconcile_model.py:0
 #, python-format
 msgid ""
@@ -14617,13 +14649,13 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_report__default_opening_date_filter__today
 msgid "Today"
-msgstr ""
+msgstr "Hari ini"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_invoice_filter
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_search
 msgid "Today Activities"
-msgstr ""
+msgstr "Aktiviti Hari Ini"
 
 #. module: account
 #. odoo-javascript
@@ -14635,13 +14667,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_move_line__price_total
 #: model:ir.model.fields,field_description:account.field_account_payment__amount_total
 #: model_terms:ir.ui.view,arch_db:account.account_invoice_report_view_tree
+#: model_terms:ir.ui.view,arch_db:account.document_tax_totals
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_tree
 #: model_terms:ir.ui.view,arch_db:account.view_invoice_tree
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 #: model_terms:ir.ui.view,arch_db:account.view_move_tree
 #, python-format
 msgid "Total"
-msgstr ""
+msgstr "Jumlah"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__quick_edit_total_amount
@@ -14707,6 +14740,13 @@ msgid "Total Residual in Currency"
 msgstr ""
 
 #. module: account
+#. odoo-javascript
+#: code:addons/account/static/src/components/tax_totals/tax_totals.xml:0
+#, python-format
+msgid "Total Rounded"
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__amount_total_signed
 #: model:ir.model.fields,field_description:account.field_account_move__amount_total_signed
 #: model:ir.model.fields,field_description:account.field_account_payment__amount_total_signed
@@ -14765,7 +14805,7 @@ msgstr ""
 #: code:addons/account/wizard/account_automatic_entry_wizard.py:0
 #, python-format
 msgid "Transfer"
-msgstr ""
+msgstr "Pemindahan"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_automatic_entry_wizard_form
@@ -14845,7 +14885,7 @@ msgstr "Taip Nama"
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.partner_view_buttons
 msgid "Type a message..."
-msgstr ""
+msgstr "Taip mesej..."
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_bank_statement_line__qr_code_method
@@ -14865,7 +14905,7 @@ msgstr ""
 #: model:ir.model.fields,help:account.field_account_setup_bank_manual_config__activity_exception_decoration
 #: model:ir.model.fields,help:account.field_res_partner_bank__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr ""
+msgstr "Jenis aktiviti pengecualian dalam rekod."
 
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_cash_rounding__rounding_method__up
@@ -14889,7 +14929,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_report__filter_unfold_all
 msgid "Unfold All"
-msgstr ""
+msgstr "Buka Semua"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_report_line__code
@@ -14899,12 +14939,12 @@ msgstr "Pengecam unik untuk baris ini."
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__price_unit
 msgid "Unit Price"
-msgstr ""
+msgstr "Harga seunit"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 msgid "Unit Price:"
-msgstr ""
+msgstr "Harga seunit:"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_report__product_uom_id
@@ -15093,7 +15133,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__template_id
 msgid "Use template"
-msgstr ""
+msgstr "Gunakan templat"
 
 #. module: account
 #: model_terms:digest.tip,tip_description:account.digest_tip_account_0
@@ -15202,7 +15242,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_payment_term_line__value_amount
 #: model:ir.model.fields,field_description:account.field_account_report_external_value__value
 msgid "Value"
-msgstr ""
+msgstr "Nilai"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_reconcile_model_line__amount_string
@@ -15229,7 +15269,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.view_invoice_tree
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 msgid "Vendor"
-msgstr ""
+msgstr "Penjual"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_form
@@ -15262,6 +15302,7 @@ msgstr ""
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/account_analytic_account.py:0
 #: code:addons/account/models/chart_template.py:0
 #: model:ir.model.fields.selection,name:account.selection__res_company__quick_edit_mode__in_invoices
 #: model_terms:ir.ui.view,arch_db:account.account_analytic_account_view_form_inherit
@@ -15269,7 +15310,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.res_partner_view_search
 #, python-format
 msgid "Vendor Bills"
-msgstr ""
+msgstr "Bil Penjual"
 
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_invoice_report__move_type__in_refund
@@ -15323,7 +15364,7 @@ msgstr ""
 #: model:ir.ui.menu,name:account.menu_finance_payables
 #: model_terms:ir.ui.view,arch_db:account.view_account_invoice_report_search
 msgid "Vendors"
-msgstr ""
+msgstr "Penjual"
 
 #. module: account
 #. odoo-javascript
@@ -15331,7 +15372,7 @@ msgstr ""
 #: code:addons/account/static/src/xml/legacy_account_payment.xml:0
 #, python-format
 msgid "View"
-msgstr ""
+msgstr "Lihat"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_partner_property_form
@@ -15341,7 +15382,7 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__res_partner__invoice_warn__warning
 msgid "Warning"
-msgstr ""
+msgstr "Amaran"
 
 #. module: account
 #. odoo-python
@@ -15363,7 +15404,7 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
 msgid "Warnings"
-msgstr ""
+msgstr "Amaran"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_config_settings__group_warning_account
@@ -15398,7 +15439,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_res_company__website_message_ids
 #: model:ir.model.fields,field_description:account.field_res_partner_bank__website_message_ids
 msgid "Website Messages"
-msgstr ""
+msgstr "Mesej Laman Web"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_account__website_message_ids
@@ -15412,7 +15453,7 @@ msgstr ""
 #: model:ir.model.fields,help:account.field_res_company__website_message_ids
 #: model:ir.model.fields,help:account.field_res_partner_bank__website_message_ids
 msgid "Website communication history"
-msgstr ""
+msgstr "Sejarah komunikasi laman web"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_payment__paired_internal_transfer_payment_id
@@ -15848,15 +15889,6 @@ msgstr ""
 
 #. module: account
 #. odoo-python
-#: code:addons/account/models/account_move.py:0
-#, python-format
-msgid ""
-"You cannot delete this entry, as it has already consumed a sequence number "
-"and is not the last one in the chain. You should probably revert it instead."
-msgstr ""
-
-#. module: account
-#. odoo-python
 #: code:addons/account/models/res_config_settings.py:0
 #, python-format
 msgid ""
@@ -16156,6 +16188,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.account_default_terms_and_conditions
 msgid "You should update this document to reflect your T&amp;C."
 msgstr ""
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/chart_template.py:0
+#, python-format
+msgid "Your taxes have been updated !"
+msgstr "Cukai anda telah dikemas kini!"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_position_form

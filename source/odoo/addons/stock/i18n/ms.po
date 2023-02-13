@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Niyas Raphy, 2022
-# Mehjabin Farsana, 2022
+# Mehjabin Farsana, 2023
 # 
 msgid ""
 msgstr ""
@@ -12,7 +12,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-15 12:48+0000\n"
 "PO-Revision-Date: 2022-09-22 05:55+0000\n"
-"Last-Translator: Mehjabin Farsana, 2022\n"
+"Last-Translator: Mehjabin Farsana, 2023\n"
 "Language-Team: Malay (https://www.transifex.com/odoo/teams/41243/ms/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -779,12 +779,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_location__comment
 #: model_terms:ir.ui.view,arch_db:stock.view_location_form
 msgid "Additional Information"
-msgstr ""
+msgstr "Maklumat tambahan"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_warehouse__partner_id
 msgid "Address"
-msgstr ""
+msgstr "Alamat"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_rule__partner_address_id
@@ -794,7 +794,7 @@ msgstr ""
 #. module: stock
 #: model:res.groups,name:stock.group_stock_manager
 msgid "Administrator"
-msgstr ""
+msgstr "Pentadbir"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.res_config_settings_view_form
@@ -814,7 +814,7 @@ msgstr "Semua"
 #. module: stock
 #: model:ir.actions.act_window,name:stock.stock_picking_action_picking_type
 msgid "All Transfers"
-msgstr ""
+msgstr "Semua Pemindahan"
 
 #. module: stock
 #. odoo-javascript
@@ -826,7 +826,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__procurement_group__move_type__one
 msgid "All at once"
-msgstr ""
+msgstr "Semua sekali"
 
 #. module: stock
 #: model_terms:res.company,invoice_terms_html:stock.res_company_1
@@ -834,6 +834,8 @@ msgid ""
 "All our contractual relations will be governed exclusively by United States "
 "law."
 msgstr ""
+"Semua hubungan kontrak kami akan dikawal secara eksklusif oleh undang-undang"
+" Amerika Syarikat."
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__returned_move_ids
@@ -843,7 +845,7 @@ msgstr ""
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
 msgid "Allocation"
-msgstr ""
+msgstr "Peruntukan"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_storage_category__allow_new_product
@@ -874,7 +876,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_res_company__annual_inventory_month
 #: model:ir.model.fields,field_description:stock.field_res_config_settings__annual_inventory_month
 msgid "Annual Inventory Month"
-msgstr ""
+msgstr "Bulan Inventori Tahunan"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_res_company__annual_inventory_month
@@ -937,7 +939,7 @@ msgstr "Mohon"
 #: code:addons/stock/static/src/views/list/inventory_report_list.xml:0
 #, python-format
 msgid "Apply All"
-msgstr ""
+msgstr "Terapkan Semua"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_product_replenish__route_ids
@@ -982,7 +984,7 @@ msgstr ""
 #: code:addons/stock/static/src/components/reception_report_line/stock_reception_report_line.xml:0
 #, python-format
 msgid "Assign"
-msgstr ""
+msgstr "Tugaskan"
 
 #. module: stock
 #. odoo-javascript
@@ -1032,7 +1034,7 @@ msgstr "Kiraan Lampiran"
 #: model:ir.ui.menu,name:stock.menu_attribute_action
 #: model_terms:ir.ui.view,arch_db:stock.res_config_settings_view_form
 msgid "Attributes"
-msgstr ""
+msgstr "Atribut"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__res_company__annual_inventory_month__8
@@ -1068,7 +1070,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:stock.selection__stock_picking__products_availability_state__available
 #, python-format
 msgid "Available"
-msgstr ""
+msgstr "Tersedia"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.product_template_search_form_view_stock
@@ -1100,7 +1102,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_picking__backorder_ids
 #: model_terms:ir.ui.view,arch_db:stock.stock_picking_type_kanban
 msgid "Back Orders"
-msgstr ""
+msgstr "Pesanan Kembali"
 
 #. module: stock
 #: model:ir.model,name:stock.model_stock_backorder_confirmation
@@ -1126,7 +1128,7 @@ msgstr ""
 #: model:ir.actions.act_window,name:stock.action_picking_tree_backorder
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Backorders"
-msgstr ""
+msgstr "Pesanan Kembali"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_location__barcode
@@ -1134,7 +1136,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_picking_type__barcode
 #: model_terms:ir.ui.view,arch_db:stock.res_config_settings_view_form
 msgid "Barcode"
-msgstr ""
+msgstr "Kod bar"
 
 #. module: stock
 #: model:ir.ui.menu,name:stock.menu_wms_barcode_nomenclature_all
@@ -1186,7 +1188,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__product_template__tracking__lot
 msgid "By Lots"
-msgstr ""
+msgstr "Mengikut Lot"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__product_template__tracking__serial
@@ -1248,12 +1250,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_return_picking_form
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_rules_report
 msgid "Cancel"
-msgstr ""
+msgstr "Batal"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_rule__propagate_cancel
 msgid "Cancel Next Move"
-msgstr ""
+msgstr "Batalkan Pergerakan Seterusnya"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_move__state__cancel
@@ -1261,7 +1263,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:stock.selection__stock_picking__state__cancel
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Cancelled"
-msgstr ""
+msgstr "Dibatalkan"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
@@ -1280,7 +1282,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_storage_category__capacity_ids
 msgid "Capacity"
-msgstr ""
+msgstr "Kapasiti"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.stock_storage_category_form
@@ -1369,7 +1371,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
 #: model_terms:ir.ui.view,arch_db:stock.vpicktree
 msgid "Check Availability"
-msgstr ""
+msgstr "Semak ketersediaan"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_picking__has_packages
@@ -1444,7 +1446,7 @@ msgstr ""
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_quant_tree_inventory_editable
 msgid "Clear"
-msgstr ""
+msgstr "Jelas"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_move_operations
@@ -1464,17 +1466,17 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_replenishment_info
 #, python-format
 msgid "Close"
-msgstr ""
+msgstr "Tutup"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_picking_type__color
 msgid "Color"
-msgstr ""
+msgstr "Warna"
 
 #. module: stock
 #: model:ir.model,name:stock.model_res_company
 msgid "Companies"
-msgstr ""
+msgstr "Syarikat"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_product_replenish__company_id
@@ -1550,13 +1552,13 @@ msgstr ""
 #. module: stock
 #: model:ir.model,name:stock.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Tetapan Konfigurasi"
 
 #. module: stock
 #: model:ir.ui.menu,name:stock.menu_stock_config_settings
 #: model_terms:ir.ui.view,arch_db:stock.stock_picking_type_kanban
 msgid "Configuration"
-msgstr ""
+msgstr "Konfigurasi"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.lot_label_layout_form_picking
@@ -1569,12 +1571,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_move_operations
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_quantity_history
 msgid "Confirm"
-msgstr ""
+msgstr "Sahkan"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_package_level__state__confirmed
 msgid "Confirmed"
-msgstr ""
+msgstr "Disahkan"
 
 #. module: stock
 #: model:ir.model,name:stock.model_stock_inventory_conflict
@@ -1603,7 +1605,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_res_config_settings__group_stock_tracking_owner
 msgid "Consignment"
-msgstr ""
+msgstr "Konsainan"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move_line__consume_line_ids
@@ -1621,7 +1623,7 @@ msgstr "Kenalan"
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_location__child_ids
 msgid "Contains"
-msgstr ""
+msgstr "Mengandungi"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_quant_package_form
@@ -1668,7 +1670,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_request_count__set_count
 msgid "Count"
-msgstr ""
+msgstr "Kira"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_picking_type__count_picking
@@ -1701,7 +1703,10 @@ msgid "Count Picking Waiting"
 msgstr ""
 
 #. module: stock
+#. odoo-javascript
+#: code:addons/stock/static/src/views/list/inventory_report_list_controller.js:0
 #: model:ir.actions.report,name:stock.action_report_inventory
+#, python-format
 msgid "Count Sheet"
 msgstr ""
 
@@ -1709,7 +1714,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_quant__inventory_quantity
 #: model_terms:ir.ui.view,arch_db:stock.stock_inventory_conflict_form_view
 msgid "Counted Quantity"
-msgstr ""
+msgstr "Kuantiti Dikira"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_template_property_form
@@ -1720,7 +1725,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_picking_type__create_backorder
 #: model_terms:ir.ui.view,arch_db:stock.view_backorder_confirmation
 msgid "Create Backorder"
-msgstr ""
+msgstr "Buat Pesanan Belakang"
 
 #. module: stock
 #. odoo-python
@@ -1889,7 +1894,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_picking__date
 #: model_terms:ir.ui.view,arch_db:stock.view_move_search
 msgid "Creation Date"
-msgstr ""
+msgstr "Tarikh Penciptaan"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_picking__date
@@ -1912,7 +1917,7 @@ msgstr ""
 #: model:ir.actions.act_window,name:stock.location_open_quants
 #: model_terms:ir.ui.view,arch_db:stock.view_location_form
 msgid "Current Stock"
-msgstr ""
+msgstr "Stok semasa"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_product_product__qty_available
@@ -1933,7 +1938,7 @@ msgstr ""
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_location_search
 msgid "Customer"
-msgstr ""
+msgstr "Pelanggan"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_product_product__sale_delay
@@ -1946,12 +1951,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_res_users__property_stock_customer
 #: model:ir.model.fields.selection,name:stock.selection__stock_location__usage__customer
 msgid "Customer Location"
-msgstr ""
+msgstr "Lokasi Pelanggan"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_location_search
 msgid "Customer Locations"
-msgstr ""
+msgstr "Lokasi Pelanggan"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_location_form
@@ -1972,12 +1977,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.stock_move_line_view_search
 #: model_terms:ir.ui.view,arch_db:stock.view_move_search
 msgid "Date"
-msgstr ""
+msgstr "Tarikh"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_move_form
 msgid "Date Processing"
-msgstr ""
+msgstr "Pemprosesan Tarikh"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_move__date_deadline
@@ -1989,7 +1994,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_move__date
 #: model_terms:ir.ui.view,arch_db:stock.view_move_form
 msgid "Date Scheduled"
-msgstr ""
+msgstr "Tarikh Dijadualkan"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_product_replenish__date_planned
@@ -2009,7 +2014,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_picking__date_done
 msgid "Date of Transfer"
-msgstr ""
+msgstr "Tarikh Pemindahan"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_location__last_inventory_date
@@ -2019,7 +2024,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__reservation_date
 msgid "Date to Reserve"
-msgstr ""
+msgstr "Tarikh untuk Tempah"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.res_config_settings_view_form
@@ -2043,7 +2048,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_picking_type__reservation_days_before
 msgid "Days"
-msgstr ""
+msgstr "Hari"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_warehouse_orderpoint__days_to_order
@@ -2531,7 +2536,7 @@ msgstr ""
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.res_config_settings_view_form
 msgid "Documentation"
-msgstr ""
+msgstr "Dokumentasi"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move_line__qty_done
@@ -2553,7 +2558,7 @@ msgstr "Selesai"
 #: model_terms:ir.ui.view,arch_db:stock.view_move_line_form
 #: model_terms:ir.ui.view,arch_db:stock.view_move_line_tree
 msgid "Done By"
-msgstr ""
+msgstr "Disiapkan oleh"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_package_level__state__draft
@@ -2785,7 +2790,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_picking__message_follower_ids
 #: model:ir.model.fields,field_description:stock.field_stock_scrap__message_follower_ids
 msgid "Followers"
-msgstr ""
+msgstr "Pengikut"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_lot__message_partner_ids
@@ -2956,7 +2961,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_move_tree
 #: model_terms:ir.ui.view,arch_db:stock.vpicktree
 msgid "From"
-msgstr ""
+msgstr "Daripada"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move_line__owner_id
@@ -3130,7 +3135,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_quant_tree_inventory_editable
 #, python-format
 msgid "History"
-msgstr ""
+msgstr "Sejarah"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_picking_type__reservation_method
@@ -3192,7 +3197,7 @@ msgstr "ID"
 #: model:ir.model.fields,field_description:stock.field_stock_lot__activity_exception_icon
 #: model:ir.model.fields,field_description:stock.field_stock_picking__activity_exception_icon
 msgid "Icon"
-msgstr ""
+msgstr "Ikon"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_lot__activity_exception_icon
@@ -3385,7 +3390,7 @@ msgstr ""
 #: code:addons/stock/models/stock_quant.py:0
 #, python-format
 msgid "Import"
-msgstr ""
+msgstr "Import"
 
 #. module: stock
 #. odoo-python
@@ -3417,7 +3422,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_move_search
 #, python-format
 msgid "Incoming"
-msgstr ""
+msgstr "Masuk"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_quant__in_date
@@ -3458,7 +3463,7 @@ msgstr ""
 #: code:addons/stock/models/stock_warehouse.py:0
 #, python-format
 msgid "Input"
-msgstr ""
+msgstr "Input"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_warehouse__wh_input_stock_loc_id
@@ -3476,7 +3481,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.stock_move_line_view_search
 #: model_terms:ir.ui.view,arch_db:stock.view_location_search
 msgid "Internal"
-msgstr ""
+msgstr "Dalaman"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_location__usage__internal
@@ -3492,7 +3497,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_lot__ref
 msgid "Internal Reference"
-msgstr ""
+msgstr "Rujukan Dalaman"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_picking_type__code__internal
@@ -3551,6 +3556,13 @@ msgid "Invalid domain right operand %s"
 msgstr ""
 
 #. module: stock
+#: code:addons/stock/models/product.py:0
+#, python-format
+msgid ""
+"Invalid rule's configuration, the following rule causes an endless loop: %s"
+msgstr ""
+
+#. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_quant__inventory_quantity_auto_apply
 msgid "Inventoried Quantity"
 msgstr ""
@@ -3567,7 +3579,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_partner_stock_form
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_quant_pivot
 msgid "Inventory"
-msgstr ""
+msgstr "Inventori"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.product_product_stock_tree
@@ -4114,7 +4126,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_production_lot_form
 #: model_terms:ir.ui.view,arch_db:stock.warehouse_orderpoint_search
 msgid "Location"
-msgstr ""
+msgstr "Lokasi"
 
 #. module: stock
 #: model:ir.actions.report,name:stock.action_report_location_barcode
@@ -4181,7 +4193,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.product_category_form_view_inherit
 #: model_terms:ir.ui.view,arch_db:stock.view_location_form
 msgid "Logistics"
-msgstr ""
+msgstr "Logistik"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__barcode_rule__type__lot
@@ -4295,7 +4307,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_picking__message_main_attachment_id
 #: model:ir.model.fields,field_description:stock.field_stock_scrap__message_main_attachment_id
 msgid "Main Attachment"
-msgstr ""
+msgstr "Lampiran Utama"
 
 #. module: stock
 #. odoo-python
@@ -4348,7 +4360,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_warehouse_orderpoint__trigger__manual
 msgid "Manual"
-msgstr ""
+msgstr "Manual"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_rule__auto__manual
@@ -4438,7 +4450,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_picking__message_has_error
 #: model:ir.model.fields,field_description:stock.field_stock_scrap__message_has_error
 msgid "Message Delivery error"
-msgstr ""
+msgstr "Ralat Penyampaian Mesej"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_res_partner__picking_warn_msg
@@ -4451,7 +4463,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_picking__message_ids
 #: model:ir.model.fields,field_description:stock.field_stock_scrap__message_ids
 msgid "Messages"
-msgstr ""
+msgstr "Mesej"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_product_removal__method
@@ -4665,7 +4677,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_lot__activity_calendar_event_id
 #: model:ir.model.fields,field_description:stock.field_stock_picking__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
-msgstr ""
+msgstr "Acara Kalendar Aktiviti Seterusnya"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_lot__activity_date_deadline
@@ -4820,7 +4832,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:stock.selection__stock_move__priority__0
 #: model:ir.model.fields.selection,name:stock.selection__stock_picking__priority__0
 msgid "Normal"
-msgstr ""
+msgstr "Biasalah"
 
 #. module: stock
 #. odoo-javascript
@@ -4840,12 +4852,12 @@ msgstr ""
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
 msgid "Note"
-msgstr ""
+msgstr "Nota"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_picking__note
 msgid "Notes"
-msgstr ""
+msgstr "Nota"
 
 #. module: stock
 #. odoo-python
@@ -5019,7 +5031,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
 #: model_terms:ir.ui.view,arch_db:stock.view_template_property_form
 msgid "Operations"
-msgstr ""
+msgstr "Operasi"
 
 #. module: stock
 #: model:ir.actions.act_window,name:stock.action_picking_type_list
@@ -5064,7 +5076,7 @@ msgstr ""
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_rule_form
 msgid "Options"
-msgstr ""
+msgstr "Pilihan"
 
 #. module: stock
 #. odoo-javascript
@@ -5072,7 +5084,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.replenishment_option_warning_view
 #, python-format
 msgid "Order"
-msgstr ""
+msgstr "Pesanan"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_warehouse_orderpoint_tree_editable
@@ -5194,7 +5206,7 @@ msgstr ""
 #: model:ir.ui.menu,name:stock.stock_picking_type_menu
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_rules_report
 msgid "Overview"
-msgstr ""
+msgstr "Gambaran keseluruhan"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_quant__owner_id
@@ -5204,7 +5216,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.stock_move_line_view_search
 #: model_terms:ir.ui.view,arch_db:stock.view_move_line_form
 msgid "Owner"
-msgstr ""
+msgstr "Pemilik"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__restrict_partner_id
@@ -5269,7 +5281,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_quant_package_form
 #: model_terms:ir.ui.view,arch_db:stock.view_quant_package_tree
 msgid "Package"
-msgstr ""
+msgstr "Pakej"
 
 #. module: stock
 #: model:ir.actions.report,name:stock.action_report_quant_package_barcode_small
@@ -5373,7 +5385,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_type_form
 msgid "Packages"
-msgstr ""
+msgstr "Pakej"
 
 #. module: stock
 #: model_terms:ir.actions.act_window,help:stock.action_package_view
@@ -5385,7 +5397,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__product_packaging_id
 msgid "Packaging"
-msgstr ""
+msgstr "Pembungkusan"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_package_type__height
@@ -5451,7 +5463,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_procurement_group__partner_id
 #: model_terms:ir.ui.view,arch_db:stock.view_move_search
 msgid "Partner"
-msgstr ""
+msgstr "Rakan kongsi"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_rule__partner_address_id
@@ -5481,7 +5493,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_scrap__picking_id
 #: model_terms:ir.ui.view,arch_db:stock.view_move_search
 msgid "Picking"
-msgstr ""
+msgstr "Memetik"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
@@ -5597,7 +5609,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
 #, python-format
 msgid "Print"
-msgstr ""
+msgstr "Cetak"
 
 #. module: stock
 #: model:res.groups,name:stock.group_stock_lot_print_gs1
@@ -5728,7 +5740,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.warehouse_orderpoint_search
 #, python-format
 msgid "Product"
-msgstr ""
+msgstr "Produk"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_picking__products_availability
@@ -5756,7 +5768,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.quant_search_view
 #: model_terms:ir.ui.view,arch_db:stock.stock_putaway_list
 msgid "Product Category"
-msgstr ""
+msgstr "Kategori Produk"
 
 #. module: stock
 #: model:ir.actions.report,name:stock.label_product_product
@@ -5802,7 +5814,7 @@ msgstr ""
 #: model:ir.ui.menu,name:stock.menu_product_packagings
 #: model_terms:ir.ui.view,arch_db:stock.res_config_settings_view_form
 msgid "Product Packagings"
-msgstr ""
+msgstr "Pembungkusan Produk"
 
 #. module: stock
 #. odoo-python
@@ -5866,7 +5878,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model,name:stock.model_product_product
 msgid "Product Variant"
-msgstr ""
+msgstr "Varian Produk"
 
 #. module: stock
 #: model:ir.actions.act_window,name:stock.stock_product_normal_action
@@ -5929,7 +5941,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.stock_location_route_form_view
 #, python-format
 msgid "Products"
-msgstr ""
+msgstr "Produk"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_picking__products_availability_state
@@ -6054,7 +6066,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_res_config_settings__module_quality_control
 msgid "Quality"
-msgstr ""
+msgstr "Kualiti"
 
 #. module: stock
 #. odoo-python
@@ -6128,7 +6140,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_move_line_tree
 #: model_terms:ir.ui.view,arch_db:stock.view_move_tree
 msgid "Quantity"
-msgstr ""
+msgstr "Kuantiti"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.message_body
@@ -6262,7 +6274,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_move_search
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Ready"
-msgstr ""
+msgstr "Sedia"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__product_qty
@@ -6280,7 +6292,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:stock.selection__stock_picking_type__code__incoming
 #, python-format
 msgid "Receipt"
-msgstr ""
+msgstr "Resit"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_warehouse__reception_route_id
@@ -6371,7 +6383,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_move_search
 #: model_terms:ir.ui.view,arch_db:stock.view_move_tree_receipt_picking
 msgid "Reference"
-msgstr ""
+msgstr "Rujukan"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_picking_type__sequence_id
@@ -6531,7 +6543,7 @@ msgstr ""
 #. module: stock
 #: model:ir.ui.menu,name:stock.menu_warehouse_report
 msgid "Reporting"
-msgstr ""
+msgstr "Pelaporan"
 
 #. module: stock
 #: model:ir.actions.act_window,name:stock.action_stock_request_count
@@ -6621,13 +6633,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_product_template__responsible_id
 #: model:ir.model.fields,field_description:stock.field_stock_picking__user_id
 msgid "Responsible"
-msgstr ""
+msgstr "Bertanggungjawab"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_lot__activity_user_id
 #: model:ir.model.fields,field_description:stock.field_stock_picking__activity_user_id
 msgid "Responsible User"
-msgstr ""
+msgstr "Pengguna Bertanggungjawab"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_warehouse
@@ -6831,7 +6843,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_picking__message_has_sms_error
 #: model:ir.model.fields,field_description:stock.field_stock_scrap__message_has_sms_error
 msgid "SMS Delivery error"
-msgstr ""
+msgstr "Ralat Penghantaran SMS"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.report_package_barcode_small
@@ -6888,7 +6900,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
 #, python-format
 msgid "Scrap"
-msgstr ""
+msgstr "Sekerap"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_scrap__scrap_location_id
@@ -7100,8 +7112,11 @@ msgid ""
 msgstr ""
 
 #. module: stock
+#. odoo-javascript
+#: code:addons/stock/static/src/views/list/inventory_report_list_controller.js:0
 #: model:ir.actions.server,name:stock.action_view_set_quants_tree
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_quant_tree_inventory_editable
+#, python-format
 msgid "Set"
 msgstr ""
 
@@ -7312,12 +7327,12 @@ msgstr "Tandatangan"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.vpicktree
 msgid "Signed"
-msgstr ""
+msgstr "Ditandatangani"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.stock_package_type_form
 msgid "Size"
-msgstr ""
+msgstr "Saiz"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.stock_package_type_form
@@ -7368,7 +7383,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move_line__origin
 msgid "Source"
-msgstr ""
+msgstr "Sumber"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__origin
@@ -7438,7 +7453,7 @@ msgstr "negeri"
 #: model_terms:ir.ui.view,arch_db:stock.view_move_search
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_lot__activity_state
@@ -7760,7 +7775,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_change_product_qty__product_tmpl_id
 msgid "Template"
-msgstr ""
+msgstr "Templat"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_rule__auto
@@ -8223,7 +8238,7 @@ msgstr ""
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.quant_search_view
 msgid "To Apply"
-msgstr ""
+msgstr "Untuk memohon"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_backorder_confirmation_line__to_backorder
@@ -8254,7 +8269,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_immediate_transfer_line__to_immediate
 #: model_terms:ir.ui.view,arch_db:stock.stock_picking_type_kanban
 msgid "To Process"
-msgstr ""
+msgstr "Untuk memproses"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.stock_reorder_report_search
@@ -8266,12 +8281,12 @@ msgstr ""
 #: code:addons/stock/static/src/widgets/json_widget.xml:0
 #, python-format
 msgid "Today"
-msgstr ""
+msgstr "Hari ini"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Today Activities"
-msgstr ""
+msgstr "Aktiviti Hari Ini"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.product_product_stock_tree
@@ -8286,7 +8301,7 @@ msgstr ""
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.product_product_stock_tree
 msgid "Total Incoming"
-msgstr ""
+msgstr "Jumlah Masuk"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.product_product_stock_tree
@@ -8302,7 +8317,7 @@ msgstr ""
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_move_tree
 msgid "Total Quantity"
-msgstr ""
+msgstr "Kuantiti keseluruhan"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_quant_tree_editable
@@ -8320,7 +8335,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_production_lot_form
 #: model_terms:ir.ui.view,arch_db:stock.view_template_property_form
 msgid "Traceability"
-msgstr ""
+msgstr "Kebolehkesanan"
 
 #. module: stock
 #. odoo-javascript
@@ -8331,7 +8346,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.report_stock_inventory
 #, python-format
 msgid "Traceability Report"
-msgstr ""
+msgstr "Laporan Kebolehkesanan"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_res_config_settings__module_product_expiry
@@ -8372,7 +8387,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_quant__tracking
 #: model:ir.model.fields,field_description:stock.field_stock_track_line__tracking
 msgid "Tracking"
-msgstr ""
+msgstr "Penjejakan"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_track_confirmation__tracking_line_ids
@@ -8390,7 +8405,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Transfer"
-msgstr ""
+msgstr "Pemindahan"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__product_label_layout__picking_quantity__picking
@@ -8493,7 +8508,7 @@ msgstr "taip"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_partner_stock_warnings_form
 msgid "Type a message..."
-msgstr ""
+msgstr "Taip mesej..."
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__picking_code
@@ -8503,13 +8518,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_picking_type__code
 #: model_terms:ir.ui.view,arch_db:stock.view_pickingtype_filter
 msgid "Type of Operation"
-msgstr ""
+msgstr "Jenis Operasi"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_lot__activity_exception_decoration
 #: model:ir.model.fields,help:stock.field_stock_picking__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr ""
+msgstr "Jenis aktiviti pengecualian dalam rekod."
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_res_config_settings__module_delivery_ups
@@ -8536,7 +8551,7 @@ msgstr ""
 #: code:addons/stock/static/src/xml/stock_traceability_report_line.xml:0
 #, python-format
 msgid "Unfold"
-msgstr ""
+msgstr "Terbongkar"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_lot__name
@@ -8554,7 +8569,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__price_unit
 msgid "Unit Price"
-msgstr ""
+msgstr "Harga seunit"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_lot__product_uom_id
@@ -8580,27 +8595,27 @@ msgstr "Unit ukuran"
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_replenishment_option__uom
 msgid "Unit of Measure Name"
-msgstr ""
+msgstr "Nama Unit Ukuran"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.res_config_settings_view_form
 msgid "Units Of Measure"
-msgstr ""
+msgstr "Unit Ukuran"
 
 #. module: stock
 #: model:ir.ui.menu,name:stock.menu_stock_unit_measure_stock
 msgid "Units of Measure"
-msgstr ""
+msgstr "Unit ukuran"
 
 #. module: stock
 #: model:ir.ui.menu,name:stock.product_uom_menu
 msgid "Units of Measures"
-msgstr ""
+msgstr "Unit Ukuran"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_product_replenish__product_uom_id
 msgid "Unity of measure"
-msgstr ""
+msgstr "Unit ukuran"
 
 #. module: stock
 #. odoo-python
@@ -8612,7 +8627,7 @@ msgstr ""
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
 msgid "Unlock"
-msgstr ""
+msgstr "Buka kunci"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_quant_package_form
@@ -8627,7 +8642,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.vpicktree
 #, python-format
 msgid "Unreserve"
-msgstr ""
+msgstr "Batalkan simpanan"
 
 #. module: stock
 #. odoo-python
@@ -8669,7 +8684,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:stock.selection__stock_move__priority__1
 #: model:ir.model.fields.selection,name:stock.selection__stock_picking__priority__1
 msgid "Urgent"
-msgstr ""
+msgstr "Mendesak"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move_line__picking_type_use_existing_lots
@@ -8759,7 +8774,7 @@ msgstr ""
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_location_search
 msgid "Vendor"
-msgstr ""
+msgstr "Penjual"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_res_partner__property_stock_supplier
@@ -8777,7 +8792,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:stock.selection__stock_location__usage__view
 #: model_terms:ir.ui.view,arch_db:stock.stock_picking_type_kanban
 msgid "View"
-msgstr ""
+msgstr "Lihat"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_template_property_form
@@ -8804,7 +8819,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.stock_picking_type_kanban
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Waiting"
-msgstr ""
+msgstr "Menunggu"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_move__state__waiting
@@ -8854,7 +8869,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_warehouse_tree
 #: model_terms:ir.ui.view,arch_db:stock.warehouse_orderpoint_search
 msgid "Warehouse"
-msgstr ""
+msgstr "Gudang"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_warehouse
@@ -8940,7 +8955,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:stock.selection__res_partner__picking_warn__warning
 #, python-format
 msgid "Warning"
-msgstr ""
+msgstr "Amaran"
 
 #. module: stock
 #. odoo-python
@@ -8964,13 +8979,13 @@ msgstr ""
 #: code:addons/stock/models/product.py:0 code:addons/stock/models/product.py:0
 #, python-format
 msgid "Warning!"
-msgstr ""
+msgstr "Amaran!"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.res_config_settings_view_form
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Warnings"
-msgstr ""
+msgstr "Amaran"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_res_config_settings__group_warning_stock
@@ -8987,19 +9002,19 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_picking__website_message_ids
 #: model:ir.model.fields,field_description:stock.field_stock_scrap__website_message_ids
 msgid "Website Messages"
-msgstr ""
+msgstr "Mesej Laman Web"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_lot__website_message_ids
 #: model:ir.model.fields,help:stock.field_stock_picking__website_message_ids
 #: model:ir.model.fields,help:stock.field_stock_scrap__website_message_ids
 msgid "Website communication history"
-msgstr ""
+msgstr "Sejarah komunikasi laman web"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_package_type__base_weight
 msgid "Weight"
-msgstr ""
+msgstr "Berat badan"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_package_type__base_weight
@@ -9252,7 +9267,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/stock/models/stock_move.py:0
 #, python-format
-msgid "You can only delete draft moves."
+msgid "You can only delete draft or cancelled moves."
 msgstr ""
 
 #. module: stock
@@ -9611,7 +9626,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_rule_form
 #: model_terms:ir.ui.view,arch_db:stock.view_template_property_form
 msgid "days"
-msgstr ""
+msgstr "hari"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_type_form
@@ -9756,4 +9771,11 @@ msgstr ""
 #: model:mail.template,subject:stock.mail_template_data_delivery_confirmation
 msgid ""
 "{{ object.company_id.name }} Delivery Order (Ref {{ object.name or 'n/a' }})"
+msgstr ""
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_rule.py:0
+#, python-format
+msgid "Global Visibility Days"
 msgstr ""

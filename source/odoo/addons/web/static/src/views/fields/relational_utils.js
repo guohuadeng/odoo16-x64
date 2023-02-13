@@ -45,7 +45,7 @@ import {
 //
 // Commons
 //
-export function useSelectCreate({ resModel, activeActions, onSelected, onCreateEdit }) {
+export function useSelectCreate({ resModel, activeActions, onSelected, onCreateEdit, onUnselect }) {
     const env = useEnv();
     const addDialog = useOwnedDialogs();
 
@@ -60,6 +60,7 @@ export function useSelectCreate({ resModel, activeActions, onSelected, onCreateE
             onSelected,
             onCreateEdit: () => onCreateEdit({ context }),
             dynamicFilters: filters,
+            onUnselect,
         });
     }
     return selectCreate;
@@ -154,6 +155,11 @@ export class Many2XAutocomplete extends Component {
             onRecordSaved: (record) => {
                 return update([record.data]);
             },
+            onRecordDiscarded: () => {
+                if (!isToMany) {
+                    this.props.update(false);
+                }
+            },
             fieldString,
             onClose: () => {
                 const autoCompleteInput = this.autoCompleteContainer.el.querySelector("input");
@@ -179,6 +185,7 @@ export class Many2XAutocomplete extends Component {
                 return update(values);
             },
             onCreateEdit: ({ context }) => this.openMany2X({ context }),
+            onUnselect: isToMany ? false : () => update(),
         });
     }
 
@@ -244,9 +251,19 @@ export class Many2XAutocomplete extends Component {
                 action: async (params) => {
                     try {
                         await this.props.quickCreate(request, params);
-                    } catch {
-                        const context = this.getCreationContext(request);
-                        return this.openMany2X({ context });
+                    } catch (e) {
+                        if (e && e.name === "RPC_ERROR") {
+                            const context = this.getCreationContext(request);
+                            return this.openMany2X({ context });
+                        }
+                        // Compatibility with legacy code
+                        if (e && e.message && e.message.name === "RPC_ERROR") {
+                            // The event.preventDefault() is necessary because we still use the legacy
+                            e.event.preventDefault();
+                            const context = this.getCreationContext(request);
+                            return this.openMany2X({ context });
+                        }
+                        throw e;
                     }
                 },
             });
@@ -348,6 +365,7 @@ Many2XAutocomplete.defaultProps = {
 export function useOpenMany2XRecord({
     resModel,
     onRecordSaved,
+    onRecordDiscarded,
     fieldString,
     activeActions,
     isToMany,
@@ -390,6 +408,7 @@ export function useOpenMany2XRecord({
                 resModel: model,
                 viewId,
                 onRecordSaved,
+                onRecordDiscarded,
                 isToMany,
             },
             {
@@ -535,7 +554,10 @@ async function getFormViewInfo({ list, activeField, viewService, userService, en
             views: [[false, "form"]],
         });
         const archInfo = new FormArchParser().parse(views.form.arch, relatedModels, comodel);
-        formViewInfo = { ...archInfo, fields }; // should be good to memorize this on activeField
+        // Fields that need to be defined are the ones in the form view, this is natural,
+        // plus the ones that the list record has, that is, present in either the list arch or the kanban arch
+        // of the one2many field
+        formViewInfo = { ...archInfo, fields: { ...list.fields, ...fields } }; // should be good to memorize this on activeField
     }
 
     await loadSubViews(

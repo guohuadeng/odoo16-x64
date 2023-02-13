@@ -5,16 +5,16 @@
 # Translators:
 # Nancy Momoland <thanhnguyen.icsc@gmail.com>, 2022
 # Duy BQ <duybq86@gmail.com>, 2022
-# Thi Huong Nguyen, 2022
 # Martin Trigaux, 2022
+# Thi Huong Nguyen, 2022
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:48+0000\n"
+"POT-Creation-Date: 2023-02-02 10:33+0000\n"
 "PO-Revision-Date: 2022-09-22 05:55+0000\n"
-"Last-Translator: Martin Trigaux, 2022\n"
+"Last-Translator: Thi Huong Nguyen, 2022\n"
 "Language-Team: Vietnamese (https://www.transifex.com/odoo/teams/41243/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -259,6 +259,7 @@ msgstr ""
 
 #. module: stock
 #. odoo-python
+#: code:addons/stock/models/stock_rule.py:0
 #: code:addons/stock/models/stock_rule.py:0
 #, python-format
 msgid "+ %d day(s)"
@@ -903,6 +904,8 @@ msgid ""
 "All our contractual relations will be governed exclusively by United States "
 "law."
 msgstr ""
+"Tất cả các quan hệ hợp đồng của chúng tôi sẽ được điều chỉnh độc quyền bởi "
+"luật pháp Hoa Kỳ."
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__returned_move_ids
@@ -1790,7 +1793,10 @@ msgid "Count Picking Waiting"
 msgstr "Số giao nhận đang chờ"
 
 #. module: stock
+#. odoo-javascript
+#: code:addons/stock/static/src/views/list/inventory_report_list_controller.js:0
 #: model:ir.actions.report,name:stock.action_report_inventory
+#, python-format
 msgid "Count Sheet"
 msgstr "Đếm trang"
 
@@ -3161,6 +3167,13 @@ msgid "Gives the sequence of this line when displaying the warehouses."
 msgstr "Quy định mã số dòng này khi hiển thị trên kho."
 
 #. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_rule.py:0
+#, python-format
+msgid "Global Visibility Days"
+msgstr ""
+
+#. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.search_product_lot_filter
 #: model_terms:ir.ui.view,arch_db:stock.stock_move_line_view_search
 #: model_terms:ir.ui.view,arch_db:stock.stock_reorder_report_search
@@ -3702,6 +3715,14 @@ msgstr "Toán tử tên miền không hợp lệ %s"
 #, python-format
 msgid "Invalid domain right operand %s"
 msgstr "Toán hạng tên miền không hợp lệ %s"
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/product.py:0
+#, python-format
+msgid ""
+"Invalid rule's configuration, the following rule causes an endless loop: %s"
+msgstr ""
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_quant__inventory_quantity_auto_apply
@@ -5924,7 +5945,6 @@ msgstr "Nhóm sản phẩm"
 #: model:ir.model.fields,field_description:stock.field_stock_putaway_rule__category_id
 #: model:ir.model.fields,field_description:stock.field_stock_quant__product_categ_id
 #: model:ir.model.fields,field_description:stock.field_stock_warehouse_orderpoint__product_category_id
-#: model_terms:ir.ui.view,arch_db:stock.quant_search_view
 #: model_terms:ir.ui.view,arch_db:stock.stock_putaway_list
 msgid "Product Category"
 msgstr "Danh mục sản phẩm"
@@ -7305,8 +7325,11 @@ msgid ""
 msgstr ""
 
 #. module: stock
+#. odoo-javascript
+#: code:addons/stock/static/src/views/list/inventory_report_list_controller.js:0
 #: model:ir.actions.server,name:stock.action_view_set_quants_tree
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_quant_tree_inventory_editable
+#, python-format
 msgid "Set"
 msgstr "Cài"
 
@@ -8428,6 +8451,15 @@ msgstr ""
 "Sản phẩm này đã được sử dụng trong ít nhất một đợt hàng tồn kho. Không nên "
 "thay đổi Loại Sản phẩm vì nó có thể dẫn đến sự mâu thuẫn. Giải pháp tốt hơn "
 "có thể là lưu trữ sản phẩm và tạo một sản phẩm mới thay thế."
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/product.py:0
+#, python-format
+msgid ""
+"This product's company cannot be changed as long as there are quantities of "
+"it belonging to another company."
+msgstr ""
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_change_product_qty__new_quantity
@@ -9597,8 +9629,8 @@ msgstr "Bạn không thể nhập số lượng âm."
 #. odoo-python
 #: code:addons/stock/models/stock_move.py:0
 #, python-format
-msgid "You can only delete draft moves."
-msgstr "Bạn chỉ có thể xóa dịch chuyển nháp."
+msgid "You can only delete draft or cancelled moves."
+msgstr ""
 
 #. module: stock
 #. odoo-python
@@ -9641,6 +9673,13 @@ msgid ""
 msgstr ""
 "You cannot cancel a stock move that has been set to 'Done'. Create a return "
 "in order to reverse the moves which took place."
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_move.py:0
+#, python-format
+msgid "You cannot change a cancelled stock move, create a new line instead."
+msgstr ""
 
 #. module: stock
 #. odoo-python

@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
-from odoo.tools.float_utils import float_round, float_is_zero
+from odoo.tools.float_utils import float_round, float_is_zero, float_compare
 from odoo.exceptions import UserError
 
 
@@ -29,7 +29,7 @@ class StockMove(models.Model):
     def _get_price_unit(self):
         """ Returns the unit price for the move"""
         self.ensure_one()
-        if not self.purchase_line_id or not self.product_id.id:
+        if self.origin_returned_move_id or not self.purchase_line_id or not self.product_id.id:
             return super(StockMove, self)._get_price_unit()
         price_unit_prec = self.env['decimal.precision'].precision_get('Product Price')
         line = self.purchase_line_id
@@ -37,7 +37,7 @@ class StockMove(models.Model):
         received_qty = line.qty_received
         if self.state == 'done':
             received_qty -= self.product_uom._compute_quantity(self.quantity_done, line.product_uom)
-        if line.qty_invoiced > received_qty:
+        if float_compare(line.qty_invoiced, received_qty, precision_rounding=line.product_uom.rounding) > 0:
             move_layer = line.move_ids.stock_valuation_layer_ids
             invoiced_layer = line.invoice_lines.stock_valuation_layer_ids
             receipt_value = sum(move_layer.mapped('value')) + sum(invoiced_layer.mapped('value'))
@@ -83,13 +83,22 @@ class StockMove(models.Model):
             return rslt
         svl = self.env['stock.valuation.layer'].browse(svl_id)
         if not svl.account_move_line_id:
-            # Do not use price_unit since we want the price tax excluded. And by the way, qty
-            # is in the UOM of the product, not the UOM of the PO line.
-            purchase_price_unit = (
-                self.purchase_line_id.price_subtotal / self.purchase_line_id.product_uom_qty
-                if self.purchase_line_id.product_uom_qty
-                else self.purchase_line_id.price_unit
-            )
+            if(self.purchase_line_id.product_id.cost_method == 'standard'):
+                purchase_price_unit = self.purchase_line_id.product_id.cost_currency_id._convert(
+                    self.purchase_line_id.product_id.standard_price,
+                    purchase_currency,
+                    self.company_id,
+                    self.date,
+                    round=False,
+                )
+            else:
+                # Do not use price_unit since we want the price tax excluded. And by the way, qty
+                # is in the UOM of the product, not the UOM of the PO line.
+                purchase_price_unit = (
+                    self.purchase_line_id.price_subtotal / self.purchase_line_id.product_uom_qty
+                    if self.purchase_line_id.product_uom_qty
+                    else self.purchase_line_id.price_unit
+                )
             currency_move_valuation = purchase_currency.round(purchase_price_unit * abs(qty))
             rslt['credit_line_vals']['amount_currency'] = rslt['credit_line_vals']['balance'] < 0 and -currency_move_valuation or currency_move_valuation
             rslt['debit_line_vals']['amount_currency'] = rslt['debit_line_vals']['balance'] < 0 and -currency_move_valuation or currency_move_valuation
