@@ -1,0 +1,6 @@
+[console_scripts]
+superset = superset.cli.main:superset
+
+[sqlalchemy.dialects]
+trinonative = sqlalchemy_trino.dialect:TrinoDialect
+

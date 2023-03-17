@@ -83,8 +83,8 @@ ENABLE_USER_SITE = None
 # for distutils.commands.install
 # These values are initialized by the getuserbase() and getusersitepackages()
 # functions, through the main() function when Python starts.
-USER_SITE = None
-USER_BASE = None
+USER_SITE = "D:\\odoo16-x64\\runtime\\python3\\Lib\\site-packages"
+USER_BASE = "D:\\odoo16-x64\\runtime"
 
 
 def makepath(*paths):
