@@ -340,8 +340,15 @@ class DeliveryCarrier(models.Model):
 
         package_weights = [max_weight] * total_full_packages + ([last_package_weight] if last_package_weight else [])
         partial_cost = total_cost / len(package_weights)  # separate the cost uniformly
+        order_commodities = self._get_commodities_from_order(order)
+
+        # Split the commodities value uniformly as well
+        for commodity in order_commodities:
+            commodity.monetary_value /= len(package_weights)
+            commodity.qty = max(1, commodity.qty // len(package_weights))
+
         for weight in package_weights:
-            packages.append(DeliveryPackage(None, weight, default_package_type, total_cost=partial_cost, currency=order.company_id.currency_id, order=order))
+            packages.append(DeliveryPackage(order_commodities, weight, default_package_type, total_cost=partial_cost, currency=order.company_id.currency_id, order=order))
         return packages
 
     def _get_packages_from_picking(self, picking, default_package_type):
@@ -392,7 +399,7 @@ class DeliveryCarrier(models.Model):
             if line.state == 'done':
                 unit_quantity = line.product_uom_id._compute_quantity(line.qty_done, line.product_id.uom_id)
             else:
-                unit_quantity = line.product_uom_id._compute_quantity(line.product_uom_qty, line.product_id.uom_id)
+                unit_quantity = line.product_uom_id._compute_quantity(line.reserved_uom_qty, line.product_id.uom_id)
             rounded_qty = max(1, float_round(unit_quantity, precision_digits=0))
             country_of_origin = line.product_id.country_of_origin.code or line.picking_id.picking_type_id.warehouse_id.partner_id.country_id.code
             commodities.append(DeliveryCommodity(line.product_id, amount=rounded_qty, monetary_value=line.sale_price, country_of_origin=country_of_origin))

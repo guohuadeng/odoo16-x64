@@ -7,15 +7,14 @@ Green Odoo 16 x64， https://www.Sunpop.cn
 本版本在使用64位的基础上，对postgresql进行了优化，并使用nginx进行反向代理，实现了longpolling，可以使用odoo的桌面消息通知，也不会经常报错了。
 在windows上搭建了一个完整的高性能 Odoo 环境。
 因速度原因，不再支持一键更新至最新版，请手工高速下载后解压覆盖 /source 目录文件。
-http://nightly.odoo.com/15.0/nightly/src/odoo_15.0.latest.zip
-http://nightly.odoocdn.com/15.0/nightly/src/odoo_15.0.latest.zip
-
+https://nightly.odoocdn.com/16.0/nightly/src/odoo_16.0.latest.zip
+https://nightly.odoo.com/16.0/nightly/src/odoo_16.0.latest.zip
 
 ## 版本信息
 1. python 3.7.5, 64位
 2. postgresql 13.4 ,64位
 3. Nginx 1.15.5， 64位
-4. Odoo 16社区版，20230213版
+4. Odoo 16社区版，20230320版
 5. 增加 sphinx 及 tx_client，用于文档及翻译
 6. 本地执行 gi.bat，会将原始odoo的最新版clone到本地 .\source_git，执行 gu.bat 更新
 7. 对断点调试的处理， 如果更新了新版odoo，将 .\fixed 目录内容覆盖 .\source 内容

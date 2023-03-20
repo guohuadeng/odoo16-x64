@@ -884,7 +884,7 @@ msgstr "Un moyen facile de construire une maison en bois"
 #. module: website_event_track
 #: model_terms:ir.ui.view,arch_db:website_event_track.view_event_track_kanban
 msgid "Edit Track"
-msgstr "Modifier la session"
+msgstr "Éditer la session"
 
 #. module: website_event_track
 #: model:ir.model.fields,field_description:website_event_track.field_event_track__partner_email
@@ -2217,7 +2217,7 @@ msgstr "Présentation déjà en favoris"
 #: code:addons/website_event_track/static/src/js/event_track_reminder.js:0
 #, python-format
 msgid "Talk removed from your Favorites"
-msgstr "Présentation retirée de vos favoris"
+msgstr "Présentation supprimée de vos favoris"
 
 #. module: website_event_track
 #: code:addons/website_event_track/models/event_event.py:0

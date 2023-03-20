@@ -261,7 +261,10 @@ class ResPartner(models.Model):
         else:
             company = self.env.company
 
-        vat_label = company.country_id.vat_label if company.country_id else "Tax ID"
+        vat_label = _("VAT")
+        if country_code and company.country_id and country_code == company.country_id.code.lower():
+            vat_label = company.country_id.vat_label
+
         expected_format = _ref_vat.get(country_code, "'CC##' (CC=Country Code, ##=VAT Number)")
 
         # Catch use case where the record label is about the public user (name: False)
@@ -281,6 +284,16 @@ class ResPartner(models.Model):
                 expected_format=expected_format,
             )
 
+
+    __check_vat_al_re = re.compile(r'^[JKLM][0-9]{8}[A-Z]$')
+
+    def check_vat_al(self, vat):
+        """Check Albania VAT number"""
+        number = stdnum.util.get_cc_module('al', 'vat').compact(vat)
+
+        if len(number) == 10 and self.__check_vat_al_re.match(number):
+            return True
+        return False
 
     __check_vat_ch_re = re.compile(r'E([0-9]{9}|-[0-9]{3}\.[0-9]{3}\.[0-9]{3})(MWST|TVA|IVA)$')
 

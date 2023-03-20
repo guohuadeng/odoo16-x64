@@ -970,12 +970,12 @@ msgstr ""
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_sidebar_blog_index_follow_us
 msgid "Follow Us"
-msgstr "Jälgi meid"
+msgstr "Jälgige meid"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.snippet_options
 msgid "Follow us"
-msgstr "Jälgi meid"
+msgstr "Jälgige meid"
 
 #. module: website_blog
 #: model:ir.model.fields,field_description:website_blog.field_blog_blog__message_follower_ids
@@ -2482,7 +2482,7 @@ msgstr "Vaatepunktid"
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.post_info
 msgid "Views"
-msgstr "Vaatajaid"
+msgstr "Vaated"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.index

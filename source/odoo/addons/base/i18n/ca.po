@@ -26,10 +26,10 @@
 # jabelchi, 2022
 # Guspy12, 2022
 # Martin Trigaux, 2022
-# Farouk Jabiri, 2022
 # Ivan Espinola, 2022
-# Óscar Fonseca <tecnico@extreme-micro.com>, 2023
 # marcescu, 2023
+# jabiri7, 2023
+# Óscar Fonseca <tecnico@extreme-micro.com>, 2023
 # 
 msgid ""
 msgstr ""
@@ -37,7 +37,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-02 11:00+0000\n"
 "PO-Revision-Date: 2022-09-22 05:44+0000\n"
-"Last-Translator: marcescu, 2023\n"
+"Last-Translator: Óscar Fonseca <tecnico@extreme-micro.com>, 2023\n"
 "Language-Team: Catalan (https://www.transifex.com/odoo/teams/41243/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -65,8 +65,8 @@ msgstr ""
 "================================\n"
 "\n"
 "    * Defineix els informes següents:\n"
-"        * Benefici/Pèrdua (§ 231 UGB Gesamtkostenverfahren)\n"
-"        * Full de balanç (§ 224 UGB)\n"
+"        * Pèrdua/Guanys (§ 231 UGB Gesamtkostenverfahren)\n"
+"        * Balanç de situació(§ 224 UGB)\n"
 "\n"
 "    "
 
@@ -92,12 +92,14 @@ msgstr ""
 "Plans de comptes austríacs (Einheitskontenrahmen 2010).\n"
 "===================================================== ========\n"
 "\n"
-"* Defineix les plantilles de gràfic de comptes següents:\n"
-"* Pla de comptes general austríac 2010\n"
+"* Defineix els següents models de pla comptable:\n"
+"* Pla comptable general austríac 2010\n"
 "* Defineix plantilles per a l'IVA en vendes i compres\n"
 "* Defineix plantilles d'impostos\n"
 "* Defineix les posicions fiscals per a la legislació fiscal austríaca\n"
-"* Defineix els informes fiscals U1/U30"
+"* Defineix els informes fiscals U1/U30\n"
+"\n"
+" "
 
 #. module: base
 #: model:ir.module.module,description:base.module_mail
@@ -711,6 +713,9 @@ msgid ""
 "        Accounting reports for Croatia (in EURO !)\n"
 "    "
 msgstr ""
+"\n"
+"        Informes comptables per Croàcia (en EURO !)\n"
+"    "
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_de_reports
@@ -781,6 +786,9 @@ msgid ""
 "        Accounting reports for Poland\n"
 "    "
 msgstr ""
+"\n"
+"        Informes comptables per Polònia\n"
+"    "
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_rs_reports
@@ -871,8 +879,9 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"        Afegiu informació quan creem la descripció d'un client potencial per incloure les preguntes i respostes vinculades als registres.\n"
-"    "
+"        Afegir informació quan construïm la descripció d'un client potencial\n"
+"        per incloure les preguntes i respostes vinculades amb les inscripcions.\n"
+"   "
 
 #. module: base
 #: model:ir.module.module,description:base.module_appointment
@@ -936,6 +945,9 @@ msgid ""
 "        Base module for Bolivian reports\n"
 "    "
 msgstr ""
+"\n"
+"        Mòdul base per als informes bolivians\n"
+"    "
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_bg_reports
@@ -1065,7 +1077,7 @@ msgid ""
 "        Bridge module for website_sale / sale_product_configurator"
 msgstr ""
 "\n"
-"        Mòdul de pont per a web websitesale / saletorproducttorconfigurator"
+"        Mòdul connector per a website_sale/sale_product_configurador"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_website_sale_stock_product_configurator
@@ -1074,7 +1086,7 @@ msgid ""
 "        Bridge module for website_sale_stock / sale_product_configurator"
 msgstr ""
 "\n"
-"        Mòdul pont per a la webtorsalestockstock / saletorproducttorconfigurator"
+"Bridge module for website_sale_stock / sale_product_configurator"
 
 #. module: base
 #: model:ir.module.module,description:base.module_website_sale_product_configurator
@@ -1144,7 +1156,7 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"        Tabella de comptes i impostos d'Eslovènia.\n"
+"        Pla de comptes i impostos d'Eslovènia.\n"
 "    "
 
 #. module: base
@@ -1320,7 +1332,7 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"        Habiliteu l'assistent d'IVA quan publiqueu una entrada de diari de declaració d'impostos\n"
+"        Habilitar l'assistent d'IVA al publicar una entrada de diari de declaració d'impostos\n"
 "    "
 
 #. module: base
@@ -2064,6 +2076,14 @@ msgid ""
 "    https://www.rrif.hr/dok/preuzimanje/RRIF-RP2021-ENG.PDF\n"
 "    "
 msgstr ""
+"\n"
+"    Plans de comptes croats actualitzats (RRIF ver.2021) (en EURO !)\n"
+"    \n"
+"    Fonts:\n"
+"    https://www.rrif.hr/dok/preuzimanje/Bilanca-2016.pdf\n"
+"    https://www.rrif.hr/dok/preuzimanje/RRIF-RP2021.PDF\n"
+"    https://www.rrif.hr/dok/preuzimanje/RRIF-RP2021-ENG.PDF\n"
+"    "
 
 #. module: base
 #: model:ir.module.module,description:base.module_hr_holidays_gantt
@@ -2322,8 +2342,8 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-" Aquest mòdul prova el mòdul 'accountediublcii', està separat des de dependències a algunes \n"
-"    Es requerien localitzacions. El seu nom comença amb 'l10n' per no sobrecarregar runbot.\n"
+" Aquest mòdul prova que el mòdul 'account_edi_ubl_cii', està separat, ja que requerien dependències \n"
+"d'algunes ubicacions. El seu nom comença per 'l10n' per no sobrecarregar runbot.\n"
 "    \n"
 "    Els fitxers de prova estan separats per fonts, s'han pres de:\n"
 "    \n"
@@ -2331,9 +2351,8 @@ msgstr ""
 "    * el document peppol-bis-invoice-3 (el repositori github: https://github.com/OpenPEPPOL/peppol-bis-invoice-3/tree/master/rules/examples conté exemples)\n"
 "    * odoo, aquests fitxers passen totes les proves de validació (usant ecosio o el validador FNFE)\n"
 "    \n"
-"    Provem que els exemples externs s'importen correctament (divisió, import total i coincidència total d'impostos).\n"
-"    També s'ha comprovat que la generació de xml a partir de odoo amb paràmetres donats dóna exactament el mateix xml que l'esperat, \n"
-"    N'hi ha de vàlides."
+"    Provem que els exemples externs s'importen correctament (moneda, import total i coincidència total d'impostos).\n"
+"    També s'ha comprovat si la generació d'xml d'odoo amb paràmetres donats dóna exactament el mateix XML que els esperats i vàlids."
 
 #. module: base
 #: model:ir.module.module,summary:base.module_sale_ebay
@@ -4635,8 +4654,8 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"Crea notes de crèdit a partir de les entrades de helpdesk\n"
-"    "
+"Crear factures rectificatives a partir de les entrades de helpdesk\n"
+" "
 
 #. module: base
 #: model:ir.module.module,description:base.module_website_slides
@@ -6110,12 +6129,9 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"En molts països, una nota de dèbit s'utilitza com a augment dels imports d'una factura existent \n"
-"\n"
-"o en alguns casos específics per cancel·lar una nota de crèdit. \n"
-"És com una factura normal, però hem de fer un seguiment de l'enllaç amb la factura original.  \n"
-"L'assistent utilitzat és similar al de la nota de crèdit.\n"
-"    "
+"En molts països, s'utilitza una nota de dèbit per a augmentar l'import d'una factura existent o, en alguns casos, per a cancel·lar una nota de crèdit.\n"
+"És com una factura ordinària, però hem de mantenir el registre de la relació amb la factura original.\n"
+"L'assistent utilitzat és similar al de la nota de crèdit."
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_cn
@@ -10843,9 +10859,9 @@ msgid ""
 "\n"
 "    Supported documents are invoices/credit notes.\n"
 msgstr ""
-" Mòdul per a la sincronització de documents entre diverses empreses. Per exemple, això us permet tenir una Ordre de Vendes creada automàticament quan una Ordre de Compra es valida amb una altra empresa del sistema com a venedor, i inversament.\n"
+" Mòdul per a la sincronització de documents entre diverses empreses. Per exemple, això permet tenir una comanda de venda creada automàticament quan una comanda de compra es valida amb una altra empresa del sistema com a venedor, i inversament.\n"
 "\n"
-"    Els documents compatibles són factures/anotacions de crèdit.\n"
+"    Els documents compatibles són factures/factures rectificatives.\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_approvals_purchase_stock
@@ -14907,7 +14923,7 @@ msgstr "Camp base"
 #: code:addons/base/models/res_lang.py:0
 #, python-format
 msgid "Base Language 'en_US' can not be deleted."
-msgstr "La llengua base 'enUSUS' no es pot suprimir."
+msgstr "No es pot suprimir l'idioma base 'en_US'."
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_model__state__base
@@ -15373,8 +15389,8 @@ msgid ""
 "Bridge module between website_event_booth_exhibitor and "
 "website_event_booth_sale."
 msgstr ""
-"Mòdul pont entre el lloc webeevent.boothexexhibitor i el lloc "
-"web.event.booth.sale."
+"Mòdul connector entre website_event_booth_exhibitor i "
+"website_event_booth_sale."
 
 #. module: base
 #: model:ir.module.module,description:base.module_mrp_subcontracting_enterprise
@@ -17649,8 +17665,8 @@ msgid ""
 "Database ID of record to open in form view, when ``view_mode`` is set to "
 "'form' only"
 msgstr ""
-"Id. de la base de dades del registre per obrir en el formulari de vista, "
-"quan el mode de vista està establert únicament a 'formulari'"
+"ID de la base de dades del registre a obrir a la vista de formulari quan "
+"'view_mode' s'estableix només a 'form'."
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_logging__dbname
@@ -27985,8 +28001,8 @@ msgid ""
 "One2Many fields cannot be synchronized as part of `commercial_fields` or "
 "`address fields`"
 msgstr ""
-"Camps One2Many no poden ser sincronitzades com una part del 'camps "
-"comercials' o 'camps adreça'"
+"Els camps One2Many no es poden sincronitzar com a elements "
+"`commercial_fields` o `address fields`"
 
 #. module: base
 #: model:ir.module.category,name:base.module_category_marketing_online_appointment
@@ -31938,7 +31954,7 @@ msgstr "Format Separador"
 #: code:addons/base/models/ir_qweb_fields.py:0
 #, python-format
 msgid "Separator use to split the address from the display_name."
-msgstr "Separador que s'usa per a separar l'adreça del nom a mostrar."
+msgstr "Separador que s'usa per a separar l'adreça del display_name."
 
 #. module: base
 #: model:ir.model,name:base.model_ir_sequence
@@ -33009,7 +33025,7 @@ msgstr "Sub-menús   "
 #: model:ir.module.module,summary:base.module_hr_expense
 #: model:ir.module.module,summary:base.module_hr_payroll_expense
 msgid "Submit, validate and reinvoice employee expenses"
-msgstr "Presentar, validar i refacturar despeses d'empletats"
+msgstr "Presentar, validar i refacturar despeses dels empleats"
 
 #. module: base
 #: model:ir.module.category,name:base.module_category_sales_subscriptions
@@ -34831,7 +34847,7 @@ msgstr ""
 #: code:addons/base/models/ir_module.py:0
 #, python-format
 msgid "Those modules cannot be uninstalled: %s"
-msgstr ""
+msgstr "Aquests complements no es poden desinstal·lar: %s"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_lang__thousands_sep
@@ -35847,7 +35863,7 @@ msgstr "Usi el codi pitó per a definir els impostos"
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_sequence__use_date_range
 msgid "Use subsequences per date_range"
-msgstr "Utilitzar sub-seqüències per rang de data"
+msgstr "Utilitzar sub-seqüències per date_range"
 
 #. module: base
 #: model:ir.module.module,description:base.module_hr_gamification

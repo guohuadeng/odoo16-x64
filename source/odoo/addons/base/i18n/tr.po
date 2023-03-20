@@ -34,6 +34,7 @@
 # Martin Trigaux, 2022
 # Murat Kaplan <muratk@projetgrup.com>, 2022
 # Gökhan Erdoğdu <gokhan.erdogdu@mechsoft.com.tr>, 2022
+# Çağlar MERSİNLİ <ceremy@gmail.com>, 2023
 # Ediz Duman <neps1192@gmail.com>, 2023
 # Ertuğrul Güreş <ertugrulg@projetgrup.com>, 2023
 # 
@@ -11192,6 +11193,8 @@ msgid ""
 "A partner with the same <span><span class=\"o_vat_label\">Company "
 "Registry</span></span> already exists ("
 msgstr ""
+"Aynı olan bir iş ortak <span><span class=\"o_vat_label\">Şirket Sicili "
+"</span></span> zaten var ("
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
@@ -11317,7 +11320,7 @@ msgstr ""
 #. module: base
 #: model:ir.model,name:base.model_res_users_apikeys_description
 msgid "API Key Description"
-msgstr ""
+msgstr "API Anahtar Açıklama"
 
 #. module: base
 #. odoo-python
@@ -11786,7 +11789,7 @@ msgstr "Etkinleştir"
 #. module: base
 #: model:ir.actions.server,name:base.action_server_module_immediate_install
 msgid "Activate Modules"
-msgstr ""
+msgstr "Modülleri Etkinleştir"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.res_lang_form
@@ -15597,7 +15600,7 @@ msgstr "Ülke İl/Eyaleti"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_loyalty
 msgid "Coupons & Loyalty"
-msgstr ""
+msgstr "Kupon & Sadakat"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_loyalty_delivery
@@ -22452,7 +22455,7 @@ msgstr "Günlükleme ayrıntıları"
 #: model:ir.model.fields,field_description:base.field_res_users__login
 #: model_terms:ir.ui.view,arch_db:base.view_res_users_kanban
 msgid "Login"
-msgstr "Oturum açma"
+msgstr "Oturum aç"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_company__logo_web
@@ -32844,7 +32847,7 @@ msgstr "Bu Pencere"
 #. module: base
 #: model:ir.model.fields,help:base.field_res_partner_bank__allow_out_payment
 msgid "This account can be used for outgoing payments"
-msgstr ""
+msgstr "Bu hesap giden ödemeler için kullanılabilir"
 
 #. module: base
 #. odoo-python
@@ -33262,7 +33265,7 @@ msgstr ""
 #: code:addons/base/models/ir_module.py:0
 #, python-format
 msgid "Those modules cannot be uninstalled: %s"
-msgstr ""
+msgstr "Bu modüller kaldırılamaz: %s"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_lang__thousands_sep
@@ -33718,6 +33721,15 @@ msgid ""
 "- 'Create Next Activity': create an activity (Discuss)\n"
 "- 'Send SMS Text Message': send SMS, log them on documents (SMS)"
 msgstr ""
+"Sunucu eylemi türü. Aşağıdaki değerler mevcuttur:\n"
+"- 'Python Kodunu Yürüt': yürütülecek bir python kodu bloğu\n"
+"- 'Yeni Kayıt Oluştur': yeni değerlerle yeni bir kayıt oluşturun\n"
+"- 'Bir Kaydı Güncelle': bir kaydın değerlerini güncelleyin\n"
+"- 'Birkaç eylemi yürütün': diğer birkaç sunucu eylemini tetikleyen bir eylem tanımlayın\n"
+"- 'E-posta Gönder': bir mesaj, not gönderin veya bir e-posta gönderin (Tartış)\n"
+"- 'Takipçi Ekle': Bir kayda takipçi ekleyin (Tartış)\n"
+"- 'Sonraki Aktiviteyi Oluştur': bir aktivite oluşturun (Tartış)\n"
+"- 'SMS Metin Mesajı Gönder': SMS gönderin, belgelere kaydedin (SMS)"
 
 #. module: base
 #: model:ir.model.fields,help:base.field_ir_model_constraint__type
@@ -33932,6 +33944,8 @@ msgid ""
 "Uninstalling modules can be risky, we recommend you to try it on a duplicate"
 " or test database first."
 msgstr ""
+"Modülleri kaldırmak riskli olabilir, önce kopya bir veritabanı üzerinde "
+"denemenizi veya test veritabanını denemenizi öneririz."
 
 #. module: base
 #. odoo-python
@@ -36082,6 +36096,8 @@ msgid ""
 "has been successfully installed.\n"
 "                            Users can choose their favorite language in their preferences."
 msgstr ""
+"başarılı bir şekilde kuruldu.\n"
+"                            Kullanıcılar tercihlerinde en sevdikleri dili seçebilirler."
 
 #. module: base
 #. odoo-python

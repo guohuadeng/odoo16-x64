@@ -8,6 +8,7 @@
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2022
 # María Florencia Frigieri Parma, 2022
 # Óscar Fonseca <tecnico@extreme-micro.com>, 2023
+# Sergio Del Castillo Baranda, 2023
 # Pedro M. Baeza <pedro.baeza@tecnativa.com>, 2023
 # 
 msgid ""
@@ -511,7 +512,7 @@ msgstr "<span class=\"o_stat_text\">Operaciones</span>"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_production_lot_form
 msgid "<span class=\"o_stat_text\">Transfers</span>"
-msgstr "<span class=\"o_stat_text\">Traslados</span>"
+msgstr "<span class=\"o_stat_text\">Transferencias</span>"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.report_mrp_line
@@ -3845,6 +3846,8 @@ msgstr "Dominio inválido para el operante derecho %s"
 msgid ""
 "Invalid rule's configuration, the following rule causes an endless loop: %s"
 msgstr ""
+"Configuración inválida de reglas. La siguiente regla provoca un bucle "
+"infinito: %s"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_quant__inventory_quantity_auto_apply
@@ -5075,7 +5078,7 @@ msgstr "Ninguna operación realizada en este lote."
 #. module: stock
 #: model_terms:ir.actions.act_window,help:stock.action_get_picking_type_operations
 msgid "No operations found. Let's create a transfer !"
-msgstr ""
+msgstr "No se encontraron operaciones. ¡Creemos una transferencia!"
 
 #. module: stock
 #: model_terms:ir.actions.act_window,help:stock.product_template_action_product
@@ -6440,6 +6443,17 @@ msgstr "Quant"
 #. odoo-python
 #: code:addons/stock/models/stock_quant.py:0
 #, python-format
+msgid ""
+"Quants are auto-deleted when appropriate. If you must manually delete them, "
+"please ask a stock manager to do it."
+msgstr ""
+"Los quants son auto-eliminados cuando resulta apropiado. Si debe eliminarlos"
+" manualmente, consulte por favor con un responsable de inventario para "
+"hacerlo."
+
+#. module: stock
+#: code:addons/stock/models/stock_quant.py:0
+#, python-format
 msgid "Quant's creation is restricted, you can't do this operation."
 msgstr ""
 "La creación de Quant está restringida, no puedes hacer esta operación."
@@ -7096,7 +7110,7 @@ msgstr "Revertir transferencia"
 #. module: stock
 #: model:ir.actions.server,name:stock.action_revert_inventory_adjustment
 msgid "Revert Inventory Adjustment"
-msgstr ""
+msgstr "Revertir ajuste de inventario"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_replenishment_option__route_id
@@ -8685,6 +8699,8 @@ msgid ""
 "This product's company cannot be changed as long as there are quantities of "
 "it belonging to another company."
 msgstr ""
+"La compañía de este producto no puede ser cambiada mientras haya cantidades "
+"del mismo pertenecientes a otra compañía."
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_change_product_qty__new_quantity
@@ -9914,6 +9930,8 @@ msgstr ""
 #, python-format
 msgid "You cannot change a cancelled stock move, create a new line instead."
 msgstr ""
+"No puede cambiar una línea de movimiento de existencias cancelada. Cree una "
+"nueva línea en su lugar."
 
 #. module: stock
 #. odoo-python
@@ -10142,6 +10160,13 @@ msgstr "Solo puede devolver las recolecciones realizadas."
 #, python-format
 msgid "You may only return one picking at a time."
 msgstr "Sólo puede devolver un albarán a la vez."
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/model/stock_picking.py:0
+#, python-format
+msgid " You might want to update the locations of this transfer's operations "
+msgstr ""
 
 #. module: stock
 #. odoo-python

@@ -4,7 +4,6 @@
 # 
 # Translators:
 # Gunther Clauwaert <gclauwae@hotmail.com>, 2022
-# Dylan Kiss, 2022
 # Martin Trigaux, 2022
 # Jolien De Paepe, 2023
 # Erwin van der Ploeg <erwin@odooexperts.nl>, 2023
@@ -1300,7 +1299,7 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"        Schakel de BTW-wizard in bij het boeken van een journaalboeking voor de belastingaangifte\n"
+"        Schakel de BTW-wizard in bij het boeken van een boeking voor de belastingaangifte\n"
 "    "
 
 #. module: base
@@ -2592,7 +2591,7 @@ msgstr ""
 "\n"
 "- * Boekhouding> Configuratie> Betalingen> Bankrekeningen *\n"
 "\n"
-"Account wordt in de lijst weergegeven als de journaalnaam.\n"
+"Account wordt in de lijst weergegeven als de dagboeknaam.\n"
 "\n"
 "Bij het bewerken wordt het ** accountnummer ** weergegeven. Dit is belangrijk omdat het wordt gebruikt door\n"
 "het ABA-proces.\n"
@@ -5207,7 +5206,7 @@ msgstr ""
 "ontvanger om de PDF op te halen met alleen het XML-bestand. Merk op dat **EHF3 volledig is geïmplementeerd door UBL Bis 3** ('referentie'\n"
 "<https://anskaffelser.dev/postaward/g3/spec/current/billing-3.0/norway/#_implementation>`_).\n"
 "\n"
-"De formaten kunnen gekozen worden uit het journaal (Journaal > Geavanceerde instellingen) gekoppeld aan de factuur.\n"
+"De formaten kunnen gekozen worden uit het dagboek (Dagboek > Geavanceerde instellingen) gekoppeld aan de factuur.\n"
 "\n"
 "Merk op dat E-FFF, NLCIUS en XRechnung (UBL) alleen beschikbaar zijn voor Belgische, Nederlandse en Duitse bedrijven,\n"
 "respectievelijk. UBL Bis 3 is alleen beschikbaar voor bedrijven waarvan het land voorkomt in de `EAS-lijst'\n"
@@ -5504,7 +5503,7 @@ msgstr ""
 "\n"
 "    1.3. Optioneel kunt je aangeven of uje leveranciersfacturen in AFIP wilt kunnen verifiëren.\n"
 "\n"
-"2. Maak verkoopjournalen die elk van je AFIP Kassa (beschikbaar in AFIP Portal) die je in Odoo wilt gebruiken, vertegenwoordigen.\n"
+"2. Maak verkoopdagboeken die elk van je AFIP Kassa (beschikbaar in AFIP Portal) die je in Odoo wilt gebruiken, vertegenwoordigen.\n"
 "\n"
 "    2.1. Het veld Documenten gebruiken is standaard ingesteld, verander dit alstublieft niet\n"
 "    2.2. Stel AFIP Kassa-systeem in voor een van de elektronische.\n"
@@ -5647,7 +5646,7 @@ msgstr ""
 "\n"
 "1. Ga naar je bedrijf en configureer je BTW-nummer en AFIP-verantwoordelijkheidstype\n"
 "2. Ga naar Boekhouding / Instellingen en stel het grootboekschema in dat je wilt gebruiken.\n"
-"3. Maak je verkoopjournalen aan, rekening houdend met AFIP Kassa-info.\n"
+"3. Maak je verkoopdagboek aan, rekening houdend met AFIP Kassa-info.\n"
 "\n"
 "Demogegevens voor testen:\n"
 "\n"
@@ -5657,7 +5656,7 @@ msgstr ""
 "  * (AR) Exento\n"
 "  * (AR) Monotributo\n"
 "\n"
-"* Journaalverkopen geconfigureerd voor voorgedrukte en Expo-facturen in alle bedrijven\n"
+"* Dagboekverkopen geconfigureerd voor voorgedrukte en Expo-facturen in alle bedrijven\n"
 "* Voorbeelden van facturen en andere documenten die al zijn gevalideerd in het bedrijf \"(AR) Responsable Inscripto\"\n"
 "* Relaties voorbeeld voor de verschillende soorten verantwoordelijkheid:\n"
 "\n"
@@ -5672,7 +5671,7 @@ msgstr ""
 "\n"
 "* Grootboekschema wordt niet automatisch geïnstalleerd, elke CoA-sjabloon is afhankelijk van de AFIP-verantwoordelijkheid van het bedrijf. Je moet de CoA voor je behoeften installeren.\n"
 "* Er worden geen verkoopdagboeken gegenereerd bij het installeren van een CoA, je moet je dagboeken handmatig configureren.\n"
-"* Het documenttype wordt correct vooraf geselecteerd bij het maken van een factuur, afhankelijk van de fiscale verantwoordelijkheid van de uitgever en ontvanger van het document en het gerelateerde journaal.\n"
+"* Het documenttype wordt correct vooraf geselecteerd bij het maken van een factuur, afhankelijk van de fiscale verantwoordelijkheid van de uitgever en ontvanger van het document en het gerelateerde dagboek.\n"
 "* Er is een CBU-accounttype toegevoegd en ook CBU-validatie\n"
 "\n"
 "\n"
@@ -6202,6 +6201,16 @@ msgid ""
 "Step 4: Repeat steps 1,2,3 for all GSTIN you have in odoo. If you have a multi-company with the same GST number then perform step 1 for the first company only.\n"
 "    "
 msgstr ""
+"\n"
+"Indiaas - E-vrachtbrief\n"
+"===================================\n"
+"E-vrachtbrief via API indienen bij de overheid.\n"
+"We gebruiken \"Tera Software Limited\" als GSP\n"
+"\n"
+"Stap 1: Eerst moet u een API-gebruikersnaam en -wachtwoord aanmaken in de E-vrachtbriefportal.\n"
+"Stap 2: Schakel over naar bedrijf gerelateerd aan dat GST-nummer\n"
+"Stap 3: Stel die gebruikersnaam en dat wachtwoord in in Odoo (Ga naar: Facturering/Boekhouding -> Configratie -> Instellingen -> Indiase elektronische vrachtbrief of zoek \"E-vrachtbrief\" in de zoekbalk)\n"
+"Stap 4: Herhaal stappen 1,2,3 voor alle GSTIN die u in odoo heeft. Heeft u meerdere bedrijven met hetzelfde GST-nummer, voer stap 1 dan alleen uit voor het eerste bedrijf."
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_in
@@ -6292,6 +6301,13 @@ msgid ""
 "To print UPI Qr code add UPI id in company and tick \"QR Codes\" in configuration\n"
 "  "
 msgstr ""
+"\n"
+"Factuur met UPI QR-code\n"
+"========================\n"
+"Deze module voegt een QR-code toe aan het factuurrapport voor UPI-betalingen, zodat u via elke UPI-app kunt betalen.\n"
+"\n"
+"Om de UPI Qr-code af te drukken, voegt u de UPI-id toe aan het bedrijf en vinkt u \"QR-codes\" aan in de configuratie\n"
+"  "
 
 #. module: base
 #: model:ir.module.module,description:base.module_account
@@ -8392,6 +8408,11 @@ msgid ""
 "This module adds TCS and TDS Tax Report and load related Taxes in Indian Company.\n"
 "    "
 msgstr ""
+"\n"
+"Belastingaangifte TCS/TDS voor India\n"
+"===================================\n"
+"\n"
+"Deze module voegt TCS- en TDS-belastingrapport toe en belastinggerelateerde belastingen in Indian Company."
 
 #. module: base
 #: model:ir.module.module,description:base.module_mrp_product_expiry
@@ -9588,7 +9609,7 @@ msgstr ""
 "\n"
 "Met deze module kun je je betalingen op voorbedrukt chequepapier afdrukken.\n"
 "Je kunt de uitvoer (lay-out, stubs-informatie, etc.) configureren in de bedrijfsinstellingen en het\n"
-"controleert nummering (als je voorgedrukte cheques zonder nummers gebruikt) in journaalinstellingen.\n"
+"controleert nummering (als je voorgedrukte cheques zonder nummers gebruikt) in dagboekinstellingen.\n"
 "\n"
 "Ondersteunde formaten\n"
 "-----------------\n"
@@ -10600,6 +10621,10 @@ msgid ""
 "This module adds the price difference account. Used in standard perpetual valuation.\n"
 "    "
 msgstr ""
+"\n"
+"WMS Boekhoudmodule\n"
+"=====================\n"
+"Deze module voegt de prijsverschilrekening toe. Gebruikt in standaard eeuwigdurende waardering."
 
 #. module: base
 #: model:ir.module.module,description:base.module_stock_account
@@ -10722,6 +10747,14 @@ msgid ""
 "    Please also update the Italian Accounting module (l10n_it) when you install this module.\n"
 "    "
 msgstr ""
+"\n"
+"Inhouding en Pensioenfondsafhandeling voor de E-factuur implementatie voor Italië.\n"
+"\n"
+"De bedrijfsvoorheffing en de pensioenfondsbelasting worden berekend zoals elke andere belasting\n"
+"met de bestelling op volgorde, dus wees voorzichtig met de volgorde van de belastingen\n"
+"in uw belastingconfiguratie.\n"
+"\n"
+"Werk ook de Italiaanse boekhoudmodule (l10n_it) bij wanneer u deze module installeert."
 
 #. module: base
 #: model:ir.module.module,description:base.module_website_crm_livechat
@@ -11629,7 +11662,7 @@ msgstr ""
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_server_action_form
 msgid "<code>Command</code>: x2Many commands namespace"
-msgstr ""
+msgstr "<code>Commando</code>: x2Many commando namespace"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_server_action_form
@@ -11662,6 +11695,8 @@ msgid ""
 "<code>log(message, level='info')</code>: logging function to record debug "
 "information in <code>ir.logging</code> table"
 msgstr ""
+"<code>log(message, level='info')</code>: logfunctie om foutopsporing vast te"
+" leggen informatie in <code>ir.logging</code> tabel"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_server_action_form
@@ -16269,7 +16304,7 @@ msgstr "Bedrijf favicon"
 #: model:ir.model.fields,field_description:base.field_res_partner__company_registry
 #: model:ir.model.fields,field_description:base.field_res_users__company_registry
 msgid "Company ID"
-msgstr "Bedrijfsnummer"
+msgstr "KVK-Nummer"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_company__logo

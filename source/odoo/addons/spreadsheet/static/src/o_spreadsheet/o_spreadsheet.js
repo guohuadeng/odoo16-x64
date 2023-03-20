@@ -1,26 +1,6 @@
 (function (exports, owl) {
     'use strict';
 
-    function _interopNamespace(e) {
-        if (e && e.__esModule) return e;
-        var n = Object.create(null);
-        if (e) {
-            Object.keys(e).forEach(function (k) {
-                if (k !== 'default') {
-                    var d = Object.getOwnPropertyDescriptor(e, k);
-                    Object.defineProperty(n, k, d.get ? d : {
-                        enumerable: true,
-                        get: function () { return e[k]; }
-                    });
-                }
-            });
-        }
-        n["default"] = e;
-        return Object.freeze(n);
-    }
-
-    var owl__namespace = /*#__PURE__*/_interopNamespace(owl);
-
     /*
      * usage: every string should be translated either with _lt if they are registered with a registry at
      *  the load of the app or with Spreadsheet._t in the templates. Spreadsheet._t is exposed in the
@@ -263,6 +243,7 @@
     const DEFAULT_FIGURE_WIDTH = 536;
     // Chart
     const MAX_CHAR_LABEL = 20;
+    const FIGURE_ID_SPLITTER = "??";
     const DEFAULT_GAUGE_LOWER_COLOR = "#cc0000";
     const DEFAULT_GAUGE_MIDDLE_COLOR = "#f1c232";
     const DEFAULT_GAUGE_UPPER_COLOR = "#6aa84f";
@@ -285,8 +266,8 @@
         ComponentsImportance[ComponentsImportance["Grid"] = 0] = "Grid";
         ComponentsImportance[ComponentsImportance["Highlight"] = 5] = "Highlight";
         ComponentsImportance[ComponentsImportance["Figure"] = 10] = "Figure";
-        ComponentsImportance[ComponentsImportance["Dropdown"] = 12] = "Dropdown";
         ComponentsImportance[ComponentsImportance["ScrollBar"] = 15] = "ScrollBar";
+        ComponentsImportance[ComponentsImportance["Dropdown"] = 16] = "Dropdown";
         ComponentsImportance[ComponentsImportance["Composer"] = 20] = "Composer";
         ComponentsImportance[ComponentsImportance["ColorPicker"] = 25] = "ColorPicker";
         ComponentsImportance[ComponentsImportance["IconPicker"] = 25] = "IconPicker";
@@ -911,6 +892,9 @@
      */
     function isDefined$1(argument) {
         return argument !== undefined;
+    }
+    function isNonEmptyString(str) {
+        return str !== undefined && str !== "";
     }
     /**
      * Check if all the values of an object, and all the values of the objects inside of it, are undefined.
@@ -3187,6 +3171,8 @@
         CommandResult[CommandResult["NonContinuousTargets"] = 80] = "NonContinuousTargets";
         CommandResult[CommandResult["DuplicatedFigureId"] = 81] = "DuplicatedFigureId";
         CommandResult[CommandResult["InvalidSelectionStep"] = 82] = "InvalidSelectionStep";
+        CommandResult[CommandResult["DuplicatedChartId"] = 83] = "DuplicatedChartId";
+        CommandResult[CommandResult["ChartDoesNotExist"] = 84] = "ChartDoesNotExist";
     })(exports.CommandResult || (exports.CommandResult = {}));
 
     var DIRECTION;
@@ -3832,7 +3818,9 @@
             // within our control and to avoid leaking into external DOM
             const horizontalPosition = `left:${this.horizontalPosition() - this.spreadsheetPosition.x}`;
             const verticalPosition = `top:${this.verticalPosition() - this.spreadsheetPosition.y}`;
-            const height = `max-height:${this.viewportDimension.height - BOTTOMBAR_HEIGHT - SCROLLBAR_WIDTH$1}`;
+            const maxHeight = Math.max(0, this.viewportDimension.height - BOTTOMBAR_HEIGHT - SCROLLBAR_WIDTH$1);
+            const height = `max-height:${maxHeight}`;
+            const shadow = maxHeight !== 0 ? "box-shadow: 1px 2px 5px 2px rgb(51 51 51 / 15%);" : "";
             return `
       position: absolute;
       z-index: ${ComponentsImportance.Popover};
@@ -3842,7 +3830,7 @@
       width:${this.props.childWidth}px;
       overflow-y: auto;
       overflow-x: hidden;
-      box-shadow: 1px 2px 5px 2px rgb(51 51 51 / 15%);
+      ${shadow}
     `;
         }
         get viewportDimension() {
@@ -5548,7 +5536,7 @@
         separator: true,
     })
         .add("unhide_columns", {
-        name: "Unhide columns",
+        name: _lt("Unhide columns"),
         sequence: 86,
         action: UNHIDE_COLUMNS_ACTION,
         isVisible: (env) => {
@@ -5636,7 +5624,7 @@
         separator: true,
     })
         .add("unhide_rows", {
-        name: "Unhide rows",
+        name: _lt("Unhide rows"),
         sequence: 86,
         action: UNHIDE_ROWS_ACTION,
         isVisible: (env) => {
@@ -6198,17 +6186,17 @@
         separator: true,
     })
         .addChild("format_wrapping_overflow", ["format", "format_wrapping"], {
-        name: "Overflow",
+        name: _lt("Overflow"),
         sequence: 10,
         action: (env) => setStyle(env, { wrapping: "overflow" }),
     })
         .addChild("format_wrapping_wrap", ["format", "format_wrapping"], {
-        name: "Wrap",
+        name: _lt("Wrap"),
         sequence: 20,
         action: (env) => setStyle(env, { wrapping: "wrap" }),
     })
         .addChild("format_wrapping_clip", ["format", "format_wrapping"], {
-        name: "Clip",
+        name: _lt("Clip"),
         sequence: 30,
         action: (env) => setStyle(env, { wrapping: "clip" }),
     })
@@ -7049,7 +7037,7 @@
         validateChartDefinition: (validator, definition) => BarChart.validateChartDefinition(validator, definition),
         transformDefinition: (definition, executed) => BarChart.transformDefinition(definition, executed),
         getChartDefinitionFromContextCreation: (context) => BarChart.getDefinitionFromContextCreation(context),
-        name: "Bar",
+        name: _lt("Bar"),
     });
     class BarChart extends AbstractChart {
         constructor(definition, sheetId, getters) {
@@ -7278,7 +7266,7 @@
         validateChartDefinition: (validator, definition) => GaugeChart.validateChartDefinition(validator, definition),
         transformDefinition: (definition, executed) => GaugeChart.transformDefinition(definition, executed),
         getChartDefinitionFromContextCreation: (context) => GaugeChart.getDefinitionFromContextCreation(context),
-        name: "Gauge",
+        name: _lt("Gauge"),
     });
     function isDataRangeValid(definition) {
         return definition.dataRange && !rangeReference.test(definition.dataRange)
@@ -7673,7 +7661,7 @@
         validateChartDefinition: (validator, definition) => LineChart.validateChartDefinition(validator, definition),
         transformDefinition: (definition, executed) => LineChart.transformDefinition(definition, executed),
         getChartDefinitionFromContextCreation: (context) => LineChart.getDefinitionFromContextCreation(context),
-        name: "Line",
+        name: _lt("Line"),
     });
     class LineChart extends AbstractChart {
         constructor(definition, sheetId, getters) {
@@ -7930,7 +7918,7 @@
         validateChartDefinition: (validator, definition) => PieChart.validateChartDefinition(validator, definition),
         transformDefinition: (definition, executed) => PieChart.transformDefinition(definition, executed),
         getChartDefinitionFromContextCreation: (context) => PieChart.getDefinitionFromContextCreation(context),
-        name: "Pie",
+        name: _lt("Pie"),
     });
     class PieChart extends AbstractChart {
         constructor(definition, sheetId, getters) {
@@ -8076,7 +8064,7 @@
         validateChartDefinition: (validator, definition) => ScorecardChart$1.validateChartDefinition(validator, definition),
         transformDefinition: (definition, executed) => ScorecardChart$1.transformDefinition(definition, executed),
         getChartDefinitionFromContextCreation: (context) => ScorecardChart$1.getDefinitionFromContextCreation(context),
-        name: "Scorecard",
+        name: _lt("Scorecard"),
     });
     function checkKeyValue(definition) {
         return definition.keyValue && !rangeReference.test(definition.keyValue)
@@ -8230,10 +8218,12 @@
     position: absolute;
     top: calc(100% + 5px);
     z-index: ${ComponentsImportance.ColorPicker};
+    padding: ${PICKER_PADDING}px 0px;
     box-shadow: 1px 2px 5px 2px rgba(51, 51, 51, 0.15);
     background-color: white;
-    padding: ${PICKER_PADDING}px 0px;
     line-height: 1.2;
+    overflow-y: auto;
+    overflow-x: hidden;
     width: ${GRADIENT_WIDTH + 2 * PICKER_PADDING}px;
 
     .o-color-picker-section-name {
@@ -8384,9 +8374,19 @@
                 },
             });
         }
+        get colorPickerStyle() {
+            if (this.props.maxHeight === undefined)
+                return "";
+            if (this.props.maxHeight <= 0) {
+                return cssPropertiesToCss({ display: "none" });
+            }
+            return cssPropertiesToCss({
+                "max-height": `${this.props.maxHeight}px`,
+            });
+        }
         onColorClick(color) {
             if (color) {
-                this.props.onColorPicked(color);
+                this.props.onColorPicked(toHex(color));
             }
         }
         getCheckMarkColor() {
@@ -8401,8 +8401,10 @@
                 this.state.isCurrentColorInvalid = true;
                 return;
             }
+            const color = toHex(this.state.currentColor);
             this.state.isCurrentColorInvalid = false;
-            this.props.onColorPicked(this.state.currentColor);
+            this.props.onColorPicked(color);
+            this.state.currentColor = color;
         }
         toggleColorPicker() {
             this.state.showGradient = !this.state.showGradient;
@@ -8811,6 +8813,9 @@
         get figureId() {
             return this.state.figureId;
         }
+        get sheetId() {
+            return this.state.sheetId;
+        }
         setup() {
             const selectedFigureId = this.env.model.getters.getSelectedFigureId();
             if (!selectedFigureId) {
@@ -8819,11 +8824,13 @@
             this.state = owl.useState({
                 panel: "configuration",
                 figureId: selectedFigureId,
+                sheetId: this.env.model.getters.getActiveSheetId(),
             });
             owl.onWillUpdateProps(() => {
                 const selectedFigureId = this.env.model.getters.getSelectedFigureId();
                 if (selectedFigureId && selectedFigureId !== this.state.figureId) {
                     this.state.figureId = selectedFigureId;
+                    this.state.sheetId = this.env.model.getters.getActiveSheetId();
                     this.shouldUpdateChart = false;
                 }
                 else {
@@ -8846,7 +8853,7 @@
             return this.env.model.dispatch("UPDATE_CHART", {
                 definition,
                 id: this.figureId,
-                sheetId: this.env.model.getters.getActiveSheetId(),
+                sheetId: this.sheetId,
             });
         }
         onTypeChange(type) {
@@ -8858,7 +8865,7 @@
             this.env.model.dispatch("UPDATE_CHART", {
                 definition,
                 id: this.figureId,
-                sheetId: this.env.model.getters.getActiveSheetId(),
+                sheetId: this.sheetId,
             });
         }
         get chartPanel() {
@@ -10007,20 +10014,6 @@
         constructor() {
             super(...arguments);
             this.ctx = document.createElement("canvas").getContext("2d");
-            this.state = owl.useState({ width: 0, height: 0 });
-        }
-        setup() {
-            this.chartRef = owl.useRef("chart");
-            const resizeObserver = new ResizeObserver(() => {
-                const { width, height } = this.chartRef.el.getBoundingClientRect();
-                this.state.width = width;
-                this.state.height = height;
-            });
-            owl.useEffect(() => {
-                const el = this.chartRef.el;
-                resizeObserver.observe(el);
-                return () => resizeObserver.unobserve(el);
-            }, () => [this.chartRef.el]);
         }
         get runtime() {
             return this.env.model.getters.getChartRuntime(this.props.figure.id);
@@ -10048,7 +10041,7 @@
             return this.runtime.fontColor;
         }
         get secondaryFontColor() {
-            return relativeLuminance(this.primaryFontColor) <= 0.3 ? "#757575" : "#bbbbbb";
+            return relativeLuminance(this.backgroundColor) > 0.3 ? "#525252" : "#C8C8C8";
         }
         get figure() {
             return this.props.figure;
@@ -10065,12 +10058,12 @@
     `;
         }
         get chartPadding() {
-            return this.state.width * CHART_PADDING_RATIO;
+            return this.props.figure.width * CHART_PADDING_RATIO;
         }
         getTextStyles() {
             var _a, _b, _c;
             // If the widest text overflows horizontally, scale it down, and apply the same scaling factors to all the other fonts.
-            const maxLineWidth = this.state.width * (1 - 2 * CHART_PADDING_RATIO);
+            const maxLineWidth = this.props.figure.width * (1 - 2 * CHART_PADDING_RATIO);
             const widestElement = this.getWidestElement();
             const baseFontSize = widestElement.getElementMaxFontSize(this.getDrawableHeight(), this);
             const fontSizeMatchingWidth = getFontSizeMatchingWidth(maxLineWidth, baseFontSize, (fontSize) => widestElement.getElementWidth(fontSize, this.ctx, this));
@@ -10115,7 +10108,7 @@
         /** Get the height of the chart minus all the vertical paddings */
         getDrawableHeight() {
             const verticalPadding = 2 * this.chartPadding;
-            let availableHeight = this.state.height - verticalPadding;
+            let availableHeight = this.props.figure.height - verticalPadding;
             availableHeight -= this.title ? TITLE_FONT_SIZE * LINE_HEIGHT : 0;
             return availableHeight;
         }
@@ -18811,7 +18804,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             return token;
         const { xc, sheetName } = splitReference(token.value);
         const [left, right] = xc.split(":");
-        const sheetRef = sheetName ? `${sheetName}!` : "";
+        const sheetRef = sheetName ? `${getComposerSheetName(sheetName)}!` : "";
         const updatedLeft = getTokenNextReferenceType(left);
         const updatedRight = right ? `:${getTokenNextReferenceType(right)}` : "";
         return { ...token, value: sheetRef + updatedLeft + updatedRight };
@@ -20478,7 +20471,6 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
     GridComposer.template = "o-spreadsheet-GridComposer";
     GridComposer.components = { Composer };
 
-    const { Component: Component$1 } = owl__namespace;
     const CSS$1 = css /* scss */ `
   .o-filter-icon {
     color: ${FILTERS_COLOR};
@@ -20504,7 +20496,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
     }
   }
 `;
-    class FilterIcon extends Component$1 {
+    class FilterIcon extends owl.Component {
         get style() {
             const { x, y } = this.props.position;
             return `top:${y}px;left:${x}px`;
@@ -20513,9 +20505,8 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
     FilterIcon.style = CSS$1;
     FilterIcon.template = "o-spreadsheet-FilterIcon";
 
-    const { Component } = owl__namespace;
     const CSS = css /* scss */ ``;
-    class FilterIconsOverlay extends Component {
+    class FilterIconsOverlay extends owl.Component {
         getVisibleFilterHeaders() {
             const sheetId = this.env.model.getters.getActiveSheetId();
             const headerPositions = this.env.model.getters.getFilterHeaders(sheetId);
@@ -20581,16 +20572,14 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
     width: 100%;
     height: 100%;
 
-    border: solid ${FIGURE_BORDER_COLOR};
     &:focus {
       outline: none;
     }
   }
 
-  div.o-active-figure-border {
+  div.o-figure-border {
     box-sizing: border-box;
     z-index: 1;
-    border: ${ACTIVE_BORDER_WIDTH}px solid ${SELECTION_BORDER_COLOR};
   }
 
   .o-figure-wrapper {
@@ -20642,10 +20631,14 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             return this.env.model.getters.getSelectedFigureId() === this.props.figure.id;
         }
         getBorderWidth() {
-            return this.env.isDashboard() ? 0 : BORDER_WIDTH;
+            if (this.env.isDashboard())
+                return 0;
+            return this.isSelected ? ACTIVE_BORDER_WIDTH : BORDER_WIDTH;
         }
-        get figureStyle() {
-            return this.props.style + `border-width: ${this.getBorderWidth()}px;`;
+        get borderStyle() {
+            const borderWidth = this.getBorderWidth();
+            const borderColor = this.isSelected ? SELECTION_BORDER_COLOR : FIGURE_BORDER_COLOR;
+            return `border: ${borderWidth}px solid ${borderColor};`;
         }
         get wrapperStyle() {
             const { x, y, width, height } = this.props.figure;
@@ -20941,6 +20934,9 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
                 this.dnd.y = Math.max(dndInitialY + deltaY, minY);
             };
             const onMouseUp = (ev) => {
+                if (!this.dnd.figId) {
+                    return;
+                }
                 let { x, y } = this.screenCoordinatesToInternal(this.dnd);
                 this.dnd.figId = undefined;
                 this.env.model.dispatch("UPDATE_FIGURE", { sheetId, id: figure.id, x, y });
@@ -20971,6 +20967,9 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
                 }
             };
             const onMouseUp = (ev) => {
+                if (!this.dnd.figId) {
+                    return;
+                }
                 this.dnd.figId = undefined;
                 let { x, y } = this.screenCoordinatesToInternal(this.dnd);
                 const update = { x, y };
@@ -26274,13 +26273,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
                 data = migrate(data);
             }
         }
-        // sanity check: try to fix missing fields/corrupted state by providing
-        // sensible default values
-        data = Object.assign(createEmptyWorkbookData(), data, { version: CURRENT_VERSION });
-        data.sheets = data.sheets.map((s, i) => Object.assign(createEmptySheet(`Sheet${i + 1}`, `Sheet${i + 1}`), s));
-        if (data.sheets.length === 0) {
-            data.sheets.push(createEmptySheet(INITIAL_SHEET_ID, "Sheet1"));
-        }
+        data = repairData(data);
         return data;
     }
     function migrate(data) {
@@ -26519,6 +26512,48 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         },
     ];
     /**
+     * This function is used to repair faulty data independently of the migration.
+     */
+    function repairData(data) {
+        data = forceUnicityOfFigure(data);
+        data = setDefaults(data);
+        return data;
+    }
+    /**
+     * Force the unicity of figure ids accross sheets
+     */
+    function forceUnicityOfFigure(data) {
+        if (data.uniqueFigureIds) {
+            return data;
+        }
+        const figureIds = new Set();
+        const uuidGenerator = new UuidGenerator();
+        for (const sheet of data.sheets || []) {
+            for (const figure of sheet.figures || []) {
+                if (figureIds.has(figure.id)) {
+                    figure.id += uuidGenerator.uuidv4();
+                }
+                figureIds.add(figure.id);
+            }
+        }
+        data.uniqueFigureIds = true;
+        return data;
+    }
+    /**
+     * sanity check: try to fix missing fields/corrupted state by providing
+     * sensible default values
+     */
+    function setDefaults(data) {
+        data = Object.assign(createEmptyWorkbookData(), data, { version: CURRENT_VERSION });
+        data.sheets = data.sheets
+            ? data.sheets.map((s, i) => Object.assign(createEmptySheet(`Sheet${i + 1}`, `Sheet${i + 1}`), s))
+            : [];
+        if (data.sheets.length === 0) {
+            data.sheets.push(createEmptySheet(INITIAL_SHEET_ID, "Sheet1"));
+        }
+        return data;
+    }
+    /**
      * The goal of this function is to repair corrupted/wrong initial messages caused by
      * a bug.
      * The bug should obviously be fixed, but it's too late for existing spreadsheet.
@@ -26656,6 +26691,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             formats: {},
             borders: {},
             revisionId: DEFAULT_REVISION_ID,
+            uniqueFigureIds: true,
         };
         return data;
     }
@@ -27574,9 +27610,8 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         constructor() {
             super(...arguments);
             this.charts = {};
-            this.nextId = 1;
             this.createChart = chartFactory(this.getters);
-            this.validateChartDefinition = (definition) => validateChartDefinition(this, definition);
+            this.validateChartDefinition = (cmd) => validateChartDefinition(this, cmd.definition);
         }
         adaptRanges(applyChange) {
             for (const [chartId, chart] of Object.entries(this.charts)) {
@@ -27589,8 +27624,9 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         allowDispatch(cmd) {
             switch (cmd.type) {
                 case "CREATE_CHART":
+                    return this.checkValidations(cmd, this.chainValidations(this.validateChartDefinition, this.checkChartDuplicate));
                 case "UPDATE_CHART":
-                    return this.validateChartDefinition(cmd.definition);
+                    return this.checkValidations(cmd, this.chainValidations(this.validateChartDefinition, this.checkChartExists));
                 default:
                     return 0 /* CommandResult.Success */;
             }
@@ -27600,22 +27636,22 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             switch (cmd.type) {
                 case "CREATE_CHART":
                     this.addFigure(cmd.id, cmd.sheetId, cmd.position, cmd.size);
-                    this.addChart(cmd.id, cmd.sheetId, cmd.definition);
+                    this.addChart(cmd.id, cmd.definition);
                     break;
                 case "UPDATE_CHART": {
-                    this.addChart(cmd.id, cmd.sheetId, cmd.definition);
+                    this.addChart(cmd.id, cmd.definition);
                     break;
                 }
                 case "DUPLICATE_SHEET": {
                     const sheetFiguresFrom = this.getters.getFigures(cmd.sheetId);
                     for (const fig of sheetFiguresFrom) {
                         if (fig.tag === "chart") {
-                            const id = this.nextId.toString();
-                            this.history.update("nextId", this.nextId + 1);
+                            const figureIdBase = fig.id.split(FIGURE_ID_SPLITTER).pop();
+                            const duplicatedFigureId = `${cmd.sheetIdTo}${FIGURE_ID_SPLITTER}${figureIdBase}`;
                             const chart = (_a = this.charts[fig.id]) === null || _a === void 0 ? void 0 : _a.copyForSheetId(cmd.sheetIdTo);
                             if (chart) {
                                 this.dispatch("CREATE_CHART", {
-                                    id,
+                                    id: duplicatedFigureId,
                                     position: { x: fig.x, y: fig.y },
                                     size: { width: fig.width, height: fig.height },
                                     definition: chart.getDefinition(),
@@ -27681,7 +27717,6 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
                         // figure data should be external IMO => chart should be in sheet.chart
                         // instead of in figure.data
                         if (figure.tag === "chart") {
-                            this.history.update("nextId", this.nextId + 1);
                             this.charts[figure.id] = this.createChart(figure.id, figure.data, sheet.id);
                         }
                     }
@@ -27689,14 +27724,23 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             }
         }
         export(data) {
+            var _a;
             if (data.sheets) {
                 for (let sheet of data.sheets) {
                     // TODO This code is false, if two plugins want ot insert figures on the sheet, it will crash !
                     const sheetFigures = this.getters.getFigures(sheet.id);
-                    const figures = sheetFigures;
-                    for (let figure of figures) {
+                    const figures = [];
+                    for (let sheetFigure of sheetFigures) {
+                        const figure = sheetFigure;
                         if (figure && figure.tag === "chart") {
-                            figure.data = this.getChartDefinition(figure.id);
+                            const data = (_a = this.charts[figure.id]) === null || _a === void 0 ? void 0 : _a.getDefinition();
+                            if (data) {
+                                figure.data = data;
+                                figures.push(figure);
+                            }
+                        }
+                        else {
+                            figures.push(figure);
                         }
                     }
                     sheet.figures = figures;
@@ -27749,8 +27793,21 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
          * Add a chart in the local state. If a chart already exists, this chart is
          * replaced
          */
-        addChart(id, sheetId, definition) {
-            this.history.update("charts", id, this.createChart(id, definition, sheetId));
+        addChart(id, definition) {
+            const sheetId = this.getters.getFigureSheetId(id);
+            if (sheetId) {
+                this.history.update("charts", id, this.createChart(id, definition, sheetId));
+            }
+        }
+        checkChartDuplicate(cmd) {
+            return this.getters.getFigureSheetId(cmd.id)
+                ? 83 /* CommandResult.DuplicatedChartId */
+                : 0 /* CommandResult.Success */;
+        }
+        checkChartExists(cmd) {
+            return this.getters.getFigureSheetId(cmd.id)
+                ? 0 /* CommandResult.Success */
+                : 84 /* CommandResult.ChartDoesNotExist */;
         }
     }
     ChartPlugin.getters = [
@@ -28213,6 +28270,9 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             var _a;
             return (_a = this.figures[sheetId]) === null || _a === void 0 ? void 0 : _a[figureId];
         }
+        getFigureSheetId(figureId) {
+            return Object.keys(this.figures).find((sheetId) => { var _a; return ((_a = this.figures[sheetId]) === null || _a === void 0 ? void 0 : _a[figureId]) !== undefined; });
+        }
         // ---------------------------------------------------------------------------
         // Import/Export
         // ---------------------------------------------------------------------------
@@ -28237,7 +28297,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             this.export(data);
         }
     }
-    FigurePlugin.getters = ["getFigures", "getFigure"];
+    FigurePlugin.getters = ["getFigures", "getFigure", "getFigureSheetId"];
 
     class FilterTable {
         constructor(zone) {
@@ -32712,6 +32772,9 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
                 case "CREATE_SHEET":
                     this.filterValues[cmd.sheetId] = {};
                     break;
+                case "HIDE_COLUMNS_ROWS":
+                    this.updateHiddenRows();
+                    break;
                 case "UPDATE_FILTER":
                     this.updateFilter(cmd);
                     this.updateHiddenRows();
@@ -32813,9 +32876,16 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
         updateHiddenRows() {
             var _a, _b;
             const sheetId = this.getters.getActiveSheetId();
-            const filters = this.getters.getFilters(sheetId);
+            const filters = this.getters
+                .getFilters(sheetId)
+                .sort((filter1, filter2) => filter1.zoneWithHeaders.top - filter2.zoneWithHeaders.top);
             const hiddenRows = new Set();
             for (let filter of filters) {
+                // Disable filters whose header are hidden
+                if (this.getters.isRowHiddenByUser(sheetId, filter.zoneWithHeaders.top))
+                    continue;
+                if (hiddenRows.has(filter.zoneWithHeaders.top))
+                    continue;
                 const filteredValues = (_b = (_a = this.filterValues[sheetId]) === null || _a === void 0 ? void 0 : _a[filter.id]) === null || _b === void 0 ? void 0 : _b.map(toLowerCase);
                 if (!filteredValues || !filter.filteredZone)
                     continue;
@@ -32848,7 +32918,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
                         const valuesInFilterZone = filter.filteredZone
                             ? positions(filter.filteredZone)
                                 .map((pos) => { var _a; return (_a = this.getters.getCell(sheetData.id, pos.col, pos.row)) === null || _a === void 0 ? void 0 : _a.formattedValue; })
-                                .filter(isDefined$1)
+                                .filter(isNonEmptyString)
                             : [];
                         // In xlsx, filtered values = values that are displayed, not values that are hidden
                         const xlsxFilteredValues = valuesInFilterZone.filter((val) => !filteredValues.includes(val));
@@ -37980,6 +38050,8 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             position: absolute;
             top: calc(100% + 5px);
             left: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
             z-index: ${ComponentsImportance.Dropdown};
             box-shadow: 1px 2px 5px 2px rgba(51, 51, 51, 0.15);
             background-color: white;
@@ -38068,6 +38140,9 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
     background-color: white;
   `;
         }
+        get dropdownStyle() {
+            return `max-height:${this.props.dropdownMaxHeight}px`;
+        }
         setup() {
             owl.useExternalListener(window, "click", this.onClick);
             owl.onWillStart(() => this.updateCellState());
@@ -38115,6 +38190,7 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             this.state.menuState.parentMenu = menu;
             this.isSelectingMenu = true;
             this.openedEl = ev.target;
+            this.env.model.dispatch("STOP_EDITION");
         }
         closeMenus() {
             this.state.activeTool = "";
@@ -38510,6 +38586,10 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
             else if (content) {
                 this.model.dispatch("SET_CURRENT_CONTENT", { content, selection });
             }
+        }
+        get gridHeight() {
+            const { height } = this.env.model.getters.getSheetViewDimension();
+            return height;
         }
     }
     Spreadsheet.template = "o-spreadsheet-Spreadsheet";
@@ -42389,9 +42469,11 @@ day_count_convention (number, default=${DEFAULT_DAY_COUNT_CONVENTION} ) ${_lt("A
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
-    exports.__info__.version = '2.0.0';
-    exports.__info__.date = '2023-02-06T07:28:33.361Z';
-    exports.__info__.hash = '66ca47d';
+
+    __info__.version = '16.0.4';
+    __info__.date = '2023-03-16T12:14:53.272Z';
+    __info__.hash = 'ebbb1f0';
+
 
 })(this.o_spreadsheet = this.o_spreadsheet || {}, owl);
 //# sourceMappingURL=o_spreadsheet.js.map

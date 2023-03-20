@@ -147,7 +147,7 @@ msgstr ""
 #. module: point_of_sale
 #: model_terms:ir.ui.view,arch_db:point_of_sale.ticket_validation_screen
 msgid "<i class=\"fa fa-pencil\"/> Edit"
-msgstr "<i class=\"fa fa-pencil\"/> Modifier"
+msgstr "<i class=\"fa fa-pencil\"/> Éditer"
 
 #. module: point_of_sale
 #. odoo-python
@@ -393,6 +393,8 @@ msgstr "Écriture comptable"
 #: model:ir.model.fields,help:point_of_sale.field_pos_session__bank_payment_ids
 msgid "Account payments representing aggregated and bank split payments."
 msgstr ""
+"Les paiements en compte représentant des paiements agrégés et des paiements "
+"fractionnés."
 
 #. module: point_of_sale
 #: model_terms:ir.ui.view,arch_db:point_of_sale.res_config_settings_view_form
@@ -414,8 +416,8 @@ msgid ""
 "Accounting journal used to post POS session journal entries and POS invoice "
 "payments."
 msgstr ""
-"Journal comptable utilisé pour poster les écritures comptables et les "
-"paiements de facture de la session de Point de Vente."
+"Journal comptable utilisé pour poster les pièces comptables et les paiements"
+" de facture de la session de Point de Vente."
 
 #. module: point_of_sale
 #: model:ir.model.fields,field_description:point_of_sale.field_pos_session__message_needaction
@@ -2177,7 +2179,7 @@ msgstr "Retracer les erreurs de téléchargement"
 #. module: point_of_sale
 #: model_terms:ir.ui.view,arch_db:point_of_sale.view_pos_config_kanban
 msgid "Edit"
-msgstr "Modifier"
+msgstr "Éditer"
 
 #. module: point_of_sale
 #. odoo-javascript
@@ -2338,7 +2340,7 @@ msgstr "Exporter les commandes non payées"
 #. module: point_of_sale
 #: model_terms:ir.ui.view,arch_db:point_of_sale.view_pos_pos_form
 msgid "Extra Info"
-msgstr "Info supplémentaires"
+msgstr "Infos supplémentaires"
 
 #. module: point_of_sale
 #: model:product.attribute,name:point_of_sale.fabric_attribute
@@ -2455,7 +2457,7 @@ msgid ""
 "journal entries for each customer. It could slow down the closing process."
 msgstr ""
 "Force à définir un client quand on utilise ce mode de paiement et ventile "
-"les écritures comptables par client. Ceci pourrait ralentir le processus de "
+"les pièces comptables par client. Ceci pourrait ralentir le processus de "
 "fermeture."
 
 #. module: point_of_sale
@@ -2976,12 +2978,12 @@ msgstr "Journal"
 #: model:ir.model,name:point_of_sale.model_account_move
 #: model:ir.model.fields,field_description:point_of_sale.field_pos_session__move_id
 msgid "Journal Entry"
-msgstr "Écriture comptable"
+msgstr "Pièce comptable"
 
 #. module: point_of_sale
 #: model:ir.model,name:point_of_sale.model_account_move_line
 msgid "Journal Item"
-msgstr "Imputation comptable"
+msgstr "Écriture comptable"
 
 #. module: point_of_sale
 #. odoo-python
@@ -2989,7 +2991,7 @@ msgstr "Imputation comptable"
 #: model_terms:ir.ui.view,arch_db:point_of_sale.view_pos_session_form
 #, python-format
 msgid "Journal Items"
-msgstr "Imputations comptables"
+msgstr "Écritures comptables"
 
 #. module: point_of_sale
 #: model:ir.model.fields,field_description:point_of_sale.field_digest_digest__kpi_pos_total_value
@@ -3109,7 +3111,7 @@ msgid ""
 "Overrides the company's receivable account (for Point of Sale) used in the journal entries."
 msgstr ""
 "Laisser vide pour utiliser le compte par défaut défini dans les paramètres de la société.\n"
-"Remplace le compte débiteur de la société (pour le point de vente) utilisé dans les écritures comptables."
+"Remplace le compte débiteur de la société (pour le point de vente) utilisé dans les pièces comptables."
 
 #. module: point_of_sale
 #: model_terms:ir.ui.view,arch_db:point_of_sale.pos_payment_method_view_form
@@ -3126,7 +3128,7 @@ msgid ""
 "Only cash and bank journals are allowed."
 msgstr ""
 "Laisser vide pour utiliser le compte débiteur du client.\n"
-"Définit le journal où seront comptabilisés les paiements cumulés (ou les paiements individuels si l'identifiant du client est true) après avoir fermé la session. \n"
+"Définit le journal où seront comptabilisés les paiements cumulés (ou les paiements individuels si l'identifiant du client est vrai) après avoir fermé la session. \n"
 "Pour le journal de caisse, nous écrivons directement dans le compte par défaut du journal par des lignes de relevé.\n"
 "Pour le journal bancaire, nous écrivons dans le compte en souffrance défini pour ce mode de paiement.\n"
 "Seuls les journaux de caisse et de banque sont autorisés. "
@@ -3226,12 +3228,12 @@ msgstr "Nom du lot"
 #: code:addons/point_of_sale/static/src/js/Screens/ProductScreen/ProductScreen.js:0
 #, python-format
 msgid "Lot/Serial Number(s) Required"
-msgstr "N° lot/série requis"
+msgstr "Lot/numéro de série requis"
 
 #. module: point_of_sale
 #: model:ir.model.fields,field_description:point_of_sale.field_pos_order_line__pack_lot_ids
 msgid "Lot/serial Number"
-msgstr "N° lot/série"
+msgstr "Lot/numéro de série"
 
 #. module: point_of_sale
 #: model:product.template,name:point_of_sale.magnetic_board_product_template
@@ -5674,7 +5676,7 @@ msgstr "ID de session"
 #. module: point_of_sale
 #: model:ir.model.fields,field_description:point_of_sale.field_pos_order__session_move_id
 msgid "Session Journal Entry"
-msgstr "Écriture comptable de la session"
+msgstr "Pièce comptable de la session"
 
 #. module: point_of_sale
 #. odoo-javascript
@@ -5913,7 +5915,7 @@ msgstr "Route spécifique"
 #: model:ir.model,name:point_of_sale.model_pos_pack_operation_lot
 msgid "Specify product lot/serial number in pos order line"
 msgstr ""
-"Précisez le numéro de lot/série du produit dans la ligne de commande PdV"
+"Précisez le lot/numéro de série du produit dans la ligne de commande PdV"
 
 #. module: point_of_sale
 #: model:ir.model.fields,field_description:point_of_sale.field_pos_config__route_id
@@ -7054,6 +7056,17 @@ msgstr "Type d'activité d'exception enregistrée."
 
 #. module: point_of_sale
 #. odoo-python
+#. openerp-web
+#: code:addons/point_of_sale/static/src/js/Screens/ReceiptScreen/ReceiptScreen.js:0
+#, python-format
+msgid ""
+"This order is not yet synced to server. Make sure it is synced then try "
+"again."
+msgstr ""
+"Cette commande n'est pas encore synchronisée sur le serveur. Assurez-vous "
+"qu'elle est synchronisée et réessayez."
+
+#. module: point_of_sale
 #: code:addons/point_of_sale/models/pos_session.py:0
 #, python-format
 msgid ""
@@ -7221,9 +7234,10 @@ msgstr "Uuid"
 #. module: point_of_sale
 #. odoo-javascript
 #: code:addons/point_of_sale/static/src/xml/Popups/CashMoveReceipt.xml:0
-#, python-format
-msgid "VAT:"
-msgstr "TVA :"
+#: code:addons/point_of_sale/static/src/js/Screens/ReceiptScreen/ReceiptScreen.js:0
+#, python-format, python-format
+msgid "Unsynced order"
+msgstr "Commande non synchronisée"
 
 #. module: point_of_sale
 #. odoo-javascript
@@ -7312,7 +7326,7 @@ msgstr "Produit pesé"
 #. module: point_of_sale
 #: model:ir.model.fields.selection,name:point_of_sale.selection__pos_config__picking_policy__one
 msgid "When all products are ready"
-msgstr "Lorsque tous les produits sont prêts"
+msgstr "Quand tous les produits sont prêts"
 
 #. module: point_of_sale
 #: model:ir.model.fields,help:point_of_sale.field_pos_config__is_margins_costs_accessible_to_every_user
@@ -7415,8 +7429,8 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas créer une commande PdV depuis l'interface du backend ou "
 "annuler la liste de prix ou créer une commande PdV dans un test python avec "
-"l'outil Formulaire ou modifier la vue formulaire dans studio s'il n'y a "
-"aucune commande PdV"
+"l'outil Formulaire ou éditer la vue formulaire dans studio s'il n'y a aucune"
+" commande PdV"
 
 #. module: point_of_sale
 #. odoo-python

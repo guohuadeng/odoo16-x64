@@ -505,6 +505,8 @@ class MrpWorkorder(models.Model):
         # Plan workorder after its predecessors
         start_date = max(self.production_id.date_planned_start, datetime.now())
         for workorder in self.blocked_by_workorder_ids:
+            if workorder.state in ['done', 'cancel']:
+                continue
             workorder._plan_workorder(replan)
             start_date = max(start_date, workorder.date_planned_finished)
         # Plan only suitable workorders
@@ -605,15 +607,15 @@ class MrpWorkorder(models.Model):
         if self.state in ('done', 'cancel'):
             return True
 
-        if self._should_start_timer():
-            self.env['mrp.workcenter.productivity'].create(
-                self._prepare_timeline_vals(self.duration, datetime.now())
-            )
-
         if self.product_tracking == 'serial':
             self.qty_producing = 1.0
         elif self.qty_producing == 0:
             self.qty_producing = self.qty_remaining
+
+        if self._should_start_timer():
+            self.env['mrp.workcenter.productivity'].create(
+                self._prepare_timeline_vals(self.duration, datetime.now())
+            )
 
         if self.production_id.state != 'progress':
             self.production_id.write({

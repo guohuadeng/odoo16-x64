@@ -169,14 +169,14 @@ msgstr "%s 작성함"
 #: code:addons/mail/static/src/models/activity_list_view_item.js:0
 #, python-format
 msgid "%s days overdue"
-msgstr ""
+msgstr "%s 일 기한 초과"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models/activity_view.js:0
 #, python-format
 msgid "%s days overdue:"
-msgstr ""
+msgstr "%s 일 기한 초과:"
 
 #. module: mail
 #. odoo-javascript
@@ -1112,7 +1112,7 @@ msgstr "활동 혼합"
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.mail_activity_type_view_form
 msgid "Activity Settings"
-msgstr ""
+msgstr "활동 설정"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_activity_mixin__activity_state
@@ -2356,6 +2356,7 @@ msgstr "회사"
 #. odoo-javascript
 #: code:addons/mail/static/src/js/activity.js:0
 #: code:addons/mail/static/src/models/mail_template.js:0
+#: code:addons/mail/static/src/models/composer_view.js:0
 #: model:ir.actions.act_window,name:mail.action_email_compose_message_wizard
 #: model_terms:ir.ui.view,arch_db:mail.email_compose_message_wizard_form
 #, python-format
@@ -2456,7 +2457,7 @@ msgstr "연결은 전용 포트 (기본값 : IMAPS = 993, POP3S = 995)를 통해
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_compose_message__reply_to_force_new
 msgid "Considers answers as new thread"
-msgstr ""
+msgstr "답변을 새로운 스레드로 처리"
 
 #. module: mail
 #: model:ir.model,name:mail.model_res_partner
@@ -2662,7 +2663,7 @@ msgstr "작성일자"
 #: code:addons/mail/static/src/models/chatter.js:0
 #, python-format
 msgid "Creating a new record..."
-msgstr ""
+msgstr "새로운 자료를 생성합니다"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.view_mail_search
@@ -3188,21 +3189,21 @@ msgstr "만기일"
 #: code:addons/mail/static/src/models/activity_list_view_item.js:0
 #, python-format
 msgid "Due in %s days"
-msgstr ""
+msgstr "%s 일 후 만기"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models/activity_view.js:0
 #, python-format
 msgid "Due in %s days:"
-msgstr ""
+msgstr "%s 일 후 만기"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/components/activity/activity.xml:0
 #, python-format
 msgid "Due on"
-msgstr ""
+msgstr "마감일"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_ir_actions_server__activity_date_deadline_range_type
@@ -3297,7 +3298,7 @@ msgstr "이메일"
 #: model:ir.model.fields,field_description:mail.field_mail_mail__email_add_signature
 #: model:ir.model.fields,field_description:mail.field_mail_message__email_add_signature
 msgid "Email Add Signature"
-msgstr ""
+msgstr "이메일 서명 추가"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_blacklist__email
@@ -4145,14 +4146,14 @@ msgstr "머리글"
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.mail_bounce_catchall
 msgid "Hello"
-msgstr "안녕"
+msgstr "안녕하세요"
 
 #. module: mail
 #. odoo-python
 #: code:addons/mail/wizard/mail_wizard_invite.py:0
 #, python-format
 msgid "Hello,"
-msgstr "안녕."
+msgstr "안녕하세요,"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_message_subtype__hidden
@@ -4169,7 +4170,7 @@ msgstr ""
 #: code:addons/mail/static/src/components/thread_view_topbar/thread_view_topbar.xml:0
 #, python-format
 msgid "Hide Call Settings"
-msgstr ""
+msgstr "전화 설정 숨김"
 
 #. module: mail
 #. odoo-javascript
@@ -5400,7 +5401,7 @@ msgstr "활동 기록"
 #: code:addons/mail/static/src/models/composer.js:0
 #, python-format
 msgid "Log an internal note..."
-msgstr ""
+msgstr "내부용으로 메모를 기록합니다."
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_compose_message__is_log
@@ -5410,6 +5411,7 @@ msgstr ""
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/components/chatter_topbar/chatter_topbar.xml:0
+#: code:addons/mail/static/src/models/composer_view.js:0
 #, python-format
 msgid "Log note"
 msgstr "로그 기록"
@@ -7183,17 +7185,17 @@ msgstr ""
 #. module: mail
 #: model:ir.model.fields.selection,name:mail.selection__ir_actions_server__mail_post_method__comment
 msgid "Post as Message"
-msgstr ""
+msgstr "메시지로 게시"
 
 #. module: mail
 #: model:ir.model.fields.selection,name:mail.selection__ir_actions_server__mail_post_method__note
 msgid "Post as Note"
-msgstr ""
+msgstr "메모로 게시"
 
 #. module: mail
 #: model:ir.model.fields.selection,name:mail.selection__mail_compose_message__composition_mode__mass_post
 msgid "Post on Multiple Documents"
-msgstr ""
+msgstr "여러 문서에 게시"
 
 #. module: mail
 #: model:ir.model.fields.selection,name:mail.selection__mail_compose_message__composition_mode__comment
@@ -7309,7 +7311,7 @@ msgstr ""
 #: code:addons/mail/static/src/components/thread_icon/thread_icon.xml:0
 #, python-format
 msgid "Public Channel"
-msgstr ""
+msgstr "공개 채널"
 
 #. module: mail
 #. odoo-javascript
@@ -7765,7 +7767,7 @@ msgstr "담당 사용자"
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_res_config_settings__restrict_template_rendering
 msgid "Restrict Template Rendering"
-msgstr ""
+msgstr "템플릿 렌더링 제한"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.res_config_settings_view_form
@@ -7839,7 +7841,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "SOS"
-msgstr ""
+msgstr "SOS"
 
 #. module: mail
 #. odoo-javascript
@@ -7847,7 +7849,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "SOS button"
-msgstr ""
+msgstr "SOS 버튼"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.view_email_server_search
@@ -8351,7 +8353,7 @@ msgstr ""
 #: code:addons/mail/static/src/components/thread_view_topbar/thread_view_topbar.xml:0
 #, python-format
 msgid "Show Call Settings"
-msgstr ""
+msgstr "전화 설정 보이기"
 
 #. module: mail
 #. odoo-javascript
@@ -8478,7 +8480,7 @@ msgstr "별표"
 #: code:addons/mail/static/src/components/thread_view_topbar/thread_view_topbar.xml:0
 #, python-format
 msgid "Start a Call"
-msgstr ""
+msgstr "통화 시작"
 
 #. module: mail
 #. odoo-javascript
@@ -8486,7 +8488,7 @@ msgstr ""
 #: code:addons/mail/static/src/components/thread_view_topbar/thread_view_topbar.xml:0
 #, python-format
 msgid "Start a Video Call"
-msgstr ""
+msgstr "화상통화 시작"
 
 #. module: mail
 #. odoo-javascript
@@ -8494,7 +8496,7 @@ msgstr ""
 #: code:addons/mail/static/src/models/discuss_sidebar_category.js:0
 #, python-format
 msgid "Start a conversation"
-msgstr ""
+msgstr "대화 시작"
 
 #. module: mail
 #. odoo-javascript
@@ -8502,7 +8504,7 @@ msgstr ""
 #: code:addons/mail/static/src/components/discuss_sidebar/discuss_sidebar.xml:0
 #, python-format
 msgid "Start a meeting"
-msgstr ""
+msgstr "미팅 시작"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_activity__state
@@ -8523,7 +8525,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Statue of Liberty"
-msgstr ""
+msgstr "자유의 여신상"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_fetchmail_server__state
@@ -8555,28 +8557,28 @@ msgstr ""
 #: code:addons/mail/static/src/components/chat_window_header/chat_window_header.xml:0
 #, python-format
 msgid "Stop adding users"
-msgstr ""
+msgstr "사용자 추가 중지"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models/call_action_list_view.js:0
 #, python-format
 msgid "Stop camera"
-msgstr ""
+msgstr "카메라 중지"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/components/composer/composer.xml:0
 #, python-format
 msgid "Stop replying"
-msgstr ""
+msgstr "답변 중지"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models/call_action_list_view.js:0
 #, python-format
 msgid "Stop screen sharing"
-msgstr ""
+msgstr "화면공유 중지"
 
 #. module: mail
 #: model:ir.model.fields.selection,name:mail.selection__mail_compose_message__reply_to_mode__update
@@ -8707,14 +8709,14 @@ msgstr "시스템 알림"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "T-Rex"
-msgstr ""
+msgstr "티렉스"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "T-shirt"
-msgstr ""
+msgstr "티셔츠"
 
 #. module: mail
 #. odoo-javascript
@@ -8905,6 +8907,8 @@ msgid ""
 "country format. You can use '/' to indicate that the partner is not subject "
 "to tax."
 msgstr ""
+"세금 식별 번호. 여기에 해당하는 값은 국가별로 인정되는 형식을 기준으로 확인합니다. '/' 기호를 사용하여 협력업체가 과세 대상이 아닌"
+" 경우 표시할 수 있습니다."
 
 #. module: mail
 #. odoo-javascript
@@ -9271,14 +9275,14 @@ msgstr "오늘 활동"
 #: code:addons/mail/static/src/models/activity_view.js:0
 #, python-format
 msgid "Today:"
-msgstr ""
+msgstr "오늘:"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Tokyo"
-msgstr ""
+msgstr "도쿄"
 
 #. module: mail
 #. odoo-javascript
@@ -9300,7 +9304,7 @@ msgstr "내일"
 #: code:addons/mail/static/src/models/activity_view.js:0
 #, python-format
 msgid "Tomorrow:"
-msgstr ""
+msgstr "내일:"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.mail_channel_view_form
@@ -9457,7 +9461,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "UFO"
-msgstr ""
+msgstr "UFO"
 
 #. module: mail
 #. odoo-javascript
@@ -9568,7 +9572,7 @@ msgstr "알 수 없는 오류"
 #: code:addons/mail/static/src/models/call_action_list_view.js:0
 #, python-format
 msgid "Unmute"
-msgstr ""
+msgstr "소리 켜기"
 
 #. module: mail
 #. odoo-javascript
@@ -9618,7 +9622,7 @@ msgstr "메일 레이아웃 업데이트"
 #: model:mail.activity.type,name:mail.mail_activity_data_upload_document
 #, python-format
 msgid "Upload Document"
-msgstr "문서 올리기"
+msgstr "문서 업로드"
 
 #. module: mail
 #. odoo-javascript
@@ -9633,7 +9637,7 @@ msgstr ""
 #: code:addons/mail/static/src/xml/web_kanban_activity.xml:0
 #, python-format
 msgid "Upload file"
-msgstr "파일 올리기"
+msgstr "파일 업로드"
 
 #. module: mail
 #. odoo-javascript
@@ -9724,7 +9728,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:mail.res_users_settings_view_form
 #: model_terms:ir.ui.view,arch_db:mail.res_users_settings_view_tree
 msgid "User Settings"
-msgstr ""
+msgstr "사용자 설정"
 
 #. module: mail
 #: model:ir.model,name:mail.model_res_users_settings_volumes
@@ -9813,7 +9817,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "VHS"
-msgstr ""
+msgstr "VHS"
 
 #. module: mail
 #. odoo-javascript
@@ -10049,7 +10053,7 @@ msgstr "어제"
 #: code:addons/mail/static/src/models/activity_view.js:0
 #, python-format
 msgid "Yesterday:"
-msgstr ""
+msgstr "어제:"
 
 #. module: mail
 #. odoo-javascript
@@ -10383,7 +10387,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "accounting"
-msgstr ""
+msgstr "회계"
 
 #. module: mail
 #. odoo-javascript
@@ -11620,7 +11624,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "bathing suit"
-msgstr ""
+msgstr "수영복"
 
 #. module: mail
 #. odoo-javascript
@@ -11630,7 +11634,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "bathroom"
-msgstr ""
+msgstr "욕실"
 
 #. module: mail
 #. odoo-javascript
@@ -11639,7 +11643,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "bathtub"
-msgstr ""
+msgstr "욕조"
 
 #. module: mail
 #. odoo-javascript
@@ -14440,7 +14444,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "coaster"
-msgstr ""
+msgstr "코스터"
 
 #. module: mail
 #. odoo-javascript
@@ -14448,21 +14452,21 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "coat"
-msgstr ""
+msgstr "코트"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "cocktail"
-msgstr ""
+msgstr "칵테일"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "cocktail glass"
-msgstr ""
+msgstr "칵테일 잔"
 
 #. module: mail
 #. odoo-javascript
@@ -14470,7 +14474,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "coconut"
-msgstr ""
+msgstr "코코넛"
 
 #. module: mail
 #. odoo-javascript
@@ -14478,14 +14482,14 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "coder"
-msgstr ""
+msgstr "커피"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "coffee"
-msgstr ""
+msgstr "커피"
 
 #. module: mail
 #. odoo-javascript
@@ -14493,28 +14497,28 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "coffin"
-msgstr ""
+msgstr "관"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "cog"
-msgstr ""
+msgstr "장부"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "cogwheel"
-msgstr ""
+msgstr "톱니바퀴"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "coin"
-msgstr ""
+msgstr "코인"
 
 #. module: mail
 #. odoo-javascript
@@ -14532,7 +14536,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "cold"
-msgstr ""
+msgstr "감기"
 
 #. module: mail
 #. odoo-javascript
@@ -14548,14 +14552,14 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "collision"
-msgstr ""
+msgstr "충돌"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "column"
-msgstr ""
+msgstr "열"
 
 #. module: mail
 #. odoo-javascript
@@ -14563,7 +14567,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "comet"
-msgstr ""
+msgstr "혜성"
 
 #. module: mail
 #. odoo-javascript
@@ -18576,7 +18580,7 @@ msgstr ""
 #: code:addons/mail/static/src/models/activity_view.js:0
 #, python-format
 msgid "for %s"
-msgstr ""
+msgstr "담당자 %s"
 
 #. module: mail
 #. odoo-javascript
@@ -19510,7 +19514,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "graph"
-msgstr ""
+msgstr "그래프"
 
 #. module: mail
 #. odoo-javascript

@@ -319,7 +319,10 @@ export const editorCommands = {
         const restoreCursor = preserveCursor(editor.document);
         const range = getDeepRange(editor.editable, { correctTripleClick: true });
         const selectedBlocks = [...new Set(getTraversedNodes(editor.editable, range).map(closestBlock))];
-        for (const block of selectedBlocks) {
+        const deepestSelectedBlocks = selectedBlocks.filter(block => (
+            !descendants(block).some(descendant => selectedBlocks.includes(descendant))
+        ));
+        for (const block of deepestSelectedBlocks) {
             if (
                 ['P', 'PRE', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE'].includes(
                     block.nodeName,
@@ -532,9 +535,9 @@ export const editorCommands = {
         // Get the <font> nodes to color
         const selectedNodes = getSelectedNodes(editor.editable).filter(node => !closestElement(node, 'table.o_selected_table'));
         const fonts = selectedNodes.flatMap(node => {
-            let font = closestElement(node, 'font');
+            let font = closestElement(node, 'font') || closestElement(node, 'span');
             const children = font && descendants(font);
-            if (font && font.nodeName === 'FONT') {
+            if (font && (font.nodeName === 'FONT' || (font.nodeName === 'SPAN' && font.style[mode]))) {
                 // Partially selected <font>: split it.
                 const selectedChildren = children.filter(child => selectedNodes.includes(child));
                 if (selectedChildren.length) {

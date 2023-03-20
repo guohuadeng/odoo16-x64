@@ -165,10 +165,10 @@ msgid ""
 "                                    </span>"
 msgstr ""
 "<span attrs=\"{'invisible': [('pricelist_item_count', '=', 1)]}\">\n"
-"                                        Precios extra\n"
+"                                        Precios adicionales\n"
 "                                    </span>\n"
 "                                    <span attrs=\"{'invisible': [('pricelist_item_count', '!=', 1)]}\">\n"
-"                                        Precio extra\n"
+"                                        Precio adicional\n"
 "                                    </span>"
 
 #. module: product
@@ -1097,7 +1097,7 @@ msgstr "Contenido extra"
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_item_form_view
 msgid "Extra Fee"
-msgstr "Tarifa extra"
+msgstr "Tarifa adicional"
 
 #. module: product
 #: model:ir.model.fields,help:product.field_product_template_attribute_value__price_extra
@@ -2528,11 +2528,9 @@ msgstr ""
 #. module: product
 #: model:ir.model.fields,help:product.field_product_pricelist_item__price_surcharge
 msgid ""
-"Specify the fixed amount to add or substract(if negative) to the amount "
+"Specify the fixed amount to add or subtract (if negative) to the amount "
 "calculated with the discount."
 msgstr ""
-"Especifique el importe fijo a añadir o a quitar (si es negativo) al importe "
-"calculado con el descuento."
 
 #. module: product
 #: model:ir.model.fields,help:product.field_product_pricelist_item__price_max_margin

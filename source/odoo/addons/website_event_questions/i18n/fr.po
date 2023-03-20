@@ -55,7 +55,7 @@ msgstr "Réponses"
 #. module: website_event_questions
 #: model:ir.model.fields,field_description:website_event_questions.field_event_question__once_per_order
 msgid "Ask once per order"
-msgstr "Demandez une fois par commande"
+msgstr "Demander une fois par commande"
 
 #. module: website_event_questions
 #: model:ir.model.fields,field_description:website_event_questions.field_event_registration__registration_answer_ids
@@ -164,7 +164,7 @@ msgid ""
 "propagated to every attendees.If not it will be asked for every attendee of "
 "a reservation."
 msgstr ""
-"Si True, cette question ne sera posée qu'une seule fois et sa valeur sera "
+"Si vrai, cette question ne sera posée qu'une seule fois et sa valeur sera "
 "propagée à tous les participants. Sinon, elle sera posée à tous les "
 "participants d'une réservation."
 

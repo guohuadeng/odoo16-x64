@@ -1408,7 +1408,7 @@ msgstr "EMAIL"
 #. module: calendar
 #: model_terms:ir.ui.view,arch_db:calendar.view_calendar_event_form
 msgid "Edit recurring event"
-msgstr "Modifier l'événement récurrent"
+msgstr "Éditer l'événement récurrent"
 
 #. module: calendar
 #: model:ir.model.fields,field_description:calendar.field_calendar_attendee__email
@@ -1632,8 +1632,8 @@ msgid ""
 "If the active field is set to false, it will allow you to hide the event "
 "alarm information without removing it."
 msgstr ""
-"Si le champ actif est défini sur false, il vous permet de masquer l'alarme "
-"de cet événement sans la supprimer."
+"Si le champ actif est défini sur faux, il vous permet de masquer l'alarme de"
+" cet événement sans la supprimer."
 
 #. module: calendar
 #: model:ir.model.fields,help:calendar.field_calendar_event__show_as
@@ -2022,7 +2022,7 @@ msgstr "Options"
 #: model:ir.model.fields,field_description:calendar.field_calendar_event__user_id
 #: model_terms:ir.ui.view,arch_db:calendar.view_calendar_event_calendar
 msgid "Organizer"
-msgstr "Organisé par"
+msgstr "Organisateur"
 
 #. module: calendar
 #. openerp-web

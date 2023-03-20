@@ -3002,6 +3002,14 @@ class BaseModel(metaclass=MetaModel):
         """
         self.ensure_one()
 
+        valid_langs = set(code for code, _ in self.env['res.lang'].get_installed()) | {'en_US'}
+        missing_langs = set(translations) - valid_langs
+        if missing_langs:
+            raise UserError(
+                _("The following languages are not activated: %(missing_names)s",
+                missing_names=', '.join(missing_langs))
+            )
+
         field = self._fields[field_name]
 
         if not field.translate:
@@ -4202,8 +4210,14 @@ class BaseModel(metaclass=MetaModel):
             SET parent_path=concat((SELECT parent.parent_path FROM {0} parent
                                     WHERE parent.id=node.{1}), node.id, '/')
             WHERE node.id IN %s
+            RETURNING node.id, node.parent_path
         """.format(self._table, self._parent_name)
         self._cr.execute(query, [tuple(self.ids)])
+
+        # update the cache of updated nodes, and determine what to recompute
+        updated = dict(self._cr.fetchall())
+        records = self.browse(updated)
+        self.env.cache.update(records, self._fields['parent_path'], updated.values())
 
     def _parent_store_update_prepare(self, vals):
         """ Return the records in ``self`` that must update their parent_path
@@ -4711,6 +4725,7 @@ class BaseModel(metaclass=MetaModel):
         if old.id in seen_map[old._name]:
             return
         seen_map[old._name].add(old.id)
+        valid_langs = set(code for code, _ in self.env['res.lang'].get_installed()) | {'en_US'}
 
         for name, field in old._fields.items():
             if not field.copy:
@@ -4739,6 +4754,11 @@ class BaseModel(metaclass=MetaModel):
                     continue
                 lang = self.env.lang or 'en_US'
                 old_value_lang = old_translations.pop(lang, old_translations['en_US'])
+                old_translations = {
+                    lang: value
+                    for lang, value in old_translations.items()
+                    if lang in valid_langs
+                }
                 if not old_translations:
                     continue
                 if not callable(field.translate):

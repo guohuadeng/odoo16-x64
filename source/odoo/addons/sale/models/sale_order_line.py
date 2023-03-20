@@ -129,7 +129,8 @@ class SaleOrderLine(models.Model):
         string="Taxes",
         compute='_compute_tax_id',
         store=True, readonly=False, precompute=True,
-        context={'active_test': False})
+        context={'active_test': False},
+        check_company=True)
 
     # Tech field caching pricelist rule used for price & discount computation
     pricelist_item_id = fields.Many2one(
@@ -306,8 +307,9 @@ class SaleOrderLine(models.Model):
         for line in self:
             if not line.product_id:
                 continue
-
-            name = line.with_context(lang=line.order_partner_id.lang)._get_sale_order_line_multiline_description_sale()
+            if not line.order_partner_id.is_public:
+                line = line.with_context(lang=line.order_partner_id.lang)
+            name = line._get_sale_order_line_multiline_description_sale()
             if line.is_downpayment and not line.display_type:
                 context = {'lang': line.order_partner_id.lang}
                 dp_state = line._get_downpayment_state()

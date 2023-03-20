@@ -7,9 +7,10 @@
 # Mads Søndergaard, 2022
 # Jorunn D. Newth, 2022
 # Cécile Collart <cco@odoo.com>, 2022
+# Lars Aam <lars.aam@vikenfiber.no>, 2022
 # Marius Stedjan <marius@stedjan.com>, 2022
 # Martin Trigaux, 2022
-# Lars Aam <lars.aam@vikenfiber.no>, 2023
+# Lars Petter Lilleng, 2023
 # Henning Fyllingsnes, 2023
 # 
 msgid ""
@@ -3378,7 +3379,7 @@ msgstr "Avisstativ"
 #. module: point_of_sale
 #: model:ir.model.fields,field_description:point_of_sale.field_pos_session__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
-msgstr "Neste aktivitets hendelse"
+msgstr "Neste kalender aktivitet"
 
 #. module: point_of_sale
 #: model:ir.model.fields,field_description:point_of_sale.field_pos_session__activity_date_deadline
@@ -4202,7 +4203,7 @@ msgstr "Kassaplukk"
 #. module: point_of_sale
 #: model:ir.model,name:point_of_sale.model_stock_picking_type
 msgid "Picking Type"
-msgstr ""
+msgstr "Plukktype"
 
 #. module: point_of_sale
 #. odoo-python
@@ -6841,6 +6842,15 @@ msgstr "Type unntaks-aktivitet på posten."
 
 #. module: point_of_sale
 #. odoo-python
+#. openerp-web
+#: code:addons/point_of_sale/static/src/js/Screens/ReceiptScreen/ReceiptScreen.js:0
+#, python-format
+msgid ""
+"This order is not yet synced to server. Make sure it is synced then try "
+"again."
+msgstr ""
+
+#. module: point_of_sale
 #: code:addons/point_of_sale/models/pos_session.py:0
 #, python-format
 msgid ""
@@ -7000,9 +7010,10 @@ msgstr "Uuid"
 #. module: point_of_sale
 #. odoo-javascript
 #: code:addons/point_of_sale/static/src/xml/Popups/CashMoveReceipt.xml:0
-#, python-format
-msgid "VAT:"
-msgstr "MVA:"
+#: code:addons/point_of_sale/static/src/js/Screens/ReceiptScreen/ReceiptScreen.js:0
+#, python-format, python-format
+msgid "Unsynced order"
+msgstr ""
 
 #. module: point_of_sale
 #. odoo-javascript

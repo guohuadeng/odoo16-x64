@@ -6320,6 +6320,14 @@ msgstr "Количество"
 #. odoo-python
 #: code:addons/stock/models/stock_quant.py:0
 #, python-format
+msgid ""
+"Quants are auto-deleted when appropriate. If you must manually delete them, "
+"please ask a stock manager to do it."
+msgstr ""
+
+#. module: stock
+#: code:addons/stock/models/stock_quant.py:0
+#, python-format
 msgid "Quant's creation is restricted, you can't do this operation."
 msgstr ""
 "Создание количественного анализа ограничено, вы не можете выполнить эту "
@@ -9946,6 +9954,13 @@ msgstr "Вы можете вернуть только выполнены ком�
 #, python-format
 msgid "You may only return one picking at a time."
 msgstr "Вы можете вернуть только одно комплектования за один раз."
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/model/stock_picking.py:0
+#, python-format
+msgid " You might want to update the locations of this transfer's operations "
+msgstr ""
 
 #. module: stock
 #. odoo-python

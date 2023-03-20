@@ -6,6 +6,7 @@
 # 敬雲 林 <chingyun@yuanchih-consult.com>, 2022
 # Martin Trigaux, 2022
 # Benson <Benson.Dr@Gmail.com>, 2023
+# Tony Ng, 2023
 # 
 msgid ""
 msgstr ""
@@ -13,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-02 10:33+0000\n"
 "PO-Revision-Date: 2022-09-22 05:57+0000\n"
-"Last-Translator: Benson <Benson.Dr@Gmail.com>, 2023\n"
+"Last-Translator: Tony Ng, 2023\n"
 "Language-Team: Chinese (Taiwan) (https://www.transifex.com/odoo/teams/41243/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -353,6 +354,12 @@ msgid ""
 "            VAT Included\n"
 "        </span>"
 msgstr ""
+"<span groups=\"account.group_show_line_subtotals_tax_excluded\" class=\"h6 text-muted\">\n"
+"            總額（未連增值稅）\n"
+"        </span>\n"
+"        <span groups=\"account.group_show_line_subtotals_tax_included\" class=\"h6 text-muted\">\n"
+"            總額（連增值稅）\n"
+"        </span>"
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.checkout
@@ -1392,6 +1399,19 @@ msgid ""
 "\n"
 "- If all the products in the checkout are free, and the customer does not visit the shipping page to add a shipping fee or the shipping fee is also free, then the email won't be sent."
 msgstr ""
+"客戶需要登入，否則無法得知電郵地址。\n"
+"\n"
+"- 若潛在客戶提出了一個或多個結賬要求然後放棄，再在復原電郵發出之前完成一次銷售，電郵就不會發出。\n"
+"\n"
+"- 若用戶已手動發送復原電郵，郵件將不會發送第二次。\n"
+"\n"
+"- 若在客戶嘗試完成結賬時發生付款處理錯誤，電郵不會發送。\n"
+"\n"
+"- 若你的商店不支援送貨至客戶地址，電郵不會發送。\n"
+"\n"
+"- 若結賬要求涉及的產品，沒有任何一件可供購買（例如沒有存貨），電郵不會發送。\n"
+"\n"
+"- 若結賬要求涉及的所有產品均是免費，而客戶未有在送貨頁面加入運費，或者運費是免費，電郵不會發送。"
 
 #. module: website_sale
 #: model:ir.ui.menu,name:website_sale.menu_orders_customers
@@ -1823,7 +1843,7 @@ msgstr "網格"
 #: model_terms:ir.ui.view,arch_db:website_sale.sale_report_view_search_website
 #: model_terms:ir.ui.view,arch_db:website_sale.view_sales_order_filter_ecommerce_abondand
 msgid "Group By"
-msgstr "分組依據"
+msgstr "分組方式"
 
 #. module: website_sale
 #: model:ir.model,name:website_sale.model_ir_http
@@ -3273,7 +3293,7 @@ msgstr "樣品"
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.view_sales_order_filter_ecommerce_abondand
 msgid "Search Abandoned Sales Orders"
-msgstr "搜尋放棄的銷售訂單"
+msgstr "搜尋遭放棄的銷售訂單"
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.snippet_options

@@ -8,14 +8,15 @@
 # Martin Trigaux, 2022
 # Michael Hofer, 2022
 # Thomas, 2023
+# Larissa Manderfeld, 2023
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:51+0000\n"
+"POT-Creation-Date: 2023-03-10 09:48+0000\n"
 "PO-Revision-Date: 2022-09-22 05:54+0000\n"
-"Last-Translator: Thomas, 2023\n"
+"Last-Translator: Larissa Manderfeld, 2023\n"
 "Language-Team: German (https://www.transifex.com/odoo/teams/41243/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -42,13 +43,6 @@ msgstr "Positionen"
 #: model:ir.model.fields,field_description:sale.field_payment_transaction__sale_order_ids_nbr
 msgid "# of Sales Orders"
 msgstr "Verkaufsaufträge"
-
-#. module: sale
-#. odoo-python
-#: code:addons/sale/models/sale_order.py:0
-#, python-format
-msgid "%(amount)s due %(date)s"
-msgstr "%(amount)s gültig bis %(date)s"
 
 #. module: sale
 #. odoo-python
@@ -637,7 +631,7 @@ msgstr "<strong class=\"mr16\">Zwischensumme</strong>"
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_template
 msgid "<strong class=\"text-muted\">Salesperson</strong>"
-msgstr "<strong class=\"text-muted\">Verkäufer</strong>"
+msgstr "<strong class=\"text-muted\">Vertriebsmitarbeiter</strong>"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_content
@@ -676,7 +670,7 @@ msgstr "<strong>Angebotsdatum:</strong>"
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
 msgid "<strong>Salesperson:</strong>"
-msgstr "<strong>Verkäufer:</strong>"
+msgstr "<strong>Vertriebsmitarbeiter</strong>"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
@@ -1018,6 +1012,11 @@ msgid ""
 "purchase amount, period). Rewards can be discounts (% or amount) or free "
 "products."
 msgstr ""
+"Steigern Sie Ihren Umsatz mit einer Vielzahl von Programmen: Gutscheine, "
+"Werbeaktionen, Geschenkkarten, Treueprogramme. Es können spezifische "
+"Bedingungen festgelegt werden (Produkte, Kunden, Mindesteinkaufsbetrag, "
+"Zeitraum). Belohnungen können Rabatte (% oder Betrag) oder kostenlose "
+"Produkte sein."
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_account_bank_statement_line__campaign_id
@@ -1743,6 +1742,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale.field_sale_order__validity_date
 msgid "Expiration"
 msgstr "Ablauf"
+
+#. module: sale
+#. odoo-python
+#: code:addons/sale/models/sale_order.py:0
+#, python-format
+msgid "Expires on %(date)s"
+msgstr ""
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.view_order_product_search
@@ -2714,6 +2720,11 @@ msgid "Order Date:"
 msgstr "Auftragsdatum:"
 
 #. module: sale
+#: model_terms:ir.ui.view,arch_db:sale.view_order_product_search
+msgid "Order Date: Last 365 Days"
+msgstr ""
+
+#. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_order__order_line
 #: model_terms:ir.ui.view,arch_db:sale.view_order_form
 msgid "Order Lines"
@@ -3146,8 +3157,10 @@ msgid "Quotation Sent"
 msgstr "Angebot gesendet"
 
 #. module: sale
+#. odoo-python
 #: code:addons/sale/models/res_config_settings.py:0
 #: model:ir.model.constraint,message:sale.constraint_res_company_check_quotation_validity_days
+#, python-format
 msgid "Quotation Validity is required and must be greater than 0."
 msgstr ""
 "Die Gültigkeit des Angebots ist erforderlich und muss größer als 0 sein."
@@ -3556,7 +3569,7 @@ msgstr "Umsatz: Unversteuerte Summe"
 #: model_terms:ir.ui.view,arch_db:sale.view_sales_order_filter
 #: model_terms:ir.ui.view,arch_db:sale.view_sales_order_line_filter
 msgid "Salesperson"
-msgstr "Verkäufer"
+msgstr "Vertriebsmitarbeiter"
 
 #. module: sale
 #. odoo-python
@@ -4156,14 +4169,9 @@ msgid ""
 "There is nothing to invoice!\n"
 "\n"
 "Reason(s) of this behavior could be:\n"
-"- You should deliver your products before invoicing them: Click on the \"truck\" icon (top-right of your screen) and follow instructions.\n"
+"- You should deliver your products before invoicing them.\n"
 "- You should modify the invoicing policy of your product: Open the product, go to the \"Sales\" tab and modify invoicing policy from \"delivered quantities\" to \"ordered quantities\". For Services, you should modify the Service Invoicing Policy to 'Prepaid'."
 msgstr ""
-"Es gibt nichts in Rechnung zu stellen!\n"
-"\n"
-"Mögliche Ursache(n) könnten sein:\n"
-"- Sie sollten Ihre Produkte ausliefern, bevor Sie sie in Rechnung stellen: Klicken Sie auf das \"LKW\"-Symbol (oben rechts auf Ihrem Bildschirm) und folgen Sie den Anweisungen.\n"
-"- Sie sollten die Abrechnungsregeln für Ihr Produkt ändern: Öffnen Sie das Produkt, gehen Sie auf die Registerkarte \"Verkauf\" und ändern Sie die Abrechnungsregel von \"gelieferte Mengen\" auf \"bestellte Mengen\". Für Dienstleistungen sollten Sie die Abrechnungsregel auf \" Vorkasse\" ändern."
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.res_config_settings_view_form

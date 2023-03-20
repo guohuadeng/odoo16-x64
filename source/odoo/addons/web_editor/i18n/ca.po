@@ -1808,7 +1808,7 @@ msgstr "Contingut multimèdia"
 #: code:addons/web_editor/static/src/xml/wysiwyg.xml:0
 #, python-format
 msgid "Medium"
-msgstr "Mitja"
+msgstr "Mitjà"
 
 #. module: web_editor
 #. odoo-javascript
@@ -2438,7 +2438,7 @@ msgstr "Saturació"
 #: model_terms:ir.ui.view,arch_db:web_editor.snippets
 #, python-format
 msgid "Save"
-msgstr "Desa"
+msgstr "Desar"
 
 #. module: web_editor
 #. odoo-javascript
@@ -2457,7 +2457,7 @@ msgstr "Guardar i recarregar"
 #. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippets
 msgid "Save record"
-msgstr "Desa el registre"
+msgstr "Desar el registre"
 
 #. module: web_editor
 #. odoo-javascript

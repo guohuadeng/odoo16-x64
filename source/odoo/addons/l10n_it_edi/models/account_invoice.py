@@ -21,7 +21,7 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     l10n_it_edi_transaction = fields.Char(copy=False, string="FatturaPA Transaction")
-    l10n_it_edi_attachment_id = fields.Many2one('ir.attachment', copy=False, string="FatturaPA Attachment")
+    l10n_it_edi_attachment_id = fields.Many2one('ir.attachment', copy=False, string="FatturaPA Attachment", ondelete="restrict")
 
     l10n_it_stamp_duty = fields.Float(default=0, string="Dati Bollo", readonly=True, states={'draft': [('readonly', False)]})
 
@@ -38,6 +38,12 @@ class AccountMove(models.Model):
             einvoice = invoice.edi_document_ids.filtered(lambda d: d.edi_format_id == fattura_pa).sudo()
             invoice.l10n_it_einvoice_id = einvoice.attachment_id
             invoice.l10n_it_einvoice_name = einvoice.attachment_id.name
+
+    @api.depends('l10n_it_edi_transaction')
+    def _compute_show_reset_to_draft_button(self):
+        super(AccountMove, self)._compute_show_reset_to_draft_button()
+        for move in self.filtered(lambda m: m.l10n_it_edi_transaction):
+            move.show_reset_to_draft_button = False
 
     def invoice_generate_xml(self):
         self.ensure_one()

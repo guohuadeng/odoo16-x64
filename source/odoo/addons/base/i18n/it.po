@@ -6,6 +6,8 @@
 # Martin Trigaux, 2022
 # Friederike Fasterling-Nesselbosch, 2022
 # Rita Amboni, 2022
+# Luca Carlo, 2023
+# Marianna Ciofani, 2023
 # Sergio Zanchetta <primes2h@gmail.com>, 2023
 # 
 msgid ""
@@ -3229,6 +3231,13 @@ msgid ""
 "\n"
 "The `pdfminer.six` Python library has to be installed in order to index PDF files\n"
 msgstr ""
+"\n"
+"Elenco allegati e indicizzazione documenti\n"
+"========================================\n"
+"* Mostra allegati in cima alle schede\n"
+"* Indicizzazione documenti: ODT, PDF, XLSX, DOCX\n"
+"\n"
+"Per indicizzare i file PDF deve essere installata la libreria `pdfminer.six`\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_au
@@ -8621,6 +8630,8 @@ msgid ""
 "\n"
 "This module provides the link between quality steps and IoT devices. \n"
 msgstr ""
+"\n"
+"Modulo che fornisce il collegamento tra fasi della qualità e dispositivi IoT. \n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_test_website_slides_full
@@ -9125,6 +9136,9 @@ msgid ""
 "\n"
 "    Supported documents are SO, PO.\n"
 msgstr ""
+" Modulo per la sincronizzazione di documenti tra diverse aziende. Per esempio, consente la creazione automatica di un ordine di vendita quando viene convalidato un ordine di acquisto che ha come fornitore un'altra azienda del sistema, e viceversa.\n"
+"\n"
+"    I documenti supportati sono OdV/OdA.\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_account_inter_company_rules
@@ -10826,7 +10840,7 @@ msgstr "Trasferimenti automatici conto"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_generic_auto_transfer_demo
 msgid "Account Automatic Transfers Demo Data"
-msgstr ""
+msgstr "Dati dimostrativi per trasferimenti automatici conto"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_website_sale_account_avatax
@@ -10878,7 +10892,7 @@ msgstr "Estratto fattura contabile"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_account_invoice_extract_purchase
 msgid "Account Invoice Extract Purchase"
-msgstr ""
+msgstr "Acquisti estrazione fattura contabile"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_partner_bank__acc_number
@@ -12241,7 +12255,7 @@ msgstr "Architettura"
 #. module: base
 #: model:ir.model.fields,field_description:base.field_reset_view_arch_wizard__arch_diff
 msgid "Architecture Diff"
-msgstr ""
+msgstr "Diff. architettura"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.edit_menu_access_search
@@ -12917,7 +12931,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,summary:base.module_test_base_automation
 msgid "Base Automation Tests: Ensure Flow Robustness"
-msgstr ""
+msgstr "Test per automazione di base: garantiscono la robustezza del flusso"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_model_fields__state__base
@@ -13540,7 +13554,7 @@ msgstr "Per impostazione predefinita il widget usa le informazioni del campo"
 #. module: base
 #: model:res.groups,name:base.group_sanitize_override
 msgid "Bypass HTML Field Sanitize"
-msgstr ""
+msgstr "Bypassare la sanificazione dei campi HTML"
 
 #. module: base
 #: model:res.partner.industry,full_name:base.res_partner_industry_C
@@ -14068,6 +14082,10 @@ msgid ""
 "- TLS (STARTTLS): TLS encryption is requested at start of SMTP session (Recommended)\n"
 "- SSL/TLS: SMTP sessions are encrypted with SSL/TLS through a dedicated port (default: 465)"
 msgstr ""
+"Scegli lo schema di crittografia della connessione:\n"
+"- Nessuna: le sessioni SMTP vengono effettuate in chiaro.\n"
+"- TILS (STARTTLS): viene richiesta la crittografia TLS all'inizio della sessione SMTP (consigliata)\n"
+"- SSL/TLS: le sessioni SMTP vengono crittografate con SSL/TLS tramite una porta dedicata (predefinita: 465)"
 
 #. module: base
 #: model:res.country,name:base.cx
@@ -14345,7 +14363,7 @@ msgstr "Favicon Aziendale"
 #: model:ir.model.fields,field_description:base.field_res_partner__company_registry
 #: model:ir.model.fields,field_description:base.field_res_users__company_registry
 msgid "Company ID"
-msgstr ""
+msgstr "ID Azienda"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_company__logo
@@ -14582,6 +14600,8 @@ msgid ""
 "Connect to your server through your usual username and password. \n"
 "This is the most basic SMTP authentication process and may not be accepted by all providers. \n"
 msgstr ""
+"Connettiti al tuo server utilizzando il tuo solito nome utente e password.\n"
+"Questo è il processo di autenticazione SMTP più semplice e potrebbe non essere accettato da tutti i provider.\n"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.ir_mail_server_form
@@ -14591,7 +14611,7 @@ msgstr "Connessione"
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_mail_server__smtp_encryption
 msgid "Connection Encryption"
-msgstr ""
+msgstr "Crittografia connessione"
 
 #. module: base
 #. odoo-python
@@ -16496,7 +16516,7 @@ msgstr "Repubblica Dominicana - Contabilità"
 #: code:addons/base/models/ir_qweb_fields.py:0
 #, python-format
 msgid "Don't display the font awesome marker"
-msgstr ""
+msgstr "Non visualizzare l'indicatore Font Awesome"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_actions_todo__state__done
@@ -16642,7 +16662,7 @@ msgstr ""
 #. module: base
 #: model:res.country,vat_label:base.us
 msgid "EIN"
-msgstr ""
+msgstr "EIN"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_hw_escpos
@@ -17044,7 +17064,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,summary:base.module_contacts_enterprise
 msgid "Enterprise features on contacts"
-msgstr ""
+msgstr "Funzionalità Enterprise per i contatti"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_website
@@ -17563,7 +17583,7 @@ msgstr ""
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_mail_server__from_filter
 msgid "FROM Filtering"
-msgstr ""
+msgstr "Filtro mittente"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_industry_fsm_sms
@@ -17849,12 +17869,12 @@ msgstr "Assistenza sul campo - Vendita"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_industry_fsm_report
 msgid "Field Service Reports"
-msgstr ""
+msgstr "Resoconti per assistenza sul campo"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_industry_fsm_sale_report
 msgid "Field Service Reports - Sale"
-msgstr ""
+msgstr "Rendiconti assistenza sul campo - Vendita"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_industry_fsm_stock
@@ -18127,7 +18147,7 @@ msgstr "Segnala"
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_lang__flag_image_url
 msgid "Flag Image Url"
-msgstr ""
+msgstr "URL immagine bandiera"
 
 #. module: base
 #: model:ir.module.category,name:base.module_category_human_resources_fleet
@@ -19385,7 +19405,7 @@ msgstr "Estratto spese HR"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_hr_expense_predict_product
 msgid "Hr Expense Predict product"
-msgstr ""
+msgstr "Previsione prodotto spese RU"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_hr_recruitment_extract
@@ -20446,6 +20466,9 @@ msgid ""
 "comma-separated list of valid field names (optionally followed by asc/desc "
 "for the direction)"
 msgstr ""
+"È stato specificato un \"ordine\" non valido (%s). Una specifica corretta "
+"per \"ordine\" è un elenco di nomi campo validi (seguito opzionalmente da "
+"asc/desc per la direzione)"
 
 #. module: base
 #. odoo-python
@@ -20847,7 +20870,7 @@ msgstr "Articoli del giornale associati al contatto"
 #: code:addons/base/models/ir_qweb_fields.py:0
 #, python-format
 msgid "Json"
-msgstr ""
+msgstr "Json"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__res_company__base_onboarding_company_state__just_done
@@ -21720,7 +21743,7 @@ msgstr "Log"
 #: code:addons/base/models/ir_qweb_fields.py:0
 #, python-format
 msgid "Long"
-msgstr ""
+msgstr "Esteso"
 
 #. module: base
 #: model:ir.module.category,name:base.module_category_human_resources_lunch
@@ -21822,7 +21845,7 @@ msgstr "Funzionalità MRP per controllo qualità con IoT"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_sale_purchase_stock
 msgid "MTO Sale <-> Purchase"
-msgstr ""
+msgstr "MTO - Vendita <-> Acquisto"
 
 #. module: base
 #: model:res.country,name:base.mo
@@ -21859,7 +21882,7 @@ msgstr "Mail Group"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_mail_mobile
 msgid "Mail Mobile"
-msgstr ""
+msgstr "Posta per dispositivo mobile"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_mail_plugin
@@ -23205,7 +23228,7 @@ msgstr "NIT"
 #. module: base
 #: model:res.country,vat_label:base.id
 msgid "NPWP"
-msgstr ""
+msgstr "NPWP"
 
 #. module: base
 #. odoo-python
@@ -25084,6 +25107,9 @@ msgid ""
 "One or more of the selected modules have already been uninstalled, if you "
 "believe this to be an error, you may try again later or contact support."
 msgstr ""
+"Uno o più moduli selezionati sono già stati disinstallati. Nel caso si "
+"tratti di un errore, è possibile riprovare più tardi o contattare il "
+"supporto."
 
 #. module: base
 #. odoo-python
@@ -25691,7 +25717,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,summary:base.module_l10n_pe
 msgid "PCGE Simplified"
-msgstr ""
+msgstr "PCGE semplificato"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_actions_report__report_type__qweb-pdf
@@ -26021,7 +26047,7 @@ msgstr ""
 #: code:addons/base/models/ir_qweb_fields.py:0
 #, python-format
 msgid "Pattern to format"
-msgstr ""
+msgstr "Modello da formattare"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_hr_payroll_account_sepa
@@ -26056,97 +26082,97 @@ msgstr "Gestione follow-up pagamenti"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_adyen
 msgid "Payment Provider: Adyen"
-msgstr ""
+msgstr "Fornitore pagamento: Adyen"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_alipay
 msgid "Payment Provider: Alipay"
-msgstr ""
+msgstr "Fornitore pagamento: Alipay"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_aps
 msgid "Payment Provider: Amazon Payment Services"
-msgstr ""
+msgstr "Fornitore pagamento: Amazon Payment"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_asiapay
 msgid "Payment Provider: AsiaPay"
-msgstr ""
+msgstr "Fornitore pagamento: AsiaPay"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_authorize
 msgid "Payment Provider: Authorize.Net"
-msgstr ""
+msgstr "Fornitore pagamento: Authorize.Net"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_buckaroo
 msgid "Payment Provider: Buckaroo"
-msgstr ""
+msgstr "Fornitore pagamento: Buckaroo"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_custom
 msgid "Payment Provider: Custom Payment Modes"
-msgstr ""
+msgstr "Fornitore pagamento: Modalità di pagamento personali"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_demo
 msgid "Payment Provider: Demo"
-msgstr ""
+msgstr "Fornitore pagamento: Demo"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_flutterwave
 msgid "Payment Provider: Flutterwave"
-msgstr ""
+msgstr "Fornitore pagamento: Flutterwave"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_mercado_pago
 msgid "Payment Provider: Mercado Pago"
-msgstr ""
+msgstr "Fornitore pagamento: Mercado Pago"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_mollie
 msgid "Payment Provider: Mollie"
-msgstr ""
+msgstr "Fornitore pagamento: Mollie"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_ogone
 msgid "Payment Provider: Ogone"
-msgstr ""
+msgstr "Fornitore pagamento: Ogone"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_payulatam
 msgid "Payment Provider: PayU Latam"
-msgstr ""
+msgstr "Fornitore pagamento: PayU Latam"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_payumoney
 msgid "Payment Provider: PayUmoney"
-msgstr ""
+msgstr "Fornitore pagamento: PayUmoney"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_paypal
 msgid "Payment Provider: Paypal"
-msgstr ""
+msgstr "Fornitore pagamento: Paypal"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_razorpay
 msgid "Payment Provider: Razorpay"
-msgstr ""
+msgstr "Fornitore pagamento: Razorpay"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_sepa_direct_debit
 msgid "Payment Provider: Sepa Direct Debit"
-msgstr ""
+msgstr "Fornitore pagamento: Addebito diretto Sepa"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_stripe
 msgid "Payment Provider: Stripe"
-msgstr ""
+msgstr "Fornitore pagamento: Stripe"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_payment_sips
 msgid "Payment Provider: Worldline SIPS"
-msgstr ""
+msgstr "Fornitore pagamento: Worldline SIPS"
 
 #. module: base
 #: model:ir.module.category,name:base.module_category_accounting_payment_providers
@@ -27444,7 +27470,7 @@ msgstr "RFC"
 #. module: base
 #: model:res.country,vat_label:base.do
 msgid "RNC"
-msgstr ""
+msgstr "RNC"
 
 #. module: base
 #: model:res.country,vat_label:base.hn
@@ -27857,7 +27883,7 @@ msgstr "Resoconto XML"
 #: model:ir.module.category,name:base.module_category_accounting_localizations_reporting
 #: model:ir.ui.menu,name:base.reporting_menuitem
 msgid "Reporting"
-msgstr "Rendicontazione"
+msgstr "Rendiconto"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_l10n_ar_reports
@@ -27907,12 +27933,12 @@ msgstr "Ripristina vista"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.reset_view_arch_wizard_view
 msgid "Reset View Architecture"
-msgstr ""
+msgstr "Ripristino architettura vista"
 
 #. module: base
 #: model:ir.model,name:base.model_reset_view_arch_wizard
 msgid "Reset View Architecture Wizard"
-msgstr ""
+msgstr "Procedura di ripristino architettura vista"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__reset_view_arch_wizard__reset_mode__other_view
@@ -28162,7 +28188,7 @@ msgstr "Server SMTP"
 #. module: base
 #: model:ir.module.module,summary:base.module_sale_purchase_stock
 msgid "SO/PO relation in case of MTO"
-msgstr ""
+msgstr "Relazione OdV/OdA in caso di MTO"
 
 #. module: base
 #: model:ir.model.fields,help:base.field_ir_model__order
@@ -28551,7 +28577,7 @@ msgstr "Azioni pianificate"
 #: model:ir.actions.act_window,name:base.ir_cron_trigger_action
 #: model:ir.ui.menu,name:base.ir_cron_trigger_menu
 msgid "Scheduled Actions Triggers"
-msgstr ""
+msgstr "Trigger di azioni pianificate"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_cron__user_id
@@ -28918,7 +28944,7 @@ msgstr "Formato Separatore"
 #: code:addons/base/models/ir_qweb_fields.py:0
 #, python-format
 msgid "Separator use to split the address from the display_name."
-msgstr ""
+msgstr "Separatore utilizzato per dividere l'indirizzo da display_name."
 
 #. module: base
 #: model:ir.model,name:base.model_ir_sequence
@@ -29150,7 +29176,7 @@ msgstr "Lista dei desideri degli acquirenti"
 #: code:addons/base/models/ir_qweb_fields.py:0
 #, python-format
 msgid "Short"
-msgstr ""
+msgstr "Breve"
 
 #. module: base
 #: model:ir.model,name:base.model_res_users_apikeys_show
@@ -29815,7 +29841,7 @@ msgstr "Nome provincia"
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_country__state_required
 msgid "State Required"
-msgstr ""
+msgstr "Provincia richiesta"
 
 #. module: base
 #: model:res.country,name:base.ps
@@ -30348,7 +30374,7 @@ msgstr "Termini e condizioni"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_test_base_automation
 msgid "Test - Base Automation"
-msgstr ""
+msgstr "Test- Automazione di base"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_test_resource
@@ -30363,7 +30389,7 @@ msgstr "Test API"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_test_action_bindings
 msgid "Test Action Bindings"
-msgstr ""
+msgstr "Test per associazioni alle azioni"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_test_l10n_be_hr_payroll_account
@@ -30379,7 +30405,7 @@ msgstr "Prova Connessione"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_test_data_cleaning
 msgid "Test Data Cleaning"
-msgstr ""
+msgstr "Test per pulizia dati"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_test_discuss_full
@@ -30404,7 +30430,7 @@ msgstr "Prova il flusso di eventi completo"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_test_website_slides_full
 msgid "Test Full eLearning Flow"
-msgstr ""
+msgstr "Test per flusso e-learning completo"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_test_http
@@ -30434,12 +30460,12 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,summary:base.module_test_marketing_automation
 msgid "Test Suite for Automated Marketing Campaigns"
-msgstr ""
+msgstr "Serie di test per campagne di marketing automatiche"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_test_data_cleaning
 msgid "Test Suite for Data Cleaning"
-msgstr ""
+msgstr "Serie di test per pulizia dati"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_test_discuss_full_enterprise
@@ -30476,7 +30502,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_test_testing_utilities
 msgid "Test testing utilities"
-msgstr ""
+msgstr "Test per utilità di test"
 
 #. module: base
 #: model:ir.module.module,description:base.module_test_access_rights
@@ -30498,7 +30524,7 @@ msgstr "Prove"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_test_apikeys
 msgid "Tests flow of API keys"
-msgstr ""
+msgstr "Flusso di test di chiavi API"
 
 #. module: base
 #: model:ir.module.module,description:base.module_test_read_group
@@ -30608,6 +30634,9 @@ msgid ""
 "country format. You can use '/' to indicate that the partner is not subject "
 "to tax."
 msgstr ""
+"Il numero di partita IVA. I valori saranno convalidati in base al formato "
+"della Nazione. Puoi usare '/' per indicare che il partner non è soggetto a "
+"tassazione."
 
 #. module: base
 #: model:ir.model.constraint,message:base.constraint_res_lang_url_code_uniq
@@ -31105,6 +31134,8 @@ msgid ""
 "The registry number of the company. Use it if it is different from the Tax "
 "ID. It must be unique across all partners of a same country"
 msgstr ""
+"Il numero di registro dell'azienda. Inseriscilo se è diverso dalla partita "
+"IVA. Deve essere unico per tutti i partner di una stessa nazione"
 
 #. module: base
 #. odoo-python
@@ -31184,7 +31215,7 @@ msgstr "Il server ha rifiutato la connessione di prova con l'errore %(repl)s"
 msgid ""
 "The server refused the test recipient (%(email_to)s) with error %(repl)s"
 msgstr ""
-"Il server ha rifuitato il destinatario della prova (%(email_to)s) con "
+"Il server ha rifiutato il destinatario della prova (%(email_to)s) con "
 "l'errore %(repl)s"
 
 #. module: base
@@ -31504,6 +31535,9 @@ msgid ""
 "present in a separate module as it contains models used only to perform\n"
 "tests independently to functional aspects of other models."
 msgstr ""
+"Modulo che contiene test relativi alla automazione di base. Si trovano\n"
+"in un modulo separato in quanto contiene modelli utilizzati solo per eseguire\n"
+"test indipendenti da aspetti funzionali di altri modelli."
 
 #. module: base
 #: model:ir.module.module,description:base.module_test_mail
@@ -31563,6 +31597,9 @@ msgid ""
 "present in a separate module as it contains models used only to perform\n"
 "tests independently to functional aspects of other models. "
 msgstr ""
+"Modulo che contiene test relativi al timer. Si trovano\n"
+"in un modulo separato in quanto contiene modelli utilizzati solo per eseguire\n"
+"test indipendenti da aspetti funzionali di altri modelli. "
 
 #. module: base
 #: model:ir.module.module,description:base.module_test_mail_full
@@ -31572,6 +31609,10 @@ msgid ""
 "contains models used only to perform tests independently to functional aspects of\n"
 "real applications. "
 msgstr ""
+"Modulo che contiene test relativi a varie funzionalità\n"
+"e sottomoduli della posta. Si trovano in un modulo separato in quanto contiene\n"
+"modelli utilizzati solo per eseguire test indipendenti da aspetti funzionali di\n"
+"applicazioni reali. "
 
 #. module: base
 #: model:ir.module.module,description:base.module_social_test_full
@@ -31589,6 +31630,9 @@ msgid ""
 "present in a separate module as it contains models used only to perform\n"
 "tests independently to functional aspects of other models. "
 msgstr ""
+"Modulo che contiene test relativi alla vista coorte. Si trovano\n"
+"in un modulo separato in quanto contiene modelli utilizzati solo per eseguire\n"
+"test indipendenti da aspetti funzionali di altri modelli."
 
 #. module: base
 #: model:ir.module.module,description:base.module_test_website_modules
@@ -32022,7 +32066,7 @@ msgstr "Transitorio: vero"
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_groups__trans_implied_ids
 msgid "Transitively inherits"
-msgstr ""
+msgstr "Ereditati in modo transitivo"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_model_fields__translate
@@ -34350,7 +34394,7 @@ msgstr "fatto"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid "e.g. \"B2B\", \"VIP\", \"Consulting\", ..."
-msgstr ""
+msgstr "es. \"B2B\", \"VIP\", \"Consulenza\", ..."
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_category_form
@@ -34605,7 +34649,7 @@ msgstr "ir.actions.server"
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_model_fields__ttype__json
 msgid "json"
-msgstr ""
+msgstr "json"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_it_stock_ddt

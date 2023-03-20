@@ -16,9 +16,9 @@
 # Triine Aavik <triine@avalah.ee>, 2022
 # Piia Paurson <piia@avalah.ee>, 2022
 # Ants Peetsalu <ants@avalah.ee>, 2022
-# Leaanika Randmets, 2022
 # Anna, 2023
 # Jana Jaakson, 2023
+# Leaanika Randmets, 2023
 # 
 msgid ""
 msgstr ""
@@ -26,7 +26,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-02 10:33+0000\n"
 "PO-Revision-Date: 2022-09-22 05:54+0000\n"
-"Last-Translator: Jana Jaakson, 2023\n"
+"Last-Translator: Leaanika Randmets, 2023\n"
 "Language-Team: Estonian (https://www.transifex.com/odoo/teams/41243/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -570,9 +570,9 @@ msgid ""
 "A consumable product is a product for which stock is not managed.\n"
 "A service is a non-material product you provide."
 msgstr ""
-"Ladustatav toode on toode, millel haldate laovarusid. Lao moodul peab olema alla laetud.\n"
+"Ladustatav toode on toode, millel haldate laovarusid. Alla peab olema laetud Lao moodul.\n"
 "Tarbitav toode on toode, millel ei hallata laovarusid.\n"
-"Teenus on teiepoolt pakutav mittemateriaalne toode."
+"Teenus on Teie poolt pakutav mittemateriaalne toode."
 
 #. module: purchase
 #: model:res.groups,name:purchase.group_warning_purchase
@@ -1165,7 +1165,7 @@ msgstr "Päevad enne saatelehte"
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_report__delay
 msgid "Days to Confirm"
-msgstr "Päeva kinnitamiseks"
+msgstr "Päevi kinnitamiseks"
 
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_report__delay_pass
@@ -1316,7 +1316,7 @@ msgstr "Keelatud väärtused mittearvestataval ostutellimuse real"
 #: code:addons/purchase/models/account_invoice.py:0
 #, python-format
 msgid "From %s document"
-msgstr ""
+msgstr "%s dokumendilt"
 
 #. module: purchase
 #: model:ir.model.fields.selection,name:purchase.selection__purchase_order__invoice_status__invoiced
@@ -1529,7 +1529,7 @@ msgstr "Ostutellimuse täitmisaeg"
 #: code:addons/purchase/static/src/js/tours/purchase.js:0
 #, python-format
 msgid "Let's create your first request for quotation."
-msgstr "Loome teie esimese hinnapäringu."
+msgstr "Loome Teie esimese hinnapäringu."
 
 #. module: purchase
 #. odoo-javascript
@@ -1581,13 +1581,14 @@ msgstr "Peamine manus"
 msgid ""
 "Make sure you only pay bills for which you received the goods you ordered"
 msgstr ""
-"Tehke kindlaks, et Te maksaksite ainult need arved, mille eest olete kauba "
+"Tehke kindlaks, et maksaksite ainult need arved, mille eest olete kauba "
 "kätte saanud"
 
 #. module: purchase
 #: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
 msgid "Manage your purchase agreements (call for tenders, blanket orders)"
-msgstr "Halda oma ostulepinguid (esita hinnapäringuid, üldised tellimused)"
+msgstr ""
+"Halda oma ostulepinguid (võrdlevad hinnapakkumised, üldised ostukokkulepped)"
 
 #. module: purchase
 #: model:ir.model.fields.selection,name:purchase.selection__purchase_order_line__qty_received_method__manual
@@ -1652,13 +1653,13 @@ msgstr "Sõnumid"
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_res_config_settings__po_double_validation_amount
 msgid "Minimum Amount"
-msgstr "Minimaalne kogus"
+msgstr "Minimaalne summa"
 
 #. module: purchase
 #: model:ir.model.fields,help:purchase.field_res_company__po_double_validation_amount
 #: model:ir.model.fields,help:purchase.field_res_config_settings__po_double_validation_amount
 msgid "Minimum amount for which a double validation is required"
-msgstr "Minimaalne kogus, mis vajab kahekordset kinnitamist"
+msgstr "Minimaalne summa, mis vajab kahekordset kinnitamist"
 
 #. module: purchase
 #: model:ir.model.constraint,message:purchase.constraint_purchase_order_line_accountable_required_fields
@@ -2498,9 +2499,9 @@ msgid ""
 "matching when you receive the products as this reference is usually written "
 "on the delivery order sent by your vendor."
 msgstr ""
-"Reference of the sales order or bid sent by the vendor. It's used to do the "
-"matching when you receive the products as this reference is usually written "
-"on the delivery order sent by your vendor."
+"Tarnija saadetud müügitellimuse või pakkumise viide. Seda kasutatakse "
+"toodete vastu võtmisel ja võrdlemisel, kuna tavaliselt on see kirjas ka "
+"tarnija saatelehtedel."
 
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_order__mail_reminder_confirmed
@@ -2633,8 +2634,8 @@ msgid ""
 "Selecting \"Blocking Message\" will throw an exception with the message and "
 "block the flow. The Message has to be written in the next field."
 msgstr ""
-"Valides 'Hoiatus' teavitab see kasutaja teatega, valides 'Blokeerimise "
-"teade' teavitab kasutajat ja peatab tegevuse. Teade tuleb kirjutada "
+"Valides 'Hoiatus' , saab kasutaja teavituse, valides 'Blokeerimise teade' "
+"saab kasutaja teavituse ja tegevus peatatakse. Teade tuleb kirjutada "
 "järgmisse lahtrisse."
 
 #. module: purchase
@@ -2865,12 +2866,12 @@ msgstr ""
 #. module: purchase
 #: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_orders
 msgid "There are currently no purchase orders for your account."
-msgstr "There are currently no purchase orders for your account."
+msgstr "Teie jaoks ei ole praegu ühtegi ostutellimust."
 
 #. module: purchase
 #: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_rfqs
 msgid "There are currently no requests for quotation for your account."
-msgstr "There are currently no requests for quotation for your account."
+msgstr "Teie jaoks ei ole praegu ühtegi hinnapäringut."
 
 #. module: purchase
 #. odoo-python

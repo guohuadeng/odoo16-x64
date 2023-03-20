@@ -229,6 +229,7 @@ odoo/addons/account/tests/test_account_account.py
 odoo/addons/account/tests/test_account_all_l10n.py
 odoo/addons/account/tests/test_account_analytic.py
 odoo/addons/account/tests/test_account_bank_statement.py
+odoo/addons/account/tests/test_account_inalterable_hash.py
 odoo/addons/account/tests/test_account_incoming_supplier_invoice.py
 odoo/addons/account/tests/test_account_invoice_report.py
 odoo/addons/account/tests/test_account_journal.py
@@ -604,7 +605,9 @@ odoo/addons/account_edi_proxy_client/models/account_edi_format.py
 odoo/addons/account_edi_proxy_client/models/account_edi_proxy_auth.py
 odoo/addons/account_edi_proxy_client/models/account_edi_proxy_user.py
 odoo/addons/account_edi_proxy_client/models/res_company.py
+odoo/addons/account_edi_proxy_client/security/account_edi_proxy_client_security.xml
 odoo/addons/account_edi_proxy_client/security/ir.model.access.csv
+odoo/addons/account_edi_proxy_client/views/account_edi_proxy_user_views.xml
 odoo/addons/account_edi_ubl_cii/__init__.py
 odoo/addons/account_edi_ubl_cii/__manifest__.py
 odoo/addons/account_edi_ubl_cii/data/account_edi_data.xml
@@ -4075,6 +4078,7 @@ odoo/addons/calendar/static/tests/systray_activity_menu_tests.js
 odoo/addons/calendar/static/tests/helpers/mock_server.js
 odoo/addons/calendar/static/tests/helpers/model_definitions_setup.js
 odoo/addons/calendar/static/tests/helpers/view_definitions_setup.js
+odoo/addons/calendar/static/tests/tours/calendar_tour.js
 odoo/addons/calendar/tests/__init__.py
 odoo/addons/calendar/tests/test_access_rights.py
 odoo/addons/calendar/tests/test_attendees.py
@@ -5270,6 +5274,7 @@ odoo/addons/event/views/event_tag_views.xml
 odoo/addons/event/views/event_templates.xml
 odoo/addons/event/views/event_ticket_views.xml
 odoo/addons/event/views/event_type_views.xml
+odoo/addons/event/views/event_views.xml
 odoo/addons/event/views/res_config_settings_views.xml
 odoo/addons/event/views/res_partner_views.xml
 odoo/addons/event_booth/__init__.py
@@ -5403,6 +5408,7 @@ odoo/addons/event_booth_sale/models/product.py
 odoo/addons/event_booth_sale/models/sale_order.py
 odoo/addons/event_booth_sale/models/sale_order_line.py
 odoo/addons/event_booth_sale/models/sale_order_template_line.py
+odoo/addons/event_booth_sale/models/sale_order_template_option.py
 odoo/addons/event_booth_sale/security/ir.model.access.csv
 odoo/addons/event_booth_sale/static/src/js/event_booth_configurator_model.js
 odoo/addons/event_booth_sale/static/src/js/sale_product_field.js
@@ -5579,6 +5585,7 @@ odoo/addons/event_sale/models/event_ticket.py
 odoo/addons/event_sale/models/product.py
 odoo/addons/event_sale/models/sale_order.py
 odoo/addons/event_sale/models/sale_order_template_line.py
+odoo/addons/event_sale/models/sale_order_template_option.py
 odoo/addons/event_sale/report/__init__.py
 odoo/addons/event_sale/report/event_event_templates.xml
 odoo/addons/event_sale/report/event_sale_report.py
@@ -6890,6 +6897,7 @@ odoo/addons/hr_expense/models/__init__.py
 odoo/addons/hr_expense/models/account_journal_dashboard.py
 odoo/addons/hr_expense/models/account_move.py
 odoo/addons/hr_expense/models/account_move_line.py
+odoo/addons/hr_expense/models/account_payment.py
 odoo/addons/hr_expense/models/analytic.py
 odoo/addons/hr_expense/models/hr_department.py
 odoo/addons/hr_expense/models/hr_employee.py
@@ -6937,6 +6945,7 @@ odoo/addons/hr_expense/tests/test_expenses_mail_import.py
 odoo/addons/hr_expense/tests/test_expenses_multi_company.py
 odoo/addons/hr_expense/views/account_journal_dashboard.xml
 odoo/addons/hr_expense/views/account_move_views.xml
+odoo/addons/hr_expense/views/account_payment_views.xml
 odoo/addons/hr_expense/views/hr_department_views.xml
 odoo/addons/hr_expense/views/hr_expense_views.xml
 odoo/addons/hr_expense/views/mail_activity_views.xml
@@ -7788,6 +7797,7 @@ odoo/addons/hr_recruitment/static/src/img/congratulations.png
 odoo/addons/hr_recruitment/static/src/js/tours/hr_recruitment.js
 odoo/addons/hr_recruitment/static/src/scss/hr_applicant.scss
 odoo/addons/hr_recruitment/static/src/scss/hr_job.scss
+odoo/addons/hr_recruitment/static/src/views/form_view.js
 odoo/addons/hr_recruitment/tests/__init__.py
 odoo/addons/hr_recruitment/tests/resume.eml
 odoo/addons/hr_recruitment/tests/test_recruitment.py
@@ -9325,10 +9335,12 @@ odoo/addons/l10n_au/data/res_currency_data.xml
 odoo/addons/l10n_au/demo/demo_company.xml
 odoo/addons/l10n_au/models/__init__.py
 odoo/addons/l10n_au/models/account_move.py
+odoo/addons/l10n_au/models/chart_template.py
 odoo/addons/l10n_au/static/description/icon.png
 odoo/addons/l10n_au/static/description/icon.svg
 odoo/addons/l10n_au/views/menuitems.xml
 odoo/addons/l10n_au/views/report_invoice.xml
+odoo/addons/l10n_au/views/res_company_views.xml
 odoo/addons/l10n_be/__init__.py
 odoo/addons/l10n_be/__manifest__.py
 odoo/addons/l10n_be/data/account.account.template.csv
@@ -9667,6 +9679,7 @@ odoo/addons/l10n_de/data/account_account_tags_data.xml
 odoo/addons/l10n_de/i18n/de.po
 odoo/addons/l10n_de/i18n/fr_BE.po
 odoo/addons/l10n_de/i18n/l10n_de.pot
+odoo/addons/l10n_de/migrations/1.1/post-migrate_update_amls.py
 odoo/addons/l10n_de/models/__init__.py
 odoo/addons/l10n_de/models/chart_template.py
 odoo/addons/l10n_de/models/datev.py
@@ -9686,6 +9699,7 @@ odoo/addons/l10n_de_skr03/data/account_tax_group_data.xml
 odoo/addons/l10n_de_skr03/data/l10n_de_skr03_chart_data.xml
 odoo/addons/l10n_de_skr03/data/l10n_de_skr03_chart_post_data.xml
 odoo/addons/l10n_de_skr03/demo/demo_company.xml
+odoo/addons/l10n_de_skr03/migrations/3.1/post-migrate_update_taxes.py
 odoo/addons/l10n_de_skr03/migrations/9.0.2.0/pre-set_tags_and_taxes_updatable.py
 odoo/addons/l10n_de_skr04/__init__.py
 odoo/addons/l10n_de_skr04/__manifest__.py
@@ -9697,6 +9711,7 @@ odoo/addons/l10n_de_skr04/data/account_tax_group_data.xml
 odoo/addons/l10n_de_skr04/data/l10n_de_skr04_chart_data.xml
 odoo/addons/l10n_de_skr04/data/l10n_de_skr04_chart_post_data.xml
 odoo/addons/l10n_de_skr04/demo/demo_company.xml
+odoo/addons/l10n_de_skr04/migrations/3.1/post-migrate_update_taxes.py
 odoo/addons/l10n_de_skr04/migrations/9.0.2.0/pre-set_tags_and_taxes_updatable.py
 odoo/addons/l10n_din5008/__init__.py
 odoo/addons/l10n_din5008/__manifest__.py
@@ -10463,15 +10478,17 @@ odoo/addons/l10n_it_stock_ddt/views/stock_picking_views.xml
 odoo/addons/l10n_jp/__init__.py
 odoo/addons/l10n_jp/__manifest__.py
 odoo/addons/l10n_jp/data/account.account.template.csv
-odoo/addons/l10n_jp/data/account.fiscal.position.tax.template.csv
 odoo/addons/l10n_jp/data/account.fiscal.position.template.csv
 odoo/addons/l10n_jp/data/account.tax.group.csv
 odoo/addons/l10n_jp/data/account_chart_template_configure_data.xml
 odoo/addons/l10n_jp/data/account_chart_template_data.xml
+odoo/addons/l10n_jp/data/account_fiscal_position_tax_template_data.xml
 odoo/addons/l10n_jp/data/account_tax_report_data.xml
 odoo/addons/l10n_jp/data/account_tax_template_data.xml
 odoo/addons/l10n_jp/data/l10n_jp_chart_data.xml
 odoo/addons/l10n_jp/demo/demo_company.xml
+odoo/addons/l10n_jp/i18n/ja_JP.po
+odoo/addons/l10n_jp/i18n/l10n_jp.pot
 odoo/addons/l10n_jp/static/description/icon.png
 odoo/addons/l10n_jp/static/description/icon.svg
 odoo/addons/l10n_ke/__init__.py
@@ -10607,6 +10624,11 @@ odoo/addons/l10n_lu/scripts/tax.xls
 odoo/addons/l10n_lu/scripts/tax2csv.py
 odoo/addons/l10n_lu/static/description/icon.png
 odoo/addons/l10n_lu/static/description/icon.svg
+odoo/addons/l10n_lu_peppol_id/__init__.py
+odoo/addons/l10n_lu_peppol_id/__manifest__.py
+odoo/addons/l10n_lu_peppol_id/models/__init__.py
+odoo/addons/l10n_lu_peppol_id/models/res_partner.py
+odoo/addons/l10n_lu_peppol_id/views/partner_view.xml
 odoo/addons/l10n_ma/__init__.py
 odoo/addons/l10n_ma/__manifest__.py
 odoo/addons/l10n_ma/data/account_chart_template_data.xml
@@ -10747,6 +10769,20 @@ odoo/addons/l10n_my/data/account_chart_template_data.xml
 odoo/addons/l10n_my/data/account_tax_template_data.xml
 odoo/addons/l10n_my/data/l10n_my_chart_data.xml
 odoo/addons/l10n_my/demo/demo_company.xml
+odoo/addons/l10n_mz/__init__.py
+odoo/addons/l10n_mz/__manifest__.py
+odoo/addons/l10n_mz/data/account.account.template.csv
+odoo/addons/l10n_mz/data/account.group.template.csv
+odoo/addons/l10n_mz/data/account_chart_template_configure_data.xml
+odoo/addons/l10n_mz/data/account_chart_template_data.xml
+odoo/addons/l10n_mz/data/account_fiscal_position_data.xml
+odoo/addons/l10n_mz/data/account_pgcpe_mozambique.xml
+odoo/addons/l10n_mz/data/account_tax_group_data.xml
+odoo/addons/l10n_mz/data/account_tax_template_data.xml
+odoo/addons/l10n_mz/data/tax_report.xml
+odoo/addons/l10n_mz/demo/demo_company.xml
+odoo/addons/l10n_mz/static/description/icon.png
+odoo/addons/l10n_mz/static/description/icon.svg
 odoo/addons/l10n_nl/README.md
 odoo/addons/l10n_nl/__init__.py
 odoo/addons/l10n_nl/__manifest__.py
@@ -10783,6 +10819,9 @@ odoo/addons/l10n_no/data/account_tax_group_data.xml
 odoo/addons/l10n_no/data/account_tax_report_data.xml
 odoo/addons/l10n_no/data/l10n_no_chart_data.xml
 odoo/addons/l10n_no/demo/demo_company.xml
+odoo/addons/l10n_no/i18n/l10n_no.pot
+odoo/addons/l10n_no/i18n/nb_NO.po
+odoo/addons/l10n_no/migrations/2.1/post-migrate_update_taxes.py
 odoo/addons/l10n_no/migrations/9.0.2.0/pre-set_tags_and_taxes_updatable.py
 odoo/addons/l10n_no/models/__init__.py
 odoo/addons/l10n_no/models/account_journal.py
@@ -10950,6 +10989,8 @@ odoo/addons/l10n_rs/i18n/l10n_rs.pot
 odoo/addons/l10n_rs/i18n/sr@latin.po
 odoo/addons/l10n_rs/models/__init__.py
 odoo/addons/l10n_rs/models/account_move.py
+odoo/addons/l10n_rs/static/description/icon.png
+odoo/addons/l10n_rs/static/description/icon.svg
 odoo/addons/l10n_rs/views/account_move.xml
 odoo/addons/l10n_rs/views/report_invoice.xml
 odoo/addons/l10n_sa/__init__.py
@@ -13055,13 +13096,9 @@ odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_references
 odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_references_2.png
 odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_references_3.png
 odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_references_4.png
-odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_team_member_1-circle.png
 odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_team_member_1.png
-odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_team_member_2-circle.png
 odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_team_member_2.png
-odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_team_member_3-circle.png
 odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_team_member_3.png
-odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_team_member_4-circle.png
 odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_team_member_4.png
 odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_text_image.jpg
 odoo/addons/mass_mailing/static/src/img/theme_default/s_default_image_three_cols_1.jpg
@@ -13084,6 +13121,7 @@ odoo/addons/mass_mailing/static/src/img/theme_imgs/default_thumb_large.png
 odoo/addons/mass_mailing/static/src/img/theme_imgs/default_thumb_small.png
 odoo/addons/mass_mailing/static/src/img/theme_imgs/empty_thumb_large.png
 odoo/addons/mass_mailing/static/src/img/theme_imgs/empty_thumb_logo.png
+odoo/addons/mass_mailing/static/src/img/theme_imgs/empty_thumb_small.png
 odoo/addons/mass_mailing/static/src/js/mailing_m2o_filter.js
 odoo/addons/mass_mailing/static/src/js/mailing_mailing_view_form_full_width.js
 odoo/addons/mass_mailing/static/src/js/mailing_portal.js
@@ -13102,6 +13140,7 @@ odoo/addons/mass_mailing/static/src/scss/mailing_filter_widget.scss
 odoo/addons/mass_mailing/static/src/scss/mailing_portal.scss
 odoo/addons/mass_mailing/static/src/scss/mass_mailing.scss
 odoo/addons/mass_mailing/static/src/scss/mass_mailing.ui.scss
+odoo/addons/mass_mailing/static/src/scss/mass_mailing.wysiwyg.scss
 odoo/addons/mass_mailing/static/src/scss/mass_mailing_mobile.scss
 odoo/addons/mass_mailing/static/src/scss/mass_mailing_mobile_preview.scss
 odoo/addons/mass_mailing/static/src/scss/themes/theme_basic.scss
@@ -14295,6 +14334,9 @@ odoo/addons/mrp/static/src/views/mrp_documents_kanban/mrp_documents_kanban_recor
 odoo/addons/mrp/static/src/views/mrp_documents_kanban/mrp_documents_kanban_renderer.js
 odoo/addons/mrp/static/src/views/mrp_documents_kanban/mrp_documents_kanban_renderer.xml
 odoo/addons/mrp/static/src/views/mrp_documents_kanban/mrp_documents_kanban_view.js
+odoo/addons/mrp/static/src/widgets/mrp_consumed.js
+odoo/addons/mrp/static/src/widgets/mrp_production_components_x2many.js
+odoo/addons/mrp/static/src/widgets/mrp_production_components_x2many.scss
 odoo/addons/mrp/static/src/widgets/mrp_should_consume.js
 odoo/addons/mrp/static/src/widgets/mrp_should_consume.xml
 odoo/addons/mrp/static/src/widgets/mrp_workorder_popover.js
@@ -14304,6 +14346,7 @@ odoo/addons/mrp/static/src/widgets/timer.xml
 odoo/addons/mrp/static/src/xml/mrp_document_template.xml
 odoo/addons/mrp/static/tests/mrp_document_kanban_tests.js
 odoo/addons/mrp/static/tests/mrp_tests_widgets.js
+odoo/addons/mrp/static/tests/tours/mrp_manual_consumption.js
 odoo/addons/mrp/static/xls/mrp_bom.xls
 odoo/addons/mrp/tests/__init__.py
 odoo/addons/mrp/tests/common.py
@@ -14313,6 +14356,7 @@ odoo/addons/mrp/tests/test_bom.py
 odoo/addons/mrp/tests/test_byproduct.py
 odoo/addons/mrp/tests/test_cancel_mo.py
 odoo/addons/mrp/tests/test_consume_tracked_component.py
+odoo/addons/mrp/tests/test_manual_consumption.py
 odoo/addons/mrp/tests/test_multicompany.py
 odoo/addons/mrp/tests/test_oee.py
 odoo/addons/mrp/tests/test_order.py
@@ -16289,6 +16333,7 @@ odoo/addons/phone_validation/models/res_partner.py
 odoo/addons/phone_validation/models/res_users.py
 odoo/addons/phone_validation/security/ir.model.access.csv
 odoo/addons/phone_validation/tests/__init__.py
+odoo/addons/phone_validation/tests/test_phonenumbers.py
 odoo/addons/phone_validation/tests/test_phonenumbers_patch.py
 odoo/addons/phone_validation/tools/__init__.py
 odoo/addons/phone_validation/tools/phone_validation.py
@@ -17081,6 +17126,15 @@ odoo/addons/pos_cache/security/ir.model.access.csv
 odoo/addons/pos_cache/static/src/js/Chrome.js
 odoo/addons/pos_cache/static/src/js/pos_cache.js
 odoo/addons/pos_cache/views/pos_cache_views.xml
+odoo/addons/pos_daily_sales_reports/__init__.py
+odoo/addons/pos_daily_sales_reports/__manifest__.py
+odoo/addons/pos_daily_sales_reports/models/__init__.py
+odoo/addons/pos_daily_sales_reports/models/pos_daily_sales_reports.py
+odoo/addons/pos_daily_sales_reports/security/ir.model.access.csv
+odoo/addons/pos_daily_sales_reports/views/point_of_sale_view.xml
+odoo/addons/pos_daily_sales_reports/wizard/__init__.py
+odoo/addons/pos_daily_sales_reports/wizard/pos_daily_sales_reports_wizard.py
+odoo/addons/pos_daily_sales_reports/wizard/pos_daily_sales_reports_wizard.xml
 odoo/addons/pos_discount/__init__.py
 odoo/addons/pos_discount/__manifest__.py
 odoo/addons/pos_discount/i18n/af.po
@@ -18722,6 +18776,7 @@ odoo/addons/project/models/analytic_account.py
 odoo/addons/project/models/company.py
 odoo/addons/project/models/digest.py
 odoo/addons/project/models/ir_ui_menu.py
+odoo/addons/project/models/mail_message.py
 odoo/addons/project/models/project.py
 odoo/addons/project/models/project_collaborator.py
 odoo/addons/project/models/project_milestone.py
@@ -19374,7 +19429,6 @@ odoo/addons/purchase/static/src/views/purchase_dashboard.xml
 odoo/addons/purchase/static/src/views/purchase_kanbanview.js
 odoo/addons/purchase/static/src/views/purchase_kanbanview.xml
 odoo/addons/purchase/static/src/views/purchase_listview.js
-odoo/addons/purchase/static/src/views/purchase_listview.scss
 odoo/addons/purchase/static/src/views/purchase_listview.xml
 odoo/addons/purchase/static/src/xml/purchase_toaster_button.xml
 odoo/addons/purchase/static/xls/product_purchase.xls
@@ -20320,6 +20374,7 @@ odoo/addons/sale/tests/test_sale_order.py
 odoo/addons/sale/tests/test_sale_prices.py
 odoo/addons/sale/tests/test_sale_product_attribute_value_config.py
 odoo/addons/sale/tests/test_sale_refund.py
+odoo/addons/sale/tests/test_sale_report.py
 odoo/addons/sale/tests/test_sale_tax_totals.py
 odoo/addons/sale/tests/test_sale_to_invoice.py
 odoo/addons/sale/views/account_views.xml
@@ -23920,10 +23975,12 @@ odoo/addons/survey/static/src/xml/survey_breadcrumb_templates.xml
 odoo/addons/survey/static/src/xml/survey_image_zoomer_templates.xml
 odoo/addons/survey/static/src/xml/survey_session_text_answer_template.xml
 odoo/addons/survey/static/tests/components/description_page_field_tests.js
+odoo/addons/survey/static/tests/components/question_page_list_renderer_tests.js
 odoo/addons/survey/static/tests/components/question_page_one2many_field_tests.js
 odoo/addons/survey/static/tests/tours/certification_failure.js
 odoo/addons/survey/static/tests/tours/certification_success.js
 odoo/addons/survey/static/tests/tours/survey.js
+odoo/addons/survey/static/tests/tours/survey_chained_conditional_questions.js
 odoo/addons/survey/static/tests/tours/survey_prefill.js
 odoo/addons/survey/static/tests/tours/survey_session_manage_test.js
 odoo/addons/survey/static/tests/tours/survey_tour_session_create.js
@@ -24161,6 +24218,7 @@ odoo/addons/test_mail/models/test_mail_thread_models.py
 odoo/addons/test_mail/security/ir.model.access.csv
 odoo/addons/test_mail/security/test_mail_security.xml
 odoo/addons/test_mail/static/tests/activity_tests.js
+odoo/addons/test_mail/static/tests/chatter_tests.js
 odoo/addons/test_mail/static/tests/systray_activity_menu_tests.js
 odoo/addons/test_mail/static/tests/tracking_value_tests.js
 odoo/addons/test_mail/static/tests/helpers/model_definitions_setup.js
@@ -27412,6 +27470,7 @@ odoo/addons/web/static/lib/moment/locale/me.js
 odoo/addons/web/static/lib/moment/locale/mi.js
 odoo/addons/web/static/lib/moment/locale/mk.js
 odoo/addons/web/static/lib/moment/locale/ml.js
+odoo/addons/web/static/lib/moment/locale/mn.js
 odoo/addons/web/static/lib/moment/locale/mr.js
 odoo/addons/web/static/lib/moment/locale/ms-my.js
 odoo/addons/web/static/lib/moment/locale/ms.js
@@ -28327,7 +28386,6 @@ odoo/addons/web/static/src/legacy/scss/modal.scss
 odoo/addons/web/static/src/legacy/scss/model_field_selector.scss
 odoo/addons/web/static/src/legacy/scss/name_and_signature.scss
 odoo/addons/web/static/src/legacy/scss/popover.scss
-odoo/addons/web/static/src/legacy/scss/progress_bar.scss
 odoo/addons/web/static/src/legacy/scss/special_fields.scss
 odoo/addons/web/static/src/legacy/scss/switch_company_menu.scss
 odoo/addons/web/static/src/legacy/scss/tempusdominus_overridden.scss
@@ -29026,6 +29084,7 @@ odoo/addons/web/static/tests/mobile/views/fields/many2many_tags_field_tests.js
 odoo/addons/web/static/tests/mobile/views/fields/many2one_barcode_field_tests.js
 odoo/addons/web/static/tests/mobile/views/fields/statusbar_field_tests.js
 odoo/addons/web/static/tests/mobile/views/view_dialog/select_create_dialog_tests.js
+odoo/addons/web/static/tests/mobile/views/widgets/signature_tests.js
 odoo/addons/web/static/tests/mobile/webclient/settings_form_view_tests.js
 odoo/addons/web/static/tests/mobile/webclient/burger_menu/burger_menu_tests.js
 odoo/addons/web/static/tests/mobile/webclient/burger_menu/burger_user_menu_tests.js
@@ -30532,6 +30591,7 @@ odoo/addons/website/static/tests/tours/snippets_all_drag_and_drop.js
 odoo/addons/website/static/tests/tours/specific_website_editor.js
 odoo/addons/website/static/tests/tours/start_cloned_snippet.js
 odoo/addons/website/static/tests/tours/translate_menu_name.js
+odoo/addons/website/static/tests/tours/website_click_tests.js
 odoo/addons/website/static/tests/tours/website_form_editor.js
 odoo/addons/website/static/tests/tours/website_form_editor_frontend.js
 odoo/addons/website/static/tests/tours/website_navbar_menu.js
@@ -30772,6 +30832,7 @@ odoo/addons/website_blog/static/src/scss/website_blog.scss
 odoo/addons/website_blog/static/src/snippets/s_blog_posts/000.js
 odoo/addons/website_blog/static/src/snippets/s_blog_posts/000.scss
 odoo/addons/website_blog/static/src/snippets/s_blog_posts/options.js
+odoo/addons/website_blog/static/tests/tours/blog_search_with_date.js
 odoo/addons/website_blog/static/tests/tours/blog_tags_tour.js
 odoo/addons/website_blog/tests/__init__.py
 odoo/addons/website_blog/tests/common.py
@@ -33809,6 +33870,7 @@ odoo/addons/website_sale/static/tests/tours/website_sale_shop_no_variant_attribu
 odoo/addons/website_sale/static/tests/tours/website_sale_shop_variant_exclusion.js
 odoo/addons/website_sale/static/tests/tours/website_sale_shop_zoom.js
 odoo/addons/website_sale/static/tests/tours/website_sale_snippet_products.js
+odoo/addons/website_sale/static/tests/tours/website_sale_variants_modal_window.js
 odoo/addons/website_sale/tests/__init__.py
 odoo/addons/website_sale/tests/test_customize.py
 odoo/addons/website_sale/tests/test_express_checkout_flows.py
@@ -35313,11 +35375,14 @@ odoo/service/security.py
 odoo/service/server.py
 odoo/service/wsgi_server.py
 odoo/tests/__init__.py
+odoo/tests/case.py
 odoo/tests/common.py
 odoo/tests/dummy.js
 odoo/tests/dummy.xml
 odoo/tests/loader.py
-odoo/tests/runner.py
+odoo/tests/result.py
+odoo/tests/suite.py
+odoo/tests/tag_selector.py
 odoo/tests/test_module_operations.py
 odoo/tests/test_parse_inline_template.py
 odoo/tools/__init__.py
@@ -35329,7 +35394,6 @@ odoo/tools/cloc.py
 odoo/tools/config.py
 odoo/tools/convert.py
 odoo/tools/date_utils.py
-odoo/tools/debugger.py
 odoo/tools/float_utils.py
 odoo/tools/func.py
 odoo/tools/geoipresolver.py

@@ -23,8 +23,8 @@
 # Ivan Kropotkin <yelizariev@itpp.dev>, 2022
 # Martin Trigaux, 2022
 # valmasone, 2023
-# Alena Vlasova, 2023
 # Сергей Шебанин <sergey@shebanin.ru>, 2023
+# Alena Vlasova, 2023
 # 
 msgid ""
 msgstr ""
@@ -32,7 +32,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-02 10:33+0000\n"
 "PO-Revision-Date: 2022-09-22 05:53+0000\n"
-"Last-Translator: Сергей Шебанин <sergey@shebanin.ru>, 2023\n"
+"Last-Translator: Alena Vlasova, 2023\n"
 "Language-Team: Russian (https://www.transifex.com/odoo/teams/41243/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -286,14 +286,14 @@ msgstr ". Сузьте поиск, чтобы добраться до остал
 #: code:addons/mail/static/src/components/activity_menu_view/activity_menu_view.xml:0
 #, python-format
 msgid "0 Future"
-msgstr "0 Будущее"
+msgstr "0 В будущем"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/components/activity_menu_view/activity_menu_view.xml:0
 #, python-format
 msgid "0 Late"
-msgstr "0 Ранее"
+msgstr "0 Просрочено"
 
 #. module: mail
 #. odoo-javascript
@@ -369,7 +369,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "11"
-msgstr ""
+msgstr "11"
 
 #. module: mail
 #. odoo-javascript
@@ -433,7 +433,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "18"
-msgstr ""
+msgstr "18"
 
 #. module: mail
 #. odoo-javascript
@@ -1317,7 +1317,7 @@ msgstr "Расширенные опции"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Africa"
-msgstr ""
+msgstr "Африка"
 
 #. module: mail
 #: model:ir.model.fields.selection,name:mail.selection__mail_activity_mixin__activity_exception_decoration__warning
@@ -1524,7 +1524,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Asia"
-msgstr ""
+msgstr "Азия"
 
 #. module: mail
 #. odoo-javascript
@@ -2392,6 +2392,7 @@ msgstr "Компании"
 #. odoo-javascript
 #: code:addons/mail/static/src/js/activity.js:0
 #: code:addons/mail/static/src/models/mail_template.js:0
+#: code:addons/mail/static/src/models/composer_view.js:0
 #: model:ir.actions.act_window,name:mail.action_email_compose_message_wizard
 #: model_terms:ir.ui.view,arch_db:mail.email_compose_message_wizard_form
 #, python-format
@@ -5293,7 +5294,7 @@ msgstr ""
 #: code:addons/mail/static/src/components/activity_menu_view/activity_menu_view.xml:0
 #, python-format
 msgid "Late"
-msgstr "Ранее"
+msgstr "Просрочено"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.mail_activity_view_search
@@ -5473,6 +5474,7 @@ msgstr ""
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/components/chatter_topbar/chatter_topbar.xml:0
+#: code:addons/mail/static/src/models/composer_view.js:0
 #, python-format
 msgid "Log note"
 msgstr "Добавить заметку"
@@ -8513,7 +8515,7 @@ msgstr ""
 #: code:addons/mail/static/src/components/call_settings_menu/call_settings_menu.xml:0
 #, python-format
 msgid "Show video participants only"
-msgstr "Показать только участников с видео"
+msgstr "Только участники с видео"
 
 #. module: mail
 #. odoo-javascript
@@ -9390,7 +9392,7 @@ msgstr "Сегодня:"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Tokyo"
-msgstr ""
+msgstr "Токио"
 
 #. module: mail
 #. odoo-javascript
@@ -10036,7 +10038,7 @@ msgstr "Настройки звука"
 #: code:addons/mail/static/src/components/call_settings_menu/call_settings_menu.xml:0
 #, python-format
 msgid "Voice detection threshold"
-msgstr "Чувствительность определения голоса"
+msgstr "Порог определения голоса"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_res_users_settings_volumes__volume
@@ -10354,7 +10356,7 @@ msgstr "Вы закрыли вашу беседу с %s."
 #: code:addons/mail/static/src/models/messaging_notification_handler.js:0
 #, python-format
 msgid "You unsubscribed from %s."
-msgstr ""
+msgstr "Вы покинули %s."
 
 #. module: mail
 #. odoo-javascript

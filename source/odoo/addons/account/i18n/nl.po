@@ -1436,6 +1436,13 @@ msgstr ""
 "Een tweede betaling wordt automatisch aangemaakt in het bestemmingsdagboek."
 
 #. module: account
+#. odoo-python
+#: code:addons/account/models/account_bank_statement.py:0
+#, python-format
+msgid "A statement should only contain lines from the same journal."
+msgstr "Een afschrift mag alleen regels uit hetzelfde dagboek bevatten."
+
+#. module: account
 #: model:ir.model.constraint,message:account.constraint_account_fiscal_position_tax_tax_src_dest_uniq
 msgid "A tax fiscal position could be defined only one time on same taxes."
 msgstr ""
@@ -2090,7 +2097,7 @@ msgstr "Actief"
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_search
 msgid "Active Account"
-msgstr "Active rekening"
+msgstr "Actieve rekening"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_invoice_send__active_domain
@@ -5935,12 +5942,12 @@ msgstr "Conceptboeking"
 #: model_terms:ir.ui.view,arch_db:account.report_invoice_document
 #, python-format
 msgid "Draft Invoice"
-msgstr "Concept factuur"
+msgstr "Conceptfactuur"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_invoice_report_search
 msgid "Draft Invoices"
-msgstr "Concept facturen"
+msgstr "Conceptfacturen"
 
 #. module: account
 #. odoo-python
@@ -14121,8 +14128,8 @@ msgid ""
 "The Journal Entry will be accounted on %(accounting_date)s upon posting."
 msgstr ""
 "De datum wordt ingesteld vóór de %(lock_type)s vergrendelingsdatum "
-"%(lock_date)s. De journaalboeking wordt bij het plaatsen op "
-"%(accounting_date)s geboekt."
+"%(lock_date)s. De boeking wordt bij het plaatsen op %(accounting_date)s "
+"geboekt."
 
 #. module: account
 #. odoo-python
@@ -14752,6 +14759,24 @@ msgstr ""
 "betalingen, maar je hebt een aantal van beide typen geselecteerd."
 
 #. module: account
+#. odoo-python
+#: code:addons/account/models/account_bank_statement.py:0
+#, python-format
+msgid "The running balance (%s) doesn't match the specified ending balance."
+msgstr "Het lopende saldo (%s) komt niet overeen met het opgegeven eindsaldo."
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_bank_statement.py:0
+#, python-format
+msgid ""
+"The starting balance doesn't match the ending balance of the previous "
+"statement, or an earlier statement is missing."
+msgstr ""
+"Het beginsaldo komt niet overeen met het eindsaldo van het vorige afschrift,"
+" of er ontbreekt een eerder afschrift."
+
+#. module: account
 #: model:ir.model.fields,help:account.field_account_move_line__statement_line_id
 msgid "The statement line that created this entry"
 msgstr "De afschriftregel die deze boeking heeft gemaakt"
@@ -14913,6 +14938,16 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account.portal_invoice_error
 msgid "There was an error processing this page."
 msgstr "Er was een fout met het verwerken van deze pagina."
+
+#. module: account
+#: code:addons/account/models/ir_actions_report.py:0
+#, python-format
+msgid ""
+"There was an error when trying to add the banner to the original PDF.\n"
+"Please make sure the source file is valid."
+msgstr ""
+"Er is een fout opgetreden bij het toevoegen van de banner aan de originele pdf.\n"
+"Zorg ervoor dat het bronbestand geldig is."
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
@@ -15591,6 +15626,17 @@ msgstr "OMHOOG"
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/account_bank_statement.py:0
+#, python-format
+msgid ""
+"Unable to create a statement due to missing transactions. You may want to "
+"reorder the transactions before proceeding."
+msgstr ""
+"Kan geen afschrift maken vanwege ontbrekende transacties. Misschien wil je "
+"de transacties opnieuw ordenen voordat je verder gaat."
+
+#. module: account
+#. odoo-python
 #: code:addons/account/models/account_journal.py:0
 #, python-format
 msgid "Undefined Yet"
@@ -15649,6 +15695,12 @@ msgstr "Onbetaalde facturen"
 #: model_terms:ir.ui.view,arch_db:account.view_account_move_line_filter
 msgid "Unposted"
 msgstr "Ongeboekt"
+
+#. module: account
+#: code:addons/account/models/company.py:0
+#, python-format
+msgid "Unposted Entries"
+msgstr "Ongeboekte boekingen"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_move_filter
@@ -15952,10 +16004,10 @@ msgid ""
 "You could enter\n"
 "BRT: ([\\d,]+)"
 msgstr ""
-"Waarde voor het bedrag van de afschrijvingregel\n"
+"Waarde voor het bedrag van de afschrijvingsregel\n"
 "* Percentage: percentage van het saldo, tussen 0 en 100.\n"
-"* Vast: de vaste waarde van de afschrijving. Het bedrag telt als een afschrijving als het negatief is, als een krediet als het positief is.\n"
-"* Van label: er is geen regex-scheidingsteken nodig, alleen de regex is nodig. Als je bijvoorbeeld het bedrag wilt extraheren\n"
+"* Vast: de vaste waarde van de afschrijving. Het aantal telt als een afschrijving als het negatief is, als een krediet als het positief is.\n"
+"* Van label: er is geen regex-scheidingsteken nodig, alleen de regex is nodig. Als je bijvoorbeeld het aantal wilt extraheren\n"
 "R:9672938 10/07 AX 9415126318 T: 5L:NA BRT: 3358,07 C:\n"
 "Zou je moeten schrijven\n"
 "BRT: ([\\ d,]+)"
@@ -16267,6 +16319,19 @@ msgstr "Verkeerde debet of credit waarde in boekingsregel!"
 #: model:ir.model.fields.selection,name:account.selection__account_move__auto_post__yearly
 msgid "Yearly"
 msgstr "Jaarlijks"
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_account.py:0
+#, python-format
+msgid ""
+"You cannot import the \"openning_balance\" if the opening move (%s) is "
+"already posted. If you are absolutely sure you want to modify the opening "
+"balance of your accounts, reset the move to draft."
+msgstr ""
+"Je kan de \"opening_balance\" niet importeren als de openingsbeweging (%s) "
+"al is geboekt. Als je absoluut het openingssaldo van je rekeningen wilt "
+"wijzigen, zet dan de boeking terug naar concept."
 
 #. module: account
 #. odoo-python
@@ -16590,6 +16655,14 @@ msgstr ""
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/company.py:0
+#, python-format
+msgid "Please contact your accountant to print the Hash integrity result."
+msgstr ""
+"Gelieve contact op te nemen met je accountant om het has-"
+"integriteitsresultaat af te drukken."
+
+#. module: account
 #: code:addons/account/models/account_account.py:0
 #, python-format
 msgid ""
@@ -16711,11 +16784,13 @@ msgstr ""
 #: code:addons/account/models/account_move_line.py:0
 #, python-format
 msgid ""
-"You cannot edit the following fields due to restrict mode being activated on"
-" the journal: %s."
+"You cannot edit the following fields: %s.\n"
+"The following entries are already hashed:\n"
+"%s"
 msgstr ""
-"Je kunt de volgende velden niet bewerken omdat de beperkingsmodus is "
-"geactiveerd op het dagboek: %s."
+"Je kan volgende velden niet bewerken: %s.\n"
+"De volgende boekingen zijn reeds gehasht:\n"
+"%s"
 
 #. module: account
 #. odoo-python

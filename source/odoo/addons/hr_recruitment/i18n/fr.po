@@ -1356,7 +1356,7 @@ msgstr "Documents"
 #. module: hr_recruitment
 #: model:hr.applicant.refuse.reason,name:hr_recruitment.refuse_reason_1
 msgid "Doesn't fit the job requirements"
-msgstr "Ne réponds pas aux prérequis du poste. "
+msgstr "Ne répond pas aux prérequis du poste. "
 
 #. module: hr_recruitment
 #: model_terms:ir.actions.act_window,help:hr_recruitment.hr_recruitment_stage_act
@@ -1383,7 +1383,7 @@ msgstr "Email"
 #: model_terms:ir.ui.view,arch_db:hr_recruitment.hr_job_simple_form
 #: model_terms:ir.ui.view,arch_db:hr_recruitment.hr_job_survey
 msgid "Email Alias"
-msgstr "Alias d'email"
+msgstr "Alias de messagerie"
 
 #. module: hr_recruitment
 #: model:ir.model.fields,field_description:hr_recruitment.field_applicant_get_refuse_reason__template_id
@@ -1690,7 +1690,7 @@ msgid ""
 "If the active field is set to false, it will allow you to hide the case "
 "without removing it."
 msgstr ""
-"Si le champ actif est défini à False, cela vous permettra de masquer le cas "
+"Si le champ actif n'est pas coché, cela vous permettra de masquer le cas "
 "sans le supprimer."
 
 #. module: hr_recruitment
@@ -3103,7 +3103,7 @@ msgid ""
 "You can define here the labels that will be displayed for the kanban state instead\n"
 "                        of the default labels."
 msgstr ""
-"Vous pouvez définir ici les libellés qui seront affichés pour les états de la kanban à la place\n"
+"Vous pouvez définir ici les libellés qui seront affichés pour les états du kanban au lieu\n"
 "                        des libellés par défaut."
 
 #. module: hr_recruitment

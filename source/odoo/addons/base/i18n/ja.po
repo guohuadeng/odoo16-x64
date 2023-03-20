@@ -3097,7 +3097,7 @@ msgid ""
 "invoices from picking, the system is able to add and compute the shipping line.\n"
 msgstr ""
 "\n"
-"販売オーダーおよびピッキングに配送方法を追加することができます。\n"
+"販売オーダおよびピッキングに配送方法を追加することができます。\n"
 "======================================================\n"
 "\n"
 "価格に応じ独自の配送業者を定義することができます。 ピッキングから請求書を作成する際、システムは出荷ラインを追加して計算することができます。\n"
@@ -3178,7 +3178,7 @@ msgstr ""
 "==========\n"
 "このモジュールを使用すると、レポート/会計/会計テストのメニューから会計モジュールの整合性と矛盾を手動でチェックすることができます。\n"
 "\n"
-"Consistency Testを作成するためのクエリを記述することができます。テストの結果をメニュー レポート - > 会計テスト でアクセスできるPDF形式で取得し、テストを選択し、ヘッダー領域の印刷ボタンからレポートを印刷します。\n"
+"Consistency Testを作成するためのクエリを記述することができます。テストの結果をメニュー レポート - > 会計テスト でアクセスできるPDF形式で取得し、テストを選択し、ヘッダ領域の印刷ボタンからレポートを印刷します。\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_account_asset
@@ -5879,7 +5879,7 @@ msgstr ""
 "リソース管理モジュール。\n"
 "===================\n"
 "\n"
-"リソースとは、スケジューリング可能なもの(タスクの開発者または製造オーダーの作業区)を表します。 このモジュールは、すべてのリソースに関連付けられたリソースカレンダーを管理します。 また、すべてのリソースの枝葉を管理します。"
+"リソースとは、スケジューリング可能なもの(タスクの開発者または製造オーダの作業区)を表します。 このモジュールは、すべてのリソースに関連付けられたリソースカレンダーを管理します。 また、すべてのリソースの枝葉を管理します。"
 
 #. module: base
 #: model:ir.module.module,description:base.module_website_mail
@@ -7126,7 +7126,7 @@ msgstr ""
 "\n"
 "しかし、会社内の昼食管理は、特に従業員またはベンダーの数が重要な場合に適切な管理が必要です。\n"
 "\n"
-"「ランチオーダー」モジュールは、この管理を容易にするだけでなく、従業員により多くのツールとユーザビリティを提供するために開発されました。\n"
+"「ランチオーダ」モジュールは、この管理を容易にするだけでなく、従業員により多くのツールとユーザビリティを提供するために開発されました。\n"
 "\n"
 "完全な食事と仕入先の管理に加えて、このモジュールは警告を表示し、従業員の好みに基づいて迅速な注文の選択を提供します。\n"
 "\n"
@@ -8868,7 +8868,9 @@ msgstr "IoTボックスに接続されたデバイスを使用して、製品の
 msgid ""
 "\n"
 "Use receipt printers connected to an IoT Box to print orders in the kitchen or at the bar.\n"
-msgstr "IoTボックスに接続されたレシートプリンターを使用して、キッチンやバーで注文を印刷します。"
+msgstr ""
+"\n"
+"IoTボックスに接続されたレシートプリンタを使用して、キッチンやバーで注文を印刷します。\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_website_event_booth_sale
@@ -9157,7 +9159,7 @@ msgid ""
 msgstr ""
 "複数の会社間でドキュメントを同期するためのモジュール。たとえば、これにより、発注書がシステムの別の会社をベンダーとして検証されたときに、逆に、発注書を自動的に作成することができます。\n"
 "\n"
-"サポートされているドキュメントは、請求書/クレジットノートです。"
+"サポートされているドキュメントは、請求書/クレジットノートです。\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_approvals_purchase_stock
@@ -9557,7 +9559,7 @@ msgstr "%y - ２桁の西暦[00,99].\\\""
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.language_install_view_form_lang_switch
 msgid "&amp; Close"
-msgstr "&amp; 閉じる"
+msgstr "、そして閉じる"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.module_view_kanban
@@ -9805,7 +9807,7 @@ msgstr "9. %w ==&gt; 5 (金曜日は6日目)"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid "<b attrs=\"{'invisible': [('is_company', '=', False)]}\">Address</b>"
-msgstr ""
+msgstr "<b attrs=\"{'invisible': [('is_company', '=', False)]}\">住所</b>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_server_action_form
@@ -9949,7 +9951,7 @@ msgstr ""
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.res_partner_kanban_view
 msgid "<span class=\"bg-danger\">Archived</span>"
-msgstr ""
+msgstr "<span class=\"bg-danger\">アーカイブ済</span>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_base_module_update
@@ -10044,28 +10046,28 @@ msgstr "<span>オブジェクト:</span>"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid "<span>Other address for the company (e.g. subsidiary, ...)</span>"
-msgstr ""
+msgstr "<span>会社の他の住所 (例えば子会社とか...)</span>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid ""
 "<span>Preferred address for all deliveries. Selected by default when you "
 "deliver an order that belongs to this company.</span>"
-msgstr ""
+msgstr "<span>配送先となる住所。この会社に配送をする時デフォルトで選択されます。</span>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid ""
 "<span>Preferred address for all invoices. Selected by default when you "
 "invoice an order that belongs to this company.</span>"
-msgstr ""
+msgstr "<span>請求先となる住所。この会社に請求をする時にデフォルトで選択されます。</span>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid ""
 "<span>Private addresses are only visible by authorized users and contain "
 "sensitive data (employee home addresses, ...).</span>"
-msgstr ""
+msgstr "<span>プライベート住所はセンシティブデータを含んでいるため、承認済ユーザのみに閲覧できます。</span>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
@@ -10073,6 +10075,8 @@ msgid ""
 "<span>Use this to organize the contact details of employees of a given "
 "company (e.g. CEO, CFO, ...).</span>"
 msgstr ""
+"<span>これを使って、特定の会社の従業員の連絡先詳細を整理します (例: CEO, CFO...)。\n"
+"</span>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.report_irmodulereference
@@ -10475,7 +10479,7 @@ msgstr "ダミーメソッドモジュール"
 msgid ""
 "A partner with the same <span><span class=\"o_vat_label\">Company "
 "Registry</span></span> already exists ("
-msgstr ""
+msgstr "同じ<span><span class=\"o_vat_label\">会社登録</span></span>の取引先は既に存在しています ("
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
@@ -11674,7 +11678,7 @@ msgstr "注文ごとのリード作成モードを許可する"
 #. module: base
 #: model:ir.module.module,summary:base.module_website_sale_comparison
 msgid "Allow shoppers to compare products based on their attributes"
-msgstr "顧客が属性を基づいて商品を比較できるようにします"
+msgstr "顧客が属性に基づいてプロダクトを比較できるようにします"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_website_sale_wishlist
@@ -12697,7 +12701,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_barcodes_gs1_nomenclature
 msgid "Barcode - GS1 Nomenclature"
-msgstr ""
+msgstr "バーコード - GS1 表現規則"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_stock_barcode_product_expiry
@@ -14165,7 +14169,7 @@ msgstr "会社ファビコン"
 #: model:ir.model.fields,field_description:base.field_res_partner__company_registry
 #: model:ir.model.fields,field_description:base.field_res_users__company_registry
 msgid "Company ID"
-msgstr ""
+msgstr "カンパニーID"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_company__logo
@@ -14189,7 +14193,7 @@ msgstr "会社名エントリー"
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 #: model_terms:ir.ui.view,arch_db:base.view_partner_simple_form
 msgid "Company Name..."
-msgstr ""
+msgstr "会社名..."
 
 #. module: base
 #: model:ir.actions.act_window,name:base.ir_property_form
@@ -14383,7 +14387,7 @@ msgstr "コンゴ共和国"
 #. module: base
 #: model:ir.module.module,summary:base.module_pos_restaurant_iot
 msgid "Connect kitchen printers to your PoS"
-msgstr "キッチンプリンターをPoSに接続します"
+msgstr "キッチンプリンタをPoSに接続します"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_hw_drivers
@@ -14794,7 +14798,7 @@ msgstr ""
 #. module: base
 #: model_terms:ir.actions.act_window,help:base.action_partner_form
 msgid "Create a Contact in your address book"
-msgstr ""
+msgstr "アドレス帳に連絡先を作成"
 
 #. module: base
 #: model_terms:ir.actions.act_window,help:base.action_country_group
@@ -18948,7 +18952,7 @@ msgstr "支払いを管理するのに有用です。"
 msgid ""
 "Helps you manage your inventory and main stock operations: delivery orders, "
 "receptions, etc."
-msgstr "在庫表と主な在庫操作の管理を手助けします：配達オーダー、受け取りなど"
+msgstr "在庫表と主な在庫操作の管理を手助けします：配達オーダ、受け取りなど"
 
 #. module: base
 #: model:ir.module.category,description:base.module_category_manufacturing_manufacturing
@@ -19658,7 +19662,7 @@ msgstr "XML / PDFからの請求書のインポート/エクスポート"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_account_edi_ubl_cii
 msgid "Import/Export electronic invoices with UBL/CII"
-msgstr ""
+msgstr "UBL又はCIIで、電子請求書をインポート・エクスポート"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_account_base_import
@@ -21750,7 +21754,7 @@ msgstr "クラウド税計算の割引を管理します。"
 #. module: base
 #: model:ir.module.module,summary:base.module_mrp_plm
 msgid "Manage engineering change orders on products, bills of material"
-msgstr "プロダクト、部品表の設計変更オーダを管理"
+msgstr "プロダクト、部品表の設計変更注文を管理"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_event_booth
@@ -24287,7 +24291,7 @@ msgstr "仕入先に関係するあらゆる活動を追跡することができ
 #. module: base
 #: model_terms:ir.actions.act_window,help:base.action_partner_form
 msgid "Odoo helps you track all activities related to your contacts."
-msgstr ""
+msgstr "Odooは、連絡先関連の全ての活動を追跡いたします。"
 
 #. module: base
 #. odoo-python
@@ -24357,7 +24361,7 @@ msgstr "多対1項目の属性削除"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_website_sale_picking
 msgid "On site Payment & Picking"
-msgstr ""
+msgstr "店頭で決済・ピッキング"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.onboarding_container
@@ -25970,7 +25974,7 @@ msgstr "製品比較"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_product_email_template
 msgid "Product Email Template"
-msgstr "商品メールテンプレート"
+msgstr "プロダクトメールテンプレート"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_product_images
@@ -25981,7 +25985,7 @@ msgstr "プロダクト画像"
 #: model:ir.module.category,name:base.module_category_manufacturing_product_lifecycle_management_(plm)
 #: model:ir.module.module,shortdesc:base.module_mrp_plm
 msgid "Product Lifecycle Management (PLM)"
-msgstr "商品ライフサイクルマネジメント (PLM)"
+msgstr "プロダクトライフサイクルマネジメント (PLM)"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_product_matrix
@@ -25997,7 +26001,7 @@ msgstr "生産性"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_product
 msgid "Products & Pricelists"
-msgstr "商品・価格表"
+msgstr "プロダクト・価格表"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_product_expiry
@@ -29078,7 +29082,7 @@ msgstr "パレスチナ"
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_company__base_onboarding_company_state
 msgid "State of the onboarding company step"
-msgstr "オンボーディング会社のステップの状態"
+msgstr "入社時ステップの状態"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_country__state_ids
@@ -29331,12 +29335,12 @@ msgstr ""
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.language_install_view_form_lang_switch
 msgid "Switch to"
-msgstr "次に切替"
+msgstr "切替 -->"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.language_install_view_form_lang_switch
 msgid "Switch to language"
-msgstr ""
+msgstr "言語を切替"
 
 #. module: base
 #: model:res.country,name:base.ch
@@ -29857,6 +29861,8 @@ msgid ""
 "country format. You can use '/' to indicate that the partner is not subject "
 "to tax."
 msgstr ""
+"Tax Identification Number "
+"(納税者番号)。ここでの値は、国の形式に基づいて検証されます。パートナーに税金がかからないことを示すには、'/' を使用します。"
 
 #. module: base
 #: model:ir.model.constraint,message:base.constraint_res_lang_url_code_uniq
@@ -30333,7 +30339,7 @@ msgstr "レートが1である通貨に対しての通貨のレート"
 msgid ""
 "The registry number of the company. Use it if it is different from the Tax "
 "ID. It must be unique across all partners of a same country"
-msgstr ""
+msgstr "会社の登録番号です。税IDと異なる場合は、これを使用します。同じ国のすべてのパートナー間で一意である必要があります。"
 
 #. module: base
 #. odoo-python
@@ -30575,20 +30581,20 @@ msgid ""
 "This field should be used when accessing view arch. It will use translation.\n"
 "                               Note that it will read `arch_db` or `arch_fs` if in dev-xml mode."
 msgstr ""
-"このフィールドは、ビューアーチにアクセスするときに使用する必要があります。翻訳を使用します。\n"
-"                               dev-xmlモードの場合、'arch_db'または'arch_fs'を読み取ることに注意してください。"
+"このフィールドは、ビューアーキテクチャにアクセスするときに使用する必要があります。翻訳を使用します。\n"
+"                               dev-xmlモードの場合、「arch_db」又は「arch_fs」を読み取ることに注意してください。"
 
 #. module: base
 #: model:ir.model.fields,help:base.field_ir_ui_view__arch_db
 msgid "This field stores the view arch."
-msgstr "このフィールドには、ビューアーチが格納されます。"
+msgstr "このフィールドには、ビューアーキテクチャが格納されます。"
 
 #. module: base
 #: model:ir.model.fields,help:base.field_ir_ui_view__arch_prev
 msgid ""
 "This field will save the current `arch_db` before writing on it.\n"
 "                                                                         Useful to (soft) reset a broken view."
-msgstr "このフィールドは、書き込む前に現在の `arch_db`を保存します。壊れたビューを(ソフト)リセットするのに便利です。"
+msgstr "このフィールドは、書き込む前に現在の「arch_db」を保存します。壊れたビューをソフトリセットするのに便利です。"
 
 #. module: base
 #. odoo-python
@@ -33442,7 +33448,7 @@ msgstr "完了"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid "e.g. \"B2B\", \"VIP\", \"Consulting\", ..."
-msgstr ""
+msgstr "例: 「B2B」、「VIP」、「コンサルティング」..."
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_category_form
@@ -33458,7 +33464,7 @@ msgstr "例 BE0477472701"
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 #: model_terms:ir.ui.view,arch_db:base.view_partner_simple_form
 msgid "e.g. Brandom Freeman"
-msgstr ""
+msgstr "例: Brandom Freeman"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_base_import_language
@@ -33485,7 +33491,7 @@ msgstr "例: 鈴木 一郎"
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 #: model_terms:ir.ui.view,arch_db:base.view_partner_simple_form
 msgid "e.g. Lumber Inc"
-msgstr ""
+msgstr "例: Lumber Inc"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
@@ -33645,7 +33651,7 @@ msgstr "取得"
 msgid ""
 "has been successfully installed.\n"
 "                            Users can choose their favorite language in their preferences."
-msgstr ""
+msgstr "は成功にインストールされました。ユーザーは自分の好みで言語を選択できます。"
 
 #. module: base
 #. odoo-python

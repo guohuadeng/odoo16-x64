@@ -682,7 +682,7 @@ msgstr "<font style=\"font-size: 62px;\">你的網站標題</font>"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_card
 msgid "<i class=\"fa fa-1x fa-clock-o mr8\"/><small>2 days ago</small>"
-msgstr "<i class=\"fa fa-1x fa-clock-o mr8\"/><small>兩天前</small>"
+msgstr "<i class=\"fa fa-1x fa-clock-o mr8\"/><small>2 天前</small>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.contactus
@@ -1911,7 +1911,7 @@ msgstr "Arch Fs"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.view_rewrite_search
 msgid "Archived"
-msgstr "已歸檔"
+msgstr "已封存"
 
 #. module: website
 #. odoo-javascript
@@ -2156,7 +2156,7 @@ msgstr "阻擋"
 #: code:addons/website/static/src/components/wysiwyg_adapter/wysiwyg_adapter.js:0
 #, python-format
 msgid "Blockquote"
-msgstr ""
+msgstr "區塊引用"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_mega_menu_big_icons_subtitles
@@ -2380,7 +2380,7 @@ msgstr "取消"
 #: code:addons/website/models/res_lang.py:0
 #, python-format
 msgid "Cannot deactivate a language that is currently used on a website."
-msgstr "無法停用當前在網站上使用的語言."
+msgstr "不可停用目前正在網站上使用的語言。"
 
 #. module: website
 #. odoo-javascript
@@ -4808,7 +4808,7 @@ msgstr "網格"
 #: model_terms:ir.ui.view,arch_db:website.website_visitor_page_view_search
 #: model_terms:ir.ui.view,arch_db:website.website_visitor_view_search
 msgid "Group By"
-msgstr "分組依據"
+msgstr "分組方式"
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_website_page__groups_id
@@ -5427,7 +5427,7 @@ msgstr ""
 #: code:addons/website/static/src/components/wysiwyg_adapter/wysiwyg_adapter.js:0
 #, python-format
 msgid "Insert a blockquote snippet."
-msgstr ""
+msgstr "加入小段引用文字。"
 
 #. module: website
 #. odoo-javascript
@@ -6086,7 +6086,7 @@ msgstr "圖書館"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_faq_collapse_options
 msgid "Light"
-msgstr "Light"
+msgstr ""
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_website_snippet_filter__limit
@@ -6193,7 +6193,7 @@ msgstr "Livechat Widget"
 #: code:addons/website/static/src/xml/website.editor.xml:0
 #, python-format
 msgid "Loading..."
-msgstr "載入中..."
+msgstr "載入中⋯"
 
 #. module: website
 #. odoo-javascript
@@ -7717,7 +7717,7 @@ msgstr "促銷"
 #. module: website
 #: model:ir.ui.menu,name:website.menu_page_properties
 msgid "Properties"
-msgstr "權益"
+msgstr "屬性"
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_website__partner_id
@@ -7968,7 +7968,7 @@ msgstr "必填項"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.qweb_500
 msgid "Reset templates"
-msgstr "重設模板"
+msgstr "重設範本"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.qweb_500
@@ -8400,7 +8400,7 @@ msgstr "分開的連結"
 #: code:addons/website/static/src/components/wysiwyg_adapter/wysiwyg_adapter.js:0
 #, python-format
 msgid "Separator"
-msgstr ""
+msgstr "分隔線"
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_theme_ir_asset__sequence
@@ -10824,6 +10824,14 @@ msgstr "您無法刪除模型本身所需的字段."
 #, python-format
 msgid "You can't remove the submit button of the form"
 msgstr "您無法刪除表單的提交按鈕"
+
+#. module: website
+#. odoo-python
+#: code:addons/website/models/website.py:0
+#, python-format
+msgid ""
+"You cannot delete default website %s. Try to change its settings instead"
+msgstr ""
 
 #. module: website
 #. odoo-python

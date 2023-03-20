@@ -574,7 +574,10 @@ class AccountAccount(models.Model):
         args = args or []
         domain = []
         if name:
-            domain = ['|', ('code', '=ilike', name.split(' ')[0] + '%'), ('name', operator, name)]
+            if operator in ('=', '!='):
+                domain = ['|', ('code', '=', name.split(' ')[0]), ('name', operator, name)]
+            else:
+                domain = ['|', ('code', '=ilike', name.split(' ')[0] + '%'), ('name', operator, name)]
             if operator in expression.NEGATIVE_TERM_OPERATORS:
                 domain = ['&', '!'] + domain[1:]
         return self._search(expression.AND([domain, args]), limit=limit, access_rights_uid=name_get_uid)
@@ -632,9 +635,14 @@ class AccountAccount(models.Model):
         """
         rslt = super(AccountAccount, self).load(fields, data)
 
-        if 'import_file' in self.env.context:
+        if 'import_file' in self.env.context and 'opening_balance' in fields:
             companies = self.search([('id', 'in', rslt['ids'])]).mapped('company_id')
             for company in companies:
+                if company.account_opening_move_id.filtered(lambda m: m.state == "posted"):
+                    raise UserError(
+                        _('You cannot import the "openning_balance" if the opening move (%s) is already posted. \
+                        If you are absolutely sure you want to modify the opening balance of your accounts, reset the move to draft.',
+                          company.account_opening_move_id.name))
                 company._auto_balance_opening_move()
                 # the current_balance of the account only includes posted moves and
                 # would always amount to 0 after the import if we didn't post the opening move

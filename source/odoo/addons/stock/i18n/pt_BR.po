@@ -6306,6 +6306,14 @@ msgstr "Qtd"
 #. odoo-python
 #: code:addons/stock/models/stock_quant.py:0
 #, python-format
+msgid ""
+"Quants are auto-deleted when appropriate. If you must manually delete them, "
+"please ask a stock manager to do it."
+msgstr ""
+
+#. module: stock
+#: code:addons/stock/models/stock_quant.py:0
+#, python-format
 msgid "Quant's creation is restricted, you can't do this operation."
 msgstr ""
 "A criação de Quantidades é restrita, você não pode fazer esta operação."
@@ -9939,6 +9947,13 @@ msgstr "Você só pode devolver separações Concluídas."
 #, python-format
 msgid "You may only return one picking at a time."
 msgstr "Você pode retornar apenas uma separação por vez."
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/model/stock_picking.py:0
+#, python-format
+msgid " You might want to update the locations of this transfer's operations "
+msgstr ""
 
 #. module: stock
 #. odoo-python

@@ -473,15 +473,21 @@ export class Record extends DataPoint {
     }
 
     get evalContext() {
-        return {
-            // ...
-            ...this.dataContext,
-            ...this.context,
-            active_id: this.resId || false,
-            active_ids: this.resId ? [this.resId] : [],
-            active_model: this.resModel,
-            current_company_id: this.model.company.currentCompany.id,
-        };
+        if (!this.__evalContext) {
+            // store evalContext and reset it after a tick, as all calls during
+            // the same tick will produce the exact same evalContext
+            this.__evalContext = {
+                // ...
+                ...this.dataContext,
+                ...this.context,
+                active_id: this.resId || false,
+                active_ids: this.resId ? [this.resId] : [],
+                active_model: this.resModel,
+                current_company_id: this.model.company.currentCompany.id,
+            };
+            Promise.resolve().then(() => (this.__evalContext = null));
+        }
+        return this.__evalContext;
     }
 
     /**
@@ -725,7 +731,10 @@ export class Record extends DataPoint {
                     : false;
             } else if (fieldType === "reference") {
                 const value = changes[fieldName];
-                changes[fieldName] = value ? `${value.resModel},${value.resId}` : false;
+                changes[fieldName] =
+                    value && value.resModel && value.resId
+                        ? `${value.resModel},${value.resId}`
+                        : value || false;
             }
         }
 
@@ -973,12 +982,12 @@ export class Record extends DataPoint {
         this.invalidateCache();
     }
 
-    async update(changes) {
+    async update(changes, options) {
         if (this._urgentSave) {
-            return this._update(changes);
+            return this._update(changes, options);
         }
         return this.model.mutex.exec(async () => {
-            await this._update(changes);
+            await this._update(changes, options);
         });
     }
 
@@ -1373,7 +1382,7 @@ export class Record extends DataPoint {
         return true;
     }
 
-    async _update(changes) {
+    async _update(changes, { silent } = {}) {
         await this._applyChanges(changes);
         if (this.selected && this.model.multiEdit) {
             await this.model.root._multiSave(this);
@@ -1409,7 +1418,9 @@ export class Record extends DataPoint {
             proms.push(this.loadPreloadedData());
             await Promise.all(proms);
             this.canBeAbandoned = false;
-            this.model.notify();
+            if (!silent) {
+                this.model.notify();
+            }
         }
     }
 }
@@ -1772,7 +1783,7 @@ class DynamicList extends DataPoint {
             const record = records.find((r) => r.resId === recordData.id);
             const value = { [handleField]: recordData[handleField] };
             if (record instanceof Record) {
-                await record.update(value);
+                await record.update(value, { silent: true });
             } else {
                 Object.assign(record.data, value);
             }
@@ -1789,13 +1800,14 @@ class DynamicList extends DataPoint {
 DynamicList.DEFAULT_LIMIT = 80;
 
 export class DynamicRecordList extends DynamicList {
-    setup(params) {
+    setup(params, state) {
         super.setup(...arguments);
 
         /** @type {Record[]} */
         this.records = [];
         this.data = params.data;
-        this.countLimit = params.countLimit || this.constructor.WEB_SEARCH_READ_COUNT_LIMIT;
+        this.countLimit =
+            state.countLimit || params.countLimit || this.constructor.WEB_SEARCH_READ_COUNT_LIMIT;
         this.hasLimitedCount = false;
     }
 
@@ -1920,6 +1932,7 @@ export class DynamicRecordList extends DynamicList {
         return {
             ...super.exportState(),
             offset: this.offset,
+            countLimit: this.countLimit,
         };
     }
 
@@ -1936,6 +1949,7 @@ export class DynamicRecordList extends DynamicList {
         this.countLimit = Number.MAX_SAFE_INTEGER;
         this.hasLimitedCount = false;
         this.model.notify();
+        return this.count;
     }
 
     async load(params = {}) {
@@ -2010,6 +2024,9 @@ export class DynamicRecordList extends DynamicList {
      * @returns {Promise<Record[]>}
      */
     async _loadRecords() {
+        if (this.countLimit < this.offset + this.limit) {
+            this.countLimit = this.offset + this.limit;
+        }
         const kwargs = {
             limit: this.limit,
             offset: this.offset,
@@ -2051,6 +2068,7 @@ export class DynamicRecordList extends DynamicList {
             this.hasLimitedCount = true;
             this.count = length - 1;
         } else {
+            this.hasLimitedCount = false;
             this.count = length;
         }
 
@@ -2437,7 +2455,8 @@ export class DynamicGroupList extends DynamicList {
                     }
                     case "__fold": {
                         // optional
-                        groupParams.isFolded = value;
+                        groupParams.isFolded =
+                            openGroups >= this.constructor.DEFAULT_LOAD_LIMIT || value;
                         if (!value) {
                             openGroups++;
                         }

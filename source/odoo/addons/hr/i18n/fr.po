@@ -1229,7 +1229,7 @@ msgstr "Email"
 #. module: hr
 #: model:ir.model,name:hr.model_mail_alias
 msgid "Email Aliases"
-msgstr "Alias email"
+msgstr "Alias de messagerie"
 
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.res_users_view_form_profile
@@ -1709,7 +1709,7 @@ msgid ""
 "If the active field is set to False, it will allow you to hide the resource "
 "record without removing it."
 msgstr ""
-"Si le champ actif est défini sur False, la ressource sera masquée mais pas "
+"Si le champ actif n'est pas coché, la ressource sera masquée mais pas "
 "supprimée."
 
 #. module: hr

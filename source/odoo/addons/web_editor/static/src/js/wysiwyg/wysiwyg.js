@@ -63,6 +63,9 @@ const PTP_CLIENT_DISCONNECTED_STATES = [
     'disconnected',
 ];
 
+// this is a local cache for ice server descriptions
+let ICE_SERVERS = null;
+
 const Wysiwyg = Widget.extend({
     defaultOptions: {
         lang: 'odoo',
@@ -127,7 +130,7 @@ const Wysiwyg = Widget.extend({
         this.$editable.data('oe-model', options.recordInfo.res_model);
         this.$editable.data('oe-id', options.recordInfo.res_id);
         document.addEventListener('mousedown', this._onDocumentMousedown, true);
-        this.$editable.on('blur', this._onBlur);
+        this._bindOnBlur();
 
         this.toolbar = new Toolbar(this, this.options.toolbarTemplate);
         await this.toolbar.appendTo(document.createElement('void'));
@@ -202,7 +205,10 @@ const Wysiwyg = Widget.extend({
             },
             filterMutationRecords: (records) => {
                 return records.filter((record) => {
-                    return !(record.target.classList && record.target.classList.contains('o_header_standard'));
+                    return !(
+                        (record.target.classList && record.target.classList.contains('o_header_standard')) ||
+                        (record.type === 'attributes' && record.attributeName === 'data-last-history-steps')
+                    );
                 });
             },
             preHistoryUndo: () => {
@@ -216,7 +222,8 @@ const Wysiwyg = Widget.extend({
             plugins: options.editorPlugins,
             direction: options.direction || localization.direction || 'ltr',
             collaborationClientAvatarUrl: `${browser.location.origin}/web/image?model=res.users&field=avatar_128&id=${this.getSession().uid}`,
-            renderingClasses: ['o_dirty', 'o_transform_removal', 'oe_edited_link'],
+            renderingClasses: ['o_dirty', 'o_transform_removal', 'oe_edited_link', 'o_menu_loading'],
+            foldSnippets: !!options.foldSnippets,
         }, editorCollaborationOptions));
 
         this.odooEditor.addEventListener('contentChanged', function () {
@@ -279,7 +286,7 @@ const Wysiwyg = Widget.extend({
                     }
                     if ($field.data('oe-type') === "image") {
                         $field.attr('contenteditable', false);
-                        $field.find('img').attr('contenteditable', true);
+                        $field.find('img').attr('contenteditable', $field.data('oe-readonly') !== 1);
                     }
                     if ($field.is('[data-oe-many2one-id]')) {
                         $field.attr('contenteditable', false);
@@ -361,6 +368,9 @@ const Wysiwyg = Widget.extend({
                     && !$target.find('> [data-oe-model]').length
                     && !$target[0].closest('.o_extra_menu_items')
                     && $target[0].isContentEditable) {
+                if (ev.ctrlKey || ev.metaKey) {
+                    window.open(ev.target.href, '_blank')
+                }
                 this.linkPopover = $target.data('popover-widget-initialized');
                 if (!this.linkPopover) {
                     // TODO this code is ugly maybe the mutex should be in the
@@ -380,7 +390,7 @@ const Wysiwyg = Widget.extend({
                     })();
                 }
                 $target.focus();
-                if ($target.closest('#wrapwrap').length) {
+                if ($target.closest('#wrapwrap').length && this.snippetsMenu) {
                     this.toggleLinkTools({
                         forceOpen: true,
                         link: $target[0],
@@ -450,7 +460,7 @@ const Wysiwyg = Widget.extend({
         // Check wether clientA is before clientB.
         const isClientFirst = (clientA, clientB) => {
             if (clientA.startTime === clientB.startTime) {
-                return clientA.id.localCompare(clientB.id) === -1;
+                return clientA.id.localeCompare(clientB.id) < 1;
             } else {
                 return clientA.startTime < clientB.startTime;
             }
@@ -461,6 +471,7 @@ const Wysiwyg = Widget.extend({
             // Wether or not the history has been sent or received at least once.
             let historySyncAtLeastOnce = false;
             let historySyncFinished = false;
+            let historyStepsBuffer = [];
 
             return new PeerToPeer({
                 peerConnectionConfig: { iceServers: this._iceServers },
@@ -515,7 +526,8 @@ const Wysiwyg = Widget.extend({
                             break;
                         case 'rtc_data_channel_open': {
                             fromClientId = notificationPayload.connectionClientId;
-                            this.ptp.clientsInfos[fromClientId].startTime = await this.ptp.requestClient(fromClientId, 'get_start_time', undefined, { transport: 'rtc' });
+                            const remoteStartTime = await this.ptp.requestClient(fromClientId, 'get_start_time', undefined, { transport: 'rtc' });
+                            this.ptp.clientsInfos[fromClientId].startTime = remoteStartTime;
                             this.ptp.requestClient(fromClientId, 'get_client_name', undefined, { transport: 'rtc' }).then((clientName) => {
                                 this.ptp.clientsInfos[fromClientId].clientName = clientName;
                             });
@@ -524,8 +536,35 @@ const Wysiwyg = Widget.extend({
                             });
 
                             if (!historySyncAtLeastOnce) {
-                                historySyncAtLeastOnce = true;
-                                await editorCollaborationOptions.onHistoryNeedSync();
+                                const localClient = { id: this._currentClientId, startTime: this._startCollaborationTime };
+                                const remoteClient = { id: fromClientId, startTime: remoteStartTime };
+                                if (isClientFirst(localClient, remoteClient)) {
+                                    historySyncAtLeastOnce = true;
+                                } else {
+                                    const { steps, historyIds } = await this.ptp.requestClient(fromClientId, 'get_history_from_snapshot', undefined, { transport: 'rtc' });
+                                    // Ensure that the history hasn't been
+                                    // synced by another client before this
+                                    // `get_history_from_snapshot` finished.
+                                    if (historySyncAtLeastOnce) {
+                                        return;
+                                    }
+                                    const firstStepId = this.odooEditor.historyGetBranchIds()[0];
+                                    const staleDocument = !historyIds.includes(firstStepId);
+                                    if (staleDocument) {
+                                        return false;
+                                    }
+                                    historySyncAtLeastOnce = true;
+                                    this.odooEditor.historyResetFromSteps(steps, historyIds);
+                                    const remoteSelection = await this.ptp.requestClient(fromClientId, 'get_collaborative_selection', undefined, { transport: 'rtc' });
+                                    if (remoteSelection) {
+                                        this.odooEditor.onExternalMultiselectionUpdate(remoteSelection);
+                                    }
+                                }
+                                // In case there are steps received in the meantime, process them.
+                                if (historyStepsBuffer.length) {
+                                    this.odooEditor.onExternalHistorySteps(historyStepsBuffer);
+                                    historyStepsBuffer = [];
+                                }
                                 historySyncFinished = true;
                             } else {
                                 const remoteSelection = await this.ptp.requestClient(fromClientId, 'get_collaborative_selection', undefined, { transport: 'rtc' });
@@ -540,6 +579,8 @@ const Wysiwyg = Widget.extend({
                             // before the history has synced at least once.
                             if (historySyncFinished) {
                                 this.odooEditor.onExternalHistorySteps([notificationPayload]);
+                            } else {
+                                historyStepsBuffer.push(notificationPayload);
                             }
                             break;
                         case 'oe_history_set_selection': {
@@ -594,7 +635,10 @@ const Wysiwyg = Widget.extend({
         }, CHECK_OFFLINE_TIME);
 
         this._peerToPeerLoading = new Promise(async (resolve) => {
-            let iceServers = await this._rpc({route: '/web_editor/get_ice_servers'});
+            if (!ICE_SERVERS) {
+                ICE_SERVERS = await this._rpc({route: '/web_editor/get_ice_servers'});
+            }
+            let iceServers = ICE_SERVERS;
             if (!iceServers.length) {
                 iceServers = [
                     {
@@ -632,50 +676,14 @@ const Wysiwyg = Widget.extend({
                     },
                     { transport: 'rtc' }
                 );
+                // If missing steps === -1, it means that either the
+                // step.clientId has a stale document or the step.clientId has a
+                // snapshot and does not includes the step in its history.
                 if (missingSteps === -1 || !missingSteps.length) {
-                    // This case should never happen.
                     console.warn('Editor get_missing_steps result is erroneous.');
                     return;
                 }
                 this.ptp && this.odooEditor.onExternalHistorySteps(missingSteps.concat([step]));
-            },
-            onHistoryNeedSync: async () => {
-                if (!this.ptp) return;
-                let firstClientId = this._currentClientId;
-                let firstClientStartTime = this._startCollaborationTime;
-                const connectedClientIds = this.ptp.getConnectedClientIds();
-                for (const clientId of connectedClientIds) {
-                    const clientInfo = this.ptp.clientsInfos[clientId];
-                    // Ensure we already retreived remote client starting time.
-                    if (!clientInfo.startTime) {
-                        continue;
-                    }
-
-                    const isCurrentClientFirst = isClientFirst(
-                        {
-                            startTime: clientInfo.startTime,
-                            id: clientId,
-                        },
-                        {
-                            startTime: firstClientStartTime,
-                            id: firstClientId,
-                        }
-                    );
-
-                    if (isCurrentClientFirst) {
-                        firstClientStartTime = clientInfo.startTime;
-                        firstClientId = clientId;
-                    }
-                }
-
-                if (firstClientId !== this._currentClientId) {
-                    const { steps, historyIds } = await this.ptp.requestClient(firstClientId, 'get_history_from_snapshot', undefined, { transport: 'rtc' });
-                    this.odooEditor.historyResetFromSteps(steps, historyIds);
-                    const remoteSelection = await this.ptp.requestClient(firstClientId, 'get_collaborative_selection', undefined, { transport: 'rtc' });
-                    if (remoteSelection) {
-                        this.odooEditor.onExternalMultiselectionUpdate(remoteSelection);
-                    }
-                }
             },
         };
         return editorCollaborationOptions;
@@ -1205,6 +1213,8 @@ const Wysiwyg = Widget.extend({
                 this.destroyLinkTools();
             }
         } else {
+            const historyStepIndex = this.odooEditor.historySize() - 1;
+            this.odooEditor.historyPauseSteps();
             let { link } = Link.getOrCreateLink({
                 containerNode: this.odooEditor.editable,
                 startNode: options.link,
@@ -1218,7 +1228,6 @@ const Wysiwyg = Widget.extend({
             }, this.$editable[0], {
                 needLabel: true
             }, undefined, link);
-            const restoreSelection = preserveCursor(this.odooEditor.document);
             linkDialog.open();
             linkDialog.on('save', this, data => {
                 if (!data) {
@@ -1230,6 +1239,7 @@ const Wysiwyg = Widget.extend({
                     data.rel = 'ugc';
                 }
                 linkWidget.applyLinkToDom(data);
+                this.odooEditor.historyUnpauseSteps();
                 this.odooEditor.historyStep();
                 link = linkWidget.$link[0];
                 this.odooEditor.setContenteditableLink(linkWidget.$link[0]);
@@ -1244,6 +1254,7 @@ const Wysiwyg = Widget.extend({
                 Promise.resolve().then(() => link.focus());
             });
             linkDialog.on('closed', this, function () {
+                this.odooEditor.historyUnpauseSteps();
                 // If the linkDialog content has been saved
                 // the previous selection in not relevant anymore.
                 if (linkDialog.destroyAction !== 'save') {
@@ -1254,7 +1265,7 @@ const Wysiwyg = Widget.extend({
                     // microtask to set the focus is hackish and might break if
                     // another microtask which changes the selection in the dom
                     // occurs at the same time (but this case seems unlikely).
-                    Promise.resolve().then(() => restoreSelection());
+                    Promise.resolve().then(() => this.odooEditor.historyRevertUntil(historyStepIndex));
                 }
             });
         }
@@ -2501,7 +2512,7 @@ const Wysiwyg = Widget.extend({
         }
     },
     _getInitialHistoryId: function (value) {
-        const matchId = value.match(/data-last-history-steps="([0-9,]*?)"/);
+        const matchId = value.match(/data-last-history-steps="([0-9,]+)"/);
         return matchId && matchId[1];
     },
     /**
@@ -2613,6 +2624,9 @@ const Wysiwyg = Widget.extend({
                 firstChild.setAttribute('data-last-history-steps', historyIds);
             }
         }
+    },
+    _bindOnBlur() {
+        this.$editable.on('blur', this._onBlur);
     },
 
 });
