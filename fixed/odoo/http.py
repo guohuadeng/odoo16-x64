@@ -335,8 +335,8 @@ def db_filter(dbs, host=None):
         # dbmap = {'gd.erpapp.cn':'gd.erpapp.cn', 'fs.erpapp.cn':'gd.erpapp.cn', 'zs.erpapp.cn':'gd.erpapp.cn'}
         if odoo.tools.config.get('dbmap', False):
             mp = json.loads(odoo.tools.config.get('dbmap', False).replace("\'", "\""))
-            if mp.get(h, False):
-                dbs = [mp.get(h, False)]
+            if mp.get(host, False):
+                dbs = [mp.get(host, False)]
                 return dbs
         # end dbmap
         
