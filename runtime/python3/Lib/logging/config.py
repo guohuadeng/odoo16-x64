@@ -48,7 +48,7 @@ RESET_ERROR = errno.ECONNRESET
 #   _listener holds the server object doing the listening
 _listener = None
 
-def fileConfig(fname, defaults=None, disable_existing_loggers=True):
+def fileConfig(fname, defaults=None, disable_existing_loggers=True, encoding=None):
     """
     Read the logging configuration from a ConfigParser-format file.
 
@@ -66,7 +66,8 @@ def fileConfig(fname, defaults=None, disable_existing_loggers=True):
         if hasattr(fname, 'readline'):
             cp.read_file(fname)
         else:
-            cp.read(fname)
+            encoding = io.text_encoding(encoding)
+            cp.read(fname, encoding=encoding)
 
     formatters = _create_formatters(cp)
 
@@ -143,6 +144,7 @@ def _install_handlers(cp, formatters):
         kwargs = section.get("kwargs", '{}')
         kwargs = eval(kwargs, vars(logging))
         h = klass(*args, **kwargs)
+        h.name = hand
         if "level" in section:
             level = section["level"]
             h.setLevel(level)
@@ -447,7 +449,7 @@ class BaseConfigurator(object):
             value = ConvertingList(value)
             value.configurator = self
         elif not isinstance(value, ConvertingTuple) and\
-                 isinstance(value, tuple):
+                 isinstance(value, tuple) and not hasattr(value, '_fields'):
             value = ConvertingTuple(value)
             value.configurator = self
         elif isinstance(value, str): # str for py3k
@@ -667,11 +669,19 @@ class DictConfigurator(BaseConfigurator):
             dfmt = config.get('datefmt', None)
             style = config.get('style', '%')
             cname = config.get('class', None)
+
             if not cname:
                 c = logging.Formatter
             else:
                 c = _resolve(cname)
-            result = c(fmt, dfmt, style)
+
+            # A TypeError would be raised if "validate" key is passed in with a formatter callable
+            # that does not accept "validate" as a parameter
+            if 'validate' in config:  # if user hasn't mentioned it, the default will be fine
+                result = c(fmt, dfmt, style, config['validate'])
+            else:
+                result = c(fmt, dfmt, style)
+
         return result
 
     def configure_filter(self, config):
@@ -784,6 +794,7 @@ class DictConfigurator(BaseConfigurator):
         """Configure a non-root logger from a dictionary."""
         logger = logging.getLogger(name)
         self.common_logger_config(logger, config, incremental)
+        logger.disabled = False
         propagate = config.get('propagate', None)
         if propagate is not None:
             logger.propagate = propagate

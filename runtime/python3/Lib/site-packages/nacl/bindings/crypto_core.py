@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import, division, print_function
 
 from nacl import exceptions as exc
 from nacl._sodium import ffi, lib
@@ -27,13 +26,13 @@ crypto_core_ed25519_NONREDUCEDSCALARBYTES = 0
 
 if has_crypto_core_ed25519:
     crypto_core_ed25519_BYTES = lib.crypto_core_ed25519_bytes()
-    crypto_core_ed25519_SCALARBYTES = \
-        lib.crypto_core_ed25519_scalarbytes()
-    crypto_core_ed25519_NONREDUCEDSCALARBYTES = \
+    crypto_core_ed25519_SCALARBYTES = lib.crypto_core_ed25519_scalarbytes()
+    crypto_core_ed25519_NONREDUCEDSCALARBYTES = (
         lib.crypto_core_ed25519_nonreducedscalarbytes()
+    )
 
 
-def crypto_core_ed25519_is_valid_point(p):
+def crypto_core_ed25519_is_valid_point(p: bytes) -> bool:
     """
     Check if ``p`` represents a point on the edwards25519 curve, in canonical
     form, on the main subgroup, and that the point doesn't have a small order.
@@ -46,19 +45,23 @@ def crypto_core_ed25519_is_valid_point(p):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_core_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_core_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(p, bytes) and len(p) == crypto_core_ed25519_BYTES,
-           'Point must be a crypto_core_ed25519_BYTES long bytes sequence',
-           raising=exc.TypeError)
+    ensure(
+        isinstance(p, bytes) and len(p) == crypto_core_ed25519_BYTES,
+        "Point must be a crypto_core_ed25519_BYTES long bytes sequence",
+        raising=exc.TypeError,
+    )
 
     rc = lib.crypto_core_ed25519_is_valid_point(p)
     return rc == 1
 
 
-def crypto_core_ed25519_add(p, q):
+def crypto_core_ed25519_add(p: bytes, q: bytes) -> bytes:
     """
     Add two points on the edwards25519 curve.
 
@@ -74,28 +77,32 @@ def crypto_core_ed25519_add(p, q):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_core_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_core_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(p, bytes) and isinstance(q, bytes) and
-           len(p) == crypto_core_ed25519_BYTES and
-           len(q) == crypto_core_ed25519_BYTES,
-           'Each point must be a {} long bytes sequence'.format(
-           'crypto_core_ed25519_BYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(p, bytes)
+        and isinstance(q, bytes)
+        and len(p) == crypto_core_ed25519_BYTES
+        and len(q) == crypto_core_ed25519_BYTES,
+        "Each point must be a {} long bytes sequence".format(
+            "crypto_core_ed25519_BYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
     r = ffi.new("unsigned char[]", crypto_core_ed25519_BYTES)
 
     rc = lib.crypto_core_ed25519_add(r, p, q)
-    ensure(rc == 0,
-           'Unexpected library error',
-           raising=exc.RuntimeError)
+    ensure(rc == 0, "Unexpected library error", raising=exc.RuntimeError)
 
     return ffi.buffer(r, crypto_core_ed25519_BYTES)[:]
 
 
-def crypto_core_ed25519_sub(p, q):
+def crypto_core_ed25519_sub(p: bytes, q: bytes) -> bytes:
     """
     Subtract a point from another on the edwards25519 curve.
 
@@ -111,28 +118,32 @@ def crypto_core_ed25519_sub(p, q):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_core_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_core_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(p, bytes) and isinstance(q, bytes) and
-           len(p) == crypto_core_ed25519_BYTES and
-           len(q) == crypto_core_ed25519_BYTES,
-           'Each point must be a {} long bytes sequence'.format(
-           'crypto_core_ed25519_BYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(p, bytes)
+        and isinstance(q, bytes)
+        and len(p) == crypto_core_ed25519_BYTES
+        and len(q) == crypto_core_ed25519_BYTES,
+        "Each point must be a {} long bytes sequence".format(
+            "crypto_core_ed25519_BYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
     r = ffi.new("unsigned char[]", crypto_core_ed25519_BYTES)
 
     rc = lib.crypto_core_ed25519_sub(r, p, q)
-    ensure(rc == 0,
-           'Unexpected library error',
-           raising=exc.RuntimeError)
+    ensure(rc == 0, "Unexpected library error", raising=exc.RuntimeError)
 
     return ffi.buffer(r, crypto_core_ed25519_BYTES)[:]
 
 
-def crypto_core_ed25519_scalar_invert(s):
+def crypto_core_ed25519_scalar_invert(s: bytes) -> bytes:
     """
     Return the multiplicative inverse of integer ``s`` modulo ``L``,
     i.e an integer ``i`` such that ``s * i = 1 (mod L)``, where ``L``
@@ -149,27 +160,29 @@ def crypto_core_ed25519_scalar_invert(s):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_core_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_core_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(s, bytes) and
-           len(s) == crypto_core_ed25519_SCALARBYTES,
-           'Integer s must be a {} long bytes sequence'.format(
-           'crypto_core_ed25519_SCALARBYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(s, bytes) and len(s) == crypto_core_ed25519_SCALARBYTES,
+        "Integer s must be a {} long bytes sequence".format(
+            "crypto_core_ed25519_SCALARBYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
     r = ffi.new("unsigned char[]", crypto_core_ed25519_SCALARBYTES)
 
     rc = lib.crypto_core_ed25519_scalar_invert(r, s)
-    ensure(rc == 0,
-           'Unexpected library error',
-           raising=exc.RuntimeError)
+    ensure(rc == 0, "Unexpected library error", raising=exc.RuntimeError)
 
     return ffi.buffer(r, crypto_core_ed25519_SCALARBYTES)[:]
 
 
-def crypto_core_ed25519_scalar_negate(s):
+def crypto_core_ed25519_scalar_negate(s: bytes) -> bytes:
     """
     Return the integer ``n`` such that ``s + n = 0 (mod L)``, where ``L``
     is the order of the main subgroup.
@@ -183,15 +196,19 @@ def crypto_core_ed25519_scalar_negate(s):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_core_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_core_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(s, bytes) and
-           len(s) == crypto_core_ed25519_SCALARBYTES,
-           'Integer s must be a {} long bytes sequence'.format(
-           'crypto_core_ed25519_SCALARBYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(s, bytes) and len(s) == crypto_core_ed25519_SCALARBYTES,
+        "Integer s must be a {} long bytes sequence".format(
+            "crypto_core_ed25519_SCALARBYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
     r = ffi.new("unsigned char[]", crypto_core_ed25519_SCALARBYTES)
 
@@ -200,7 +217,7 @@ def crypto_core_ed25519_scalar_negate(s):
     return ffi.buffer(r, crypto_core_ed25519_SCALARBYTES)[:]
 
 
-def crypto_core_ed25519_scalar_complement(s):
+def crypto_core_ed25519_scalar_complement(s: bytes) -> bytes:
     """
     Return the complement of integer ``s`` modulo ``L``, i.e. an integer
     ``c`` such that ``s + c = 1 (mod L)``, where ``L`` is the order of
@@ -215,15 +232,19 @@ def crypto_core_ed25519_scalar_complement(s):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_core_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_core_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(s, bytes) and
-           len(s) == crypto_core_ed25519_SCALARBYTES,
-           'Integer s must be a {} long bytes sequence'.format(
-           'crypto_core_ed25519_SCALARBYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(s, bytes) and len(s) == crypto_core_ed25519_SCALARBYTES,
+        "Integer s must be a {} long bytes sequence".format(
+            "crypto_core_ed25519_SCALARBYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
     r = ffi.new("unsigned char[]", crypto_core_ed25519_SCALARBYTES)
 
@@ -232,7 +253,7 @@ def crypto_core_ed25519_scalar_complement(s):
     return ffi.buffer(r, crypto_core_ed25519_SCALARBYTES)[:]
 
 
-def crypto_core_ed25519_scalar_add(p, q):
+def crypto_core_ed25519_scalar_add(p: bytes, q: bytes) -> bytes:
     """
     Add integers ``p`` and ``q`` modulo ``L``, where ``L`` is the order of
     the main subgroup.
@@ -249,16 +270,22 @@ def crypto_core_ed25519_scalar_add(p, q):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_core_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_core_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(p, bytes) and isinstance(q, bytes) and
-           len(p) == crypto_core_ed25519_SCALARBYTES and
-           len(q) == crypto_core_ed25519_SCALARBYTES,
-           'Each integer must be a {} long bytes sequence'.format(
-           'crypto_core_ed25519_SCALARBYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(p, bytes)
+        and isinstance(q, bytes)
+        and len(p) == crypto_core_ed25519_SCALARBYTES
+        and len(q) == crypto_core_ed25519_SCALARBYTES,
+        "Each integer must be a {} long bytes sequence".format(
+            "crypto_core_ed25519_SCALARBYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
     r = ffi.new("unsigned char[]", crypto_core_ed25519_SCALARBYTES)
 
@@ -267,7 +294,7 @@ def crypto_core_ed25519_scalar_add(p, q):
     return ffi.buffer(r, crypto_core_ed25519_SCALARBYTES)[:]
 
 
-def crypto_core_ed25519_scalar_sub(p, q):
+def crypto_core_ed25519_scalar_sub(p: bytes, q: bytes) -> bytes:
     """
     Subtract integers ``p`` and ``q`` modulo ``L``, where ``L`` is the
     order of the main subgroup.
@@ -284,16 +311,22 @@ def crypto_core_ed25519_scalar_sub(p, q):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_core_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_core_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(p, bytes) and isinstance(q, bytes) and
-           len(p) == crypto_core_ed25519_SCALARBYTES and
-           len(q) == crypto_core_ed25519_SCALARBYTES,
-           'Each integer must be a {} long bytes sequence'.format(
-           'crypto_core_ed25519_SCALARBYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(p, bytes)
+        and isinstance(q, bytes)
+        and len(p) == crypto_core_ed25519_SCALARBYTES
+        and len(q) == crypto_core_ed25519_SCALARBYTES,
+        "Each integer must be a {} long bytes sequence".format(
+            "crypto_core_ed25519_SCALARBYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
     r = ffi.new("unsigned char[]", crypto_core_ed25519_SCALARBYTES)
 
@@ -302,7 +335,7 @@ def crypto_core_ed25519_scalar_sub(p, q):
     return ffi.buffer(r, crypto_core_ed25519_SCALARBYTES)[:]
 
 
-def crypto_core_ed25519_scalar_mul(p, q):
+def crypto_core_ed25519_scalar_mul(p: bytes, q: bytes) -> bytes:
     """
     Multiply integers ``p`` and ``q`` modulo ``L``, where ``L`` is the
     order of the main subgroup.
@@ -319,16 +352,22 @@ def crypto_core_ed25519_scalar_mul(p, q):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_core_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_core_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(p, bytes) and isinstance(q, bytes) and
-           len(p) == crypto_core_ed25519_SCALARBYTES and
-           len(q) == crypto_core_ed25519_SCALARBYTES,
-           'Each integer must be a {} long bytes sequence'.format(
-           'crypto_core_ed25519_SCALARBYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(p, bytes)
+        and isinstance(q, bytes)
+        and len(p) == crypto_core_ed25519_SCALARBYTES
+        and len(q) == crypto_core_ed25519_SCALARBYTES,
+        "Each integer must be a {} long bytes sequence".format(
+            "crypto_core_ed25519_SCALARBYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
     r = ffi.new("unsigned char[]", crypto_core_ed25519_SCALARBYTES)
 
@@ -337,7 +376,7 @@ def crypto_core_ed25519_scalar_mul(p, q):
     return ffi.buffer(r, crypto_core_ed25519_SCALARBYTES)[:]
 
 
-def crypto_core_ed25519_scalar_reduce(s):
+def crypto_core_ed25519_scalar_reduce(s: bytes) -> bytes:
     """
     Reduce integer ``s`` to ``s`` modulo ``L``, where ``L`` is the order
     of the main subgroup.
@@ -351,15 +390,20 @@ def crypto_core_ed25519_scalar_reduce(s):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_core_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_core_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(s, bytes) and
-           len(s) == crypto_core_ed25519_NONREDUCEDSCALARBYTES,
-           'Integer s must be a {} long bytes sequence'.format(
-           'crypto_core_ed25519_NONREDUCEDSCALARBYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(s, bytes)
+        and len(s) == crypto_core_ed25519_NONREDUCEDSCALARBYTES,
+        "Integer s must be a {} long bytes sequence".format(
+            "crypto_core_ed25519_NONREDUCEDSCALARBYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
     r = ffi.new("unsigned char[]", crypto_core_ed25519_SCALARBYTES)
 

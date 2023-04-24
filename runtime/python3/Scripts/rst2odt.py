@@ -1,4 +1,4 @@
-#!d:\odoo13-x64\runtime\python3\python.exe
+#!d:\odoo16-x64\runtime\python3\python.exe
 
 # $Id: rst2odt.py 5839 2009-01-07 19:09:28Z dkuhlman $
 # Author: Dave Kuhlman <dkuhlman@rexx.com>

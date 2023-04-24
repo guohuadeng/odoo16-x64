@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import, division, print_function
+
+# We create a clone of various builtin Exception types which additionally
+# inherit from CryptoError. Below, we refer to the parent types via the
+# `builtins` namespace, so mypy can distinguish between (e.g.)
+# `nacl.exceptions.RuntimeError` and `builtins.RuntimeError`.
+import builtins
+from typing import Type
 
 
 class CryptoError(Exception):
@@ -27,19 +33,19 @@ class BadSignatureError(CryptoError):
     """
 
 
-class RuntimeError(RuntimeError, CryptoError):
+class RuntimeError(builtins.RuntimeError, CryptoError):
     pass
 
 
-class AssertionError(AssertionError, CryptoError):
+class AssertionError(builtins.AssertionError, CryptoError):
     pass
 
 
-class TypeError(TypeError, CryptoError):
+class TypeError(builtins.TypeError, CryptoError):
     pass
 
 
-class ValueError(ValueError, CryptoError):
+class ValueError(builtins.ValueError, CryptoError):
     pass
 
 
@@ -57,10 +63,11 @@ class UnavailableError(RuntimeError):
     trying to call functions not available in a minimal build of
     libsodium.
     """
+
     pass
 
 
-def ensure(cond, *args, **kwds):
+def ensure(cond: bool, *args: object, **kwds: Type[Exception]) -> None:
     """
     Return if a condition is true, otherwise raise a caller-configurable
     :py:class:`Exception`
@@ -70,9 +77,9 @@ def ensure(cond, *args, **kwds):
     The only accepted named parameter is `raising` used to configure the
     exception to be raised if `cond` is not `True`
     """
-    _CHK_UNEXP = 'check_condition() got an unexpected keyword argument {0}'
+    _CHK_UNEXP = "check_condition() got an unexpected keyword argument {0}"
 
-    raising = kwds.pop('raising', AssertionError)
+    raising = kwds.pop("raising", AssertionError)
     if kwds:
         raise TypeError(_CHK_UNEXP.format(repr(kwds.popitem()[0])))
 

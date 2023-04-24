@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import
-from __future__ import division
 
 import nacl.bindings
 import nacl.encoding
@@ -39,25 +37,23 @@ MEMLIMIT_MIN = nacl.bindings.crypto_pwhash_argon2i_MEMLIMIT_MIN
 OPSLIMIT_MAX = nacl.bindings.crypto_pwhash_argon2i_OPSLIMIT_MAX
 OPSLIMIT_MIN = nacl.bindings.crypto_pwhash_argon2i_OPSLIMIT_MIN
 
-OPSLIMIT_INTERACTIVE = \
-    nacl.bindings.crypto_pwhash_argon2i_OPSLIMIT_INTERACTIVE
-MEMLIMIT_INTERACTIVE = \
-    nacl.bindings.crypto_pwhash_argon2i_MEMLIMIT_INTERACTIVE
-OPSLIMIT_SENSITIVE = \
-    nacl.bindings.crypto_pwhash_argon2i_OPSLIMIT_SENSITIVE
-MEMLIMIT_SENSITIVE = \
-    nacl.bindings.crypto_pwhash_argon2i_MEMLIMIT_SENSITIVE
+OPSLIMIT_INTERACTIVE = nacl.bindings.crypto_pwhash_argon2i_OPSLIMIT_INTERACTIVE
+MEMLIMIT_INTERACTIVE = nacl.bindings.crypto_pwhash_argon2i_MEMLIMIT_INTERACTIVE
+OPSLIMIT_SENSITIVE = nacl.bindings.crypto_pwhash_argon2i_OPSLIMIT_SENSITIVE
+MEMLIMIT_SENSITIVE = nacl.bindings.crypto_pwhash_argon2i_MEMLIMIT_SENSITIVE
 
-OPSLIMIT_MODERATE = \
-    nacl.bindings.crypto_pwhash_argon2i_OPSLIMIT_MODERATE
-MEMLIMIT_MODERATE = \
-    nacl.bindings.crypto_pwhash_argon2i_MEMLIMIT_MODERATE
+OPSLIMIT_MODERATE = nacl.bindings.crypto_pwhash_argon2i_OPSLIMIT_MODERATE
+MEMLIMIT_MODERATE = nacl.bindings.crypto_pwhash_argon2i_MEMLIMIT_MODERATE
 
 
-def kdf(size, password, salt,
-        opslimit=OPSLIMIT_SENSITIVE,
-        memlimit=MEMLIMIT_SENSITIVE,
-        encoder=nacl.encoding.RawEncoder):
+def kdf(
+    size: int,
+    password: bytes,
+    salt: bytes,
+    opslimit: int = OPSLIMIT_SENSITIVE,
+    memlimit: int = MEMLIMIT_SENSITIVE,
+    encoder: nacl.encoding.Encoder = nacl.encoding.RawEncoder,
+) -> bytes:
     """
     Derive a ``size`` bytes long key from a caller-supplied
     ``password`` and ``salt`` pair using the argon2i
@@ -104,15 +100,17 @@ def kdf(size, password, salt,
     """
 
     return encoder.encode(
-        nacl.bindings.crypto_pwhash_alg(size, password, salt,
-                                        opslimit, memlimit,
-                                        ALG)
+        nacl.bindings.crypto_pwhash_alg(
+            size, password, salt, opslimit, memlimit, ALG
+        )
     )
 
 
-def str(password,
-        opslimit=OPSLIMIT_INTERACTIVE,
-        memlimit=MEMLIMIT_INTERACTIVE):
+def str(
+    password: bytes,
+    opslimit: int = OPSLIMIT_INTERACTIVE,
+    memlimit: int = MEMLIMIT_INTERACTIVE,
+) -> bytes:
     """
     Hashes a password with a random salt, using the memory-hard
     argon2i construct and returning an ascii string that has all
@@ -129,7 +127,6 @@ def str(password,
 
     .. versionadded:: 1.2
     """
-    return nacl.bindings.crypto_pwhash_str_alg(password,
-                                               opslimit,
-                                               memlimit,
-                                               ALG)
+    return nacl.bindings.crypto_pwhash_str_alg(
+        password, opslimit, memlimit, ALG
+    )

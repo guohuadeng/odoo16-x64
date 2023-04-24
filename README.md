@@ -11,10 +11,10 @@ https://nightly.odoocdn.com/16.0/nightly/src/odoo_16.0.latest.zip
 https://nightly.odoo.com/16.0/nightly/src/odoo_16.0.latest.zip
 
 ## 版本信息
-1. python 3.7.5, 64位
+1. python 3.10.10, 64位
 2. postgresql 13.4 ,64位
 3. Nginx 1.15.5， 64位
-4. Odoo 16社区版，20230320版
+4. Odoo 16社区版，20230424版
 5. 增加 sphinx 及 tx_client，用于文档及翻译
 6. 本地执行 gi.bat，会将原始odoo的最新版clone到本地 .\source_git，执行 gu.bat 更新
 7. 对断点调试的处理， 如果更新了新版odoo，将 .\fixed 目录内容覆盖 .\source 内容
@@ -82,11 +82,11 @@ createuser --createdb --no-createrole --no-superuser --pwprompt odoo
 ```
 
 # 附：如何自行制作绿色安装包
-## 先装 python 3.7.5 ，pip3，用64位。与ubuntu 内置一样版本，改python.exe为python3.exe
+## 先装 python 3.10.10 ，pip3，用64位。与ubuntu 内置一样版本，改python.exe为python3.exe
 ```
 https://www.python.org/downloads/windows/
-cd d:\Odoo15-x64\runtime\python3
-SET PATH=d:\Odoo15-x64\runtime\python3;d:\Odoo15\runtime\python3\scripts;%PATH%
+cd d:\Odoo16-x64\runtime\python3
+SET PATH=d:\Odoo16-x64\runtime\python3;d:\Odoo15\runtime\python3\scripts;%PATH%
 ```
 
 ## 安装pip
@@ -102,10 +102,9 @@ http://www.lfd.uci.edu/~gohlke/pythonlibs/
 ## 部份要人工下载安装的odoo依赖，已下载放在 ./extra
 ## 优化 requirements.txt 可忽略ms库
 
-## python 3.7.5
+## python 3.10.10
 ```
-pip3 install -r .\source\requirements.txt  -i https://mirrors.aliyun.com/pypi/simple --target=D:\odoo15-x64\runtime\python3\Lib\site-packages
-pip3 install reportlab==3.5.59  -i https://mirrors.ustc.edu.cn/pypi/web/simple
+pip3 install -r .\source\requirements.txt  -i https://mirrors.aliyun.com/pypi/simple --target=D:\odoo16-x64\runtime\python3\Lib\site-packages
 ```
 
 ## pycrypto 处理

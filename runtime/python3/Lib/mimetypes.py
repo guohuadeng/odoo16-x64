@@ -27,6 +27,12 @@ import os
 import sys
 import posixpath
 import urllib.parse
+
+try:
+    from _winapi import _mimetypes_read_windows_registry
+except ImportError:
+    _mimetypes_read_windows_registry = None
+
 try:
     import winreg as _winreg
 except ImportError:
@@ -95,7 +101,7 @@ class MimeTypes:
             exts.append(ext)
 
     def guess_type(self, url, strict=True):
-        """Guess the type of a file based on its URL.
+        """Guess the type of a file which is either a URL or a path-like object.
 
         Return value is a tuple (type, encoding) where type is None if
         the type can't be guessed (no or unknown suffix) or a string
@@ -114,7 +120,7 @@ class MimeTypes:
         but non-standard types.
         """
         url = os.fspath(url)
-        scheme, url = urllib.parse.splittype(url)
+        scheme, url = urllib.parse._splittype(url)
         if scheme == 'data':
             # syntax of data URLs:
             # dataurl   := "data:" [ mediatype ] [ ";base64" ] "," data
@@ -135,25 +141,23 @@ class MimeTypes:
                 type = 'text/plain'
             return type, None           # never compressed, so encoding is None
         base, ext = posixpath.splitext(url)
-        while ext in self.suffix_map:
-            base, ext = posixpath.splitext(base + self.suffix_map[ext])
+        while (ext_lower := ext.lower()) in self.suffix_map:
+            base, ext = posixpath.splitext(base + self.suffix_map[ext_lower])
+        # encodings_map is case sensitive
         if ext in self.encodings_map:
             encoding = self.encodings_map[ext]
             base, ext = posixpath.splitext(base)
         else:
             encoding = None
+        ext = ext.lower()
         types_map = self.types_map[True]
         if ext in types_map:
             return types_map[ext], encoding
-        elif ext.lower() in types_map:
-            return types_map[ext.lower()], encoding
         elif strict:
             return None, encoding
         types_map = self.types_map[False]
         if ext in types_map:
             return types_map[ext], encoding
-        elif ext.lower() in types_map:
-            return types_map[ext.lower()], encoding
         else:
             return None, encoding
 
@@ -169,7 +173,7 @@ class MimeTypes:
         but non-standard types.
         """
         type = type.lower()
-        extensions = self.types_map_inv[True].get(type, [])
+        extensions = list(self.types_map_inv[True].get(type, []))
         if not strict:
             for ext in self.types_map_inv[False].get(type, []):
                 if ext not in extensions:
@@ -237,10 +241,21 @@ class MimeTypes:
         types.
         """
 
-        # Windows only
-        if not _winreg:
+        if not _mimetypes_read_windows_registry and not _winreg:
             return
 
+        add_type = self.add_type
+        if strict:
+            add_type = lambda type, ext: self.add_type(type, ext, True)
+
+        # Accelerated function if it is available
+        if _mimetypes_read_windows_registry:
+            _mimetypes_read_windows_registry(add_type)
+        elif _winreg:
+            self._read_windows_registry(add_type)
+
+    @classmethod
+    def _read_windows_registry(cls, add_type):
         def enum_types(mimedb):
             i = 0
             while True:
@@ -265,7 +280,7 @@ class MimeTypes:
                             subkey, 'Content Type')
                         if datatype != _winreg.REG_SZ:
                             continue
-                        self.add_type(mimetype, subkeyname, strict)
+                        add_type(mimetype, subkeyname)
                 except OSError:
                     continue
 
@@ -349,8 +364,8 @@ def init(files=None):
 
     if files is None or _db is None:
         db = MimeTypes()
-        if _winreg:
-            db.read_windows_registry()
+        # Quick return if not supported
+        db.read_windows_registry()
 
         if files is None:
             files = knownfiles
@@ -372,7 +387,7 @@ def init(files=None):
 
 def read_mime_types(file):
     try:
-        f = open(file)
+        f = open(file, encoding='utf-8')
     except OSError:
         return None
     with f:
@@ -401,6 +416,7 @@ def _default_mime_types():
         '.Z': 'compress',
         '.bz2': 'bzip2',
         '.xz': 'xz',
+        '.br': 'br',
         }
 
     # Before adding new types, make sure they are either registered with IANA,
@@ -414,6 +430,7 @@ def _default_mime_types():
         '.js'     : 'application/javascript',
         '.mjs'    : 'application/javascript',
         '.json'   : 'application/json',
+        '.webmanifest': 'application/manifest+json',
         '.doc'    : 'application/msword',
         '.dot'    : 'application/msword',
         '.wiz'    : 'application/msword',
@@ -446,6 +463,7 @@ def _default_mime_types():
         '.dvi'    : 'application/x-dvi',
         '.gtar'   : 'application/x-gtar',
         '.hdf'    : 'application/x-hdf',
+        '.h5'     : 'application/x-hdf5',
         '.latex'  : 'application/x-latex',
         '.mif'    : 'application/x-mif',
         '.cdf'    : 'application/x-netcdf',
@@ -478,10 +496,19 @@ def _default_mime_types():
         '.wsdl'   : 'application/xml',
         '.xpdl'   : 'application/xml',
         '.zip'    : 'application/zip',
+        '.3gp'    : 'audio/3gpp',
+        '.3gpp'   : 'audio/3gpp',
+        '.3g2'    : 'audio/3gpp2',
+        '.3gpp2'  : 'audio/3gpp2',
+        '.aac'    : 'audio/aac',
+        '.adts'   : 'audio/aac',
+        '.loas'   : 'audio/aac',
+        '.ass'    : 'audio/aac',
         '.au'     : 'audio/basic',
         '.snd'    : 'audio/basic',
         '.mp3'    : 'audio/mpeg',
         '.mp2'    : 'audio/mpeg',
+        '.opus'   : 'audio/opus',
         '.aif'    : 'audio/x-aiff',
         '.aifc'   : 'audio/x-aiff',
         '.aiff'   : 'audio/x-aiff',
@@ -493,6 +520,8 @@ def _default_mime_types():
         '.jpg'    : 'image/jpeg',
         '.jpe'    : 'image/jpeg',
         '.jpeg'   : 'image/jpeg',
+        '.heic'   : 'image/heic',
+        '.heif'   : 'image/heif',
         '.png'    : 'image/png',
         '.svg'    : 'image/svg+xml',
         '.tiff'   : 'image/tiff',
@@ -562,7 +591,7 @@ def _default_mime_types():
 _default_mime_types()
 
 
-if __name__ == '__main__':
+def _main():
     import getopt
 
     USAGE = """\
@@ -606,3 +635,7 @@ More than one type argument may be given.
             guess, encoding = guess_type(gtype, strict)
             if not guess: print("I don't know anything about type", gtype)
             else: print('type:', guess, 'encoding:', encoding)
+
+
+if __name__ == '__main__':
+    _main()

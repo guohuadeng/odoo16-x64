@@ -5,7 +5,6 @@ try:
 except ImportError:  # pragma: no cover
     ssl = None
 
-from . import base_events
 from . import constants
 from . import protocols
 from . import transports
@@ -316,10 +315,9 @@ class _SSLProtocolTransport(transports._FlowControlMixin,
         self._closed = True
         self._ssl_protocol._start_shutdown()
 
-    def __del__(self):
+    def __del__(self, _warn=warnings.warn):
         if not self._closed:
-            warnings.warn(f"unclosed transport {self!r}", ResourceWarning,
-                          source=self)
+            _warn(f"unclosed transport {self!r}", ResourceWarning, source=self)
             self.close()
 
     def is_reading(self):
@@ -368,6 +366,12 @@ class _SSLProtocolTransport(transports._FlowControlMixin,
     def get_write_buffer_size(self):
         """Return the current size of the write buffer."""
         return self._ssl_protocol._transport.get_write_buffer_size()
+
+    def get_write_buffer_limits(self):
+        """Get the high and low watermarks for write flow control. 
+        Return a tuple (low, high) where low and high are 
+        positive number of bytes."""
+        return self._ssl_protocol._transport.get_write_buffer_limits()
 
     @property
     def _protocol_paused(self):
@@ -528,7 +532,9 @@ class SSLProtocol(protocols.Protocol):
 
         try:
             ssldata, appdata = self._sslpipe.feed_ssldata(data)
-        except Exception as e:
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except BaseException as e:
             self._fatal_error(e, 'SSL error in data received')
             return
 
@@ -543,7 +549,9 @@ class SSLProtocol(protocols.Protocol):
                             self._app_protocol, chunk)
                     else:
                         self._app_protocol.data_received(chunk)
-                except Exception as ex:
+                except (SystemExit, KeyboardInterrupt):
+                    raise
+                except BaseException as ex:
                     self._fatal_error(
                         ex, 'application protocol failed to receive SSL data')
                     return
@@ -629,7 +637,9 @@ class SSLProtocol(protocols.Protocol):
                 raise handshake_exc
 
             peercert = sslobj.getpeercert()
-        except Exception as exc:
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except BaseException as exc:
             if isinstance(exc, ssl.CertificateError):
                 msg = 'SSL handshake failed on verifying the certificate'
             else:
@@ -692,7 +702,9 @@ class SSLProtocol(protocols.Protocol):
                 # delete it and reduce the outstanding buffer size.
                 del self._write_backlog[0]
                 self._write_buffer_size -= len(data)
-        except Exception as exc:
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except BaseException as exc:
             if self._in_handshake:
                 # Exceptions will be re-raised in _on_handshake_complete.
                 self._on_handshake_complete(exc)

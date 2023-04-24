@@ -30,7 +30,7 @@
 
 from ._IntegerBase import IntegerBase
 
-from Crypto.Util.number import long_to_bytes, bytes_to_long
+from Crypto.Util.number import long_to_bytes, bytes_to_long, inverse, GCD
 
 
 class IntegerNative(IntegerBase):
@@ -62,16 +62,31 @@ class IntegerNative(IntegerBase):
     def __index__(self):
         return int(self._value)
 
-    def to_bytes(self, block_size=0):
+    def to_bytes(self, block_size=0, byteorder='big'):
         if self._value < 0:
             raise ValueError("Conversion only valid for non-negative numbers")
         result = long_to_bytes(self._value, block_size)
         if len(result) > block_size > 0:
             raise ValueError("Value too large to encode")
+        if byteorder == 'big':
+            pass
+        elif byteorder == 'little':
+            result = bytearray(result)
+            result.reverse()
+            result = bytes(result)
+        else:
+            raise ValueError("Incorrect byteorder")
         return result
 
     @classmethod
-    def from_bytes(cls, byte_string):
+    def from_bytes(cls, byte_string, byteorder='big'):
+        if byteorder == 'big':
+            pass
+        elif byteorder == 'little':
+            byte_string = bytearray(byte_string)
+            byte_string.reverse()
+        else:
+            raise ValueError("Incorrect byteorder")
         return cls(bytes_to_long(byte_string))
 
     # Relations
@@ -265,13 +280,7 @@ class IntegerNative(IntegerBase):
         if self._value == 0:
             return 1
 
-        bit_size = 0
-        tmp = self._value
-        while tmp:
-            tmp >>= 1
-            bit_size += 1
-
-        return bit_size
+        return self._value.bit_length()
 
     def size_in_bytes(self):
         return (self.size_in_bits() - 1) // 8 + 1
@@ -303,22 +312,7 @@ class IntegerNative(IntegerBase):
         self._value = int(source)
 
     def inplace_inverse(self, modulus):
-        modulus = int(modulus)
-        if modulus == 0:
-            raise ZeroDivisionError("Modulus cannot be zero")
-        if modulus < 0:
-            raise ValueError("Modulus cannot be negative")
-        r_p, r_n = self._value, modulus
-        s_p, s_n = 1, 0
-        while r_n > 0:
-            q = r_p // r_n
-            r_p, r_n = r_n, r_p - q * r_n
-            s_p, s_n = s_n, s_p - q * s_n
-        if r_p != 1:
-            raise ValueError("No inverse value can be computed" + str(r_p))
-        while s_p < 0:
-            s_p += modulus
-        self._value = s_p
+        self._value = inverse(self._value, int(modulus))
         return self
 
     def inverse(self, modulus):
@@ -327,11 +321,7 @@ class IntegerNative(IntegerBase):
         return result
 
     def gcd(self, term):
-        r_p, r_n = abs(self._value), abs(int(term))
-        while r_n > 0:
-            q = r_p // r_n
-            r_p, r_n = r_n, r_p - q * r_n
-        return self.__class__(r_p)
+        return self.__class__(GCD(abs(self._value), abs(int(term))))
 
     def lcm(self, term):
         term = int(term)
@@ -348,7 +338,7 @@ class IntegerNative(IntegerBase):
             raise ValueError("n must be a positive integer")
 
         if (n & 1) == 0:
-            raise ValueError("n must be even for the Jacobi symbol")
+            raise ValueError("n must be odd for the Jacobi symbol")
 
         # Step 1
         a = a % n

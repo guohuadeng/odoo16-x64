@@ -11,20 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function
 
 from nacl import exceptions as exc
 from nacl._sodium import ffi, lib
 from nacl.exceptions import ensure
 
 
-def _sodium_init():
-    ensure(lib.sodium_init() != -1,
-           "Could not initialize sodium",
-           raising=exc.RuntimeError)
+def _sodium_init() -> None:
+    ensure(
+        lib.sodium_init() != -1,
+        "Could not initialize sodium",
+        raising=exc.RuntimeError,
+    )
 
 
-def sodium_init():
+def sodium_init() -> None:
     """
     Initializes sodium, picking the best implementations available for this
     machine.

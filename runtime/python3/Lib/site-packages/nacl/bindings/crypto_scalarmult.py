@@ -12,30 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import, division, print_function
 
 from nacl import exceptions as exc
 from nacl._sodium import ffi, lib
 from nacl.exceptions import ensure
 
 
-has_crypto_scalarmult_ed25519 = \
-    bool(lib.PYNACL_HAS_CRYPTO_SCALARMULT_ED25519)
+has_crypto_scalarmult_ed25519 = bool(lib.PYNACL_HAS_CRYPTO_SCALARMULT_ED25519)
 
-crypto_scalarmult_BYTES = lib.crypto_scalarmult_bytes()
-crypto_scalarmult_SCALARBYTES = lib.crypto_scalarmult_scalarbytes()
+crypto_scalarmult_BYTES: int = lib.crypto_scalarmult_bytes()
+crypto_scalarmult_SCALARBYTES: int = lib.crypto_scalarmult_scalarbytes()
 
 crypto_scalarmult_ed25519_BYTES = 0
 crypto_scalarmult_ed25519_SCALARBYTES = 0
 
 if has_crypto_scalarmult_ed25519:
-    crypto_scalarmult_ed25519_BYTES = \
-        lib.crypto_scalarmult_ed25519_bytes()
-    crypto_scalarmult_ed25519_SCALARBYTES = \
+    crypto_scalarmult_ed25519_BYTES = lib.crypto_scalarmult_ed25519_bytes()
+    crypto_scalarmult_ed25519_SCALARBYTES = (
         lib.crypto_scalarmult_ed25519_scalarbytes()
+    )
 
 
-def crypto_scalarmult_base(n):
+def crypto_scalarmult_base(n: bytes) -> bytes:
     """
     Computes and returns the scalar product of a standard group element and an
     integer ``n``.
@@ -46,14 +44,12 @@ def crypto_scalarmult_base(n):
     q = ffi.new("unsigned char[]", crypto_scalarmult_BYTES)
 
     rc = lib.crypto_scalarmult_base(q, n)
-    ensure(rc == 0,
-           'Unexpected library error',
-           raising=exc.RuntimeError)
+    ensure(rc == 0, "Unexpected library error", raising=exc.RuntimeError)
 
     return ffi.buffer(q, crypto_scalarmult_SCALARBYTES)[:]
 
 
-def crypto_scalarmult(n, p):
+def crypto_scalarmult(n: bytes, p: bytes) -> bytes:
     """
     Computes and returns the scalar product of the given group element and an
     integer ``n``.
@@ -65,14 +61,12 @@ def crypto_scalarmult(n, p):
     q = ffi.new("unsigned char[]", crypto_scalarmult_BYTES)
 
     rc = lib.crypto_scalarmult(q, n, p)
-    ensure(rc == 0,
-           'Unexpected library error',
-           raising=exc.RuntimeError)
+    ensure(rc == 0, "Unexpected library error", raising=exc.RuntimeError)
 
     return ffi.buffer(q, crypto_scalarmult_SCALARBYTES)[:]
 
 
-def crypto_scalarmult_ed25519_base(n):
+def crypto_scalarmult_ed25519_base(n: bytes) -> bytes:
     """
     Computes and returns the scalar product of a standard group element and an
     integer ``n`` on the edwards25519 curve.
@@ -86,27 +80,30 @@ def crypto_scalarmult_ed25519_base(n):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_scalarmult_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_scalarmult_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(n, bytes) and
-           len(n) == crypto_scalarmult_ed25519_SCALARBYTES,
-           'Input must be a {} long bytes sequence'.format(
-           'crypto_scalarmult_ed25519_SCALARBYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(n, bytes)
+        and len(n) == crypto_scalarmult_ed25519_SCALARBYTES,
+        "Input must be a {} long bytes sequence".format(
+            "crypto_scalarmult_ed25519_SCALARBYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
     q = ffi.new("unsigned char[]", crypto_scalarmult_ed25519_BYTES)
 
     rc = lib.crypto_scalarmult_ed25519_base(q, n)
-    ensure(rc == 0,
-           'Unexpected library error',
-           raising=exc.RuntimeError)
+    ensure(rc == 0, "Unexpected library error", raising=exc.RuntimeError)
 
     return ffi.buffer(q, crypto_scalarmult_ed25519_BYTES)[:]
 
 
-def crypto_scalarmult_ed25519_base_noclamp(n):
+def crypto_scalarmult_ed25519_base_noclamp(n: bytes) -> bytes:
     """
     Computes and returns the scalar product of a standard group element and an
     integer ``n`` on the edwards25519 curve. The integer ``n`` is not clamped.
@@ -120,27 +117,30 @@ def crypto_scalarmult_ed25519_base_noclamp(n):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_scalarmult_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_scalarmult_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(n, bytes) and
-           len(n) == crypto_scalarmult_ed25519_SCALARBYTES,
-           'Input must be a {} long bytes sequence'.format(
-           'crypto_scalarmult_ed25519_SCALARBYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(n, bytes)
+        and len(n) == crypto_scalarmult_ed25519_SCALARBYTES,
+        "Input must be a {} long bytes sequence".format(
+            "crypto_scalarmult_ed25519_SCALARBYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
     q = ffi.new("unsigned char[]", crypto_scalarmult_ed25519_BYTES)
 
     rc = lib.crypto_scalarmult_ed25519_base_noclamp(q, n)
-    ensure(rc == 0,
-           'Unexpected library error',
-           raising=exc.RuntimeError)
+    ensure(rc == 0, "Unexpected library error", raising=exc.RuntimeError)
 
     return ffi.buffer(q, crypto_scalarmult_ed25519_BYTES)[:]
 
 
-def crypto_scalarmult_ed25519(n, p):
+def crypto_scalarmult_ed25519(n: bytes, p: bytes) -> bytes:
     """
     Computes and returns the scalar product of a *clamped* integer ``n``
     and the given group element on the edwards25519 curve.
@@ -160,33 +160,38 @@ def crypto_scalarmult_ed25519(n, p):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_scalarmult_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_scalarmult_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(n, bytes) and
-           len(n) == crypto_scalarmult_ed25519_SCALARBYTES,
-           'Input must be a {} long bytes sequence'.format(
-           'crypto_scalarmult_ed25519_SCALARBYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(n, bytes)
+        and len(n) == crypto_scalarmult_ed25519_SCALARBYTES,
+        "Input must be a {} long bytes sequence".format(
+            "crypto_scalarmult_ed25519_SCALARBYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
-    ensure(isinstance(p, bytes) and
-           len(p) == crypto_scalarmult_ed25519_BYTES,
-           'Input must be a {} long bytes sequence'.format(
-           'crypto_scalarmult_ed25519_BYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(p, bytes) and len(p) == crypto_scalarmult_ed25519_BYTES,
+        "Input must be a {} long bytes sequence".format(
+            "crypto_scalarmult_ed25519_BYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
     q = ffi.new("unsigned char[]", crypto_scalarmult_ed25519_BYTES)
 
     rc = lib.crypto_scalarmult_ed25519(q, n, p)
-    ensure(rc == 0,
-           'Unexpected library error',
-           raising=exc.RuntimeError)
+    ensure(rc == 0, "Unexpected library error", raising=exc.RuntimeError)
 
     return ffi.buffer(q, crypto_scalarmult_ed25519_BYTES)[:]
 
 
-def crypto_scalarmult_ed25519_noclamp(n, p):
+def crypto_scalarmult_ed25519_noclamp(n: bytes, p: bytes) -> bytes:
     """
     Computes and returns the scalar product of an integer ``n``
     and the given group element on the edwards25519 curve. The integer
@@ -204,27 +209,32 @@ def crypto_scalarmult_ed25519_noclamp(n, p):
     :raises nacl.exceptions.UnavailableError: If called when using a
         minimal build of libsodium.
     """
-    ensure(has_crypto_scalarmult_ed25519,
-           'Not available in minimal build',
-           raising=exc.UnavailableError)
+    ensure(
+        has_crypto_scalarmult_ed25519,
+        "Not available in minimal build",
+        raising=exc.UnavailableError,
+    )
 
-    ensure(isinstance(n, bytes) and
-           len(n) == crypto_scalarmult_ed25519_SCALARBYTES,
-           'Input must be a {} long bytes sequence'.format(
-           'crypto_scalarmult_ed25519_SCALARBYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(n, bytes)
+        and len(n) == crypto_scalarmult_ed25519_SCALARBYTES,
+        "Input must be a {} long bytes sequence".format(
+            "crypto_scalarmult_ed25519_SCALARBYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
-    ensure(isinstance(p, bytes) and
-           len(p) == crypto_scalarmult_ed25519_BYTES,
-           'Input must be a {} long bytes sequence'.format(
-           'crypto_scalarmult_ed25519_BYTES'),
-           raising=exc.TypeError)
+    ensure(
+        isinstance(p, bytes) and len(p) == crypto_scalarmult_ed25519_BYTES,
+        "Input must be a {} long bytes sequence".format(
+            "crypto_scalarmult_ed25519_BYTES"
+        ),
+        raising=exc.TypeError,
+    )
 
     q = ffi.new("unsigned char[]", crypto_scalarmult_ed25519_BYTES)
 
     rc = lib.crypto_scalarmult_ed25519_noclamp(q, n, p)
-    ensure(rc == 0,
-           'Unexpected library error',
-           raising=exc.RuntimeError)
+    ensure(rc == 0, "Unexpected library error", raising=exc.RuntimeError)
 
     return ffi.buffer(q, crypto_scalarmult_ed25519_BYTES)[:]

@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import
-from __future__ import division
 
 import nacl.bindings
 
@@ -34,7 +32,7 @@ ALG_ARGON2ID13 = nacl.bindings.crypto_pwhash_ALG_ARGON2ID13
 ALG_ARGON2_DEFAULT = nacl.bindings.crypto_pwhash_ALG_DEFAULT
 
 
-def verify(password_hash, password):
+def verify(password_hash: bytes, password: bytes) -> bool:
     """
     Takes a modular crypt encoded argon2i or argon2id stored password hash
     and checks if the user provided password will hash to the same string
@@ -48,5 +46,4 @@ def verify(password_hash, password):
 
     .. versionadded:: 1.2
     """
-    return nacl.bindings.crypto_pwhash_str_verify(password_hash,
-                                                  password)
+    return nacl.bindings.crypto_pwhash_str_verify(password_hash, password)

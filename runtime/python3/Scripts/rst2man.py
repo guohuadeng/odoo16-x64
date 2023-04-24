@@ -1,6 +1,6 @@
-#!d:\odoo13-x64\runtime\python3\python.exe
+#!d:\odoo16-x64\runtime\python3\python.exe
 
-# Author: 
+# Author:
 # Contact: grubert@users.sf.net
 # Copyright: This module has been placed in the public domain.
 

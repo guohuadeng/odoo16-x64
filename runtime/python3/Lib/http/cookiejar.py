@@ -28,6 +28,7 @@ http://wwwsearch.sf.net/):
 __all__ = ['Cookie', 'CookieJar', 'CookiePolicy', 'DefaultCookiePolicy',
            'FileCookieJar', 'LWPCookieJar', 'LoadError', 'MozillaCookieJar']
 
+import os
 import copy
 import datetime
 import re
@@ -49,10 +50,18 @@ def _debug(*args):
         logger = logging.getLogger("http.cookiejar")
     return logger.debug(*args)
 
-
+HTTPONLY_ATTR = "HTTPOnly"
+HTTPONLY_PREFIX = "#HttpOnly_"
 DEFAULT_HTTP_PORT = str(http.client.HTTP_PORT)
+NETSCAPE_MAGIC_RGX = re.compile("#( Netscape)? HTTP Cookie File")
 MISSING_FILENAME_TEXT = ("a filename was not supplied (nor was the CookieJar "
                          "instance initialised with one)")
+NETSCAPE_HEADER_TEXT =  """\
+# Netscape HTTP Cookie File
+# http://curl.haxx.se/rfc/cookie_spec.html
+# This is a generated file!  Do not edit.
+
+"""
 
 def _warn_unhandled_exception():
     # There are a few catch-all except: statements in this module, for
@@ -213,10 +222,14 @@ LOOSE_HTTP_DATE_RE = re.compile(
        (?::(\d\d))?    # optional seconds
     )?                 # optional clock
        \s*
-    ([-+]?\d{2,4}|(?![APap][Mm]\b)[A-Za-z]+)? # timezone
+    (?:
+       ([-+]?\d{2,4}|(?![APap][Mm]\b)[A-Za-z]+) # timezone
        \s*
-    (?:\(\w+\))?       # ASCII representation of timezone in parens.
-       \s*$""", re.X | re.ASCII)
+    )?
+    (?:
+       \(\w+\)         # ASCII representation of timezone in parens.
+       \s*
+    )?$""", re.X | re.ASCII)
 def http2time(text):
     """Returns time in seconds since epoch of time represented by a string.
 
@@ -286,9 +299,11 @@ ISO_DATE_RE = re.compile(
       (?::?(\d\d(?:\.\d*)?))?  # optional seconds (and fractional)
    )?                    # optional clock
       \s*
-   ([-+]?\d\d?:?(:?\d\d)?
-    |Z|z)?               # timezone  (Z is "zero meridian", i.e. GMT)
-      \s*$""", re.X | re. ASCII)
+   (?:
+      ([-+]?\d\d?:?(:?\d\d)?
+       |Z|z)             # timezone  (Z is "zero meridian", i.e. GMT)
+      \s*
+   )?$""", re.X | re. ASCII)
 def iso2time(text):
     """
     As for http2time, but parses the ISO 8601 formats:
@@ -878,6 +893,7 @@ class DefaultCookiePolicy(CookiePolicy):
                  strict_ns_domain=DomainLiberal,
                  strict_ns_set_initial_dollar=False,
                  strict_ns_set_path=False,
+                 secure_protocols=("https", "wss")
                  ):
         """Constructor arguments should be passed as keyword arguments only."""
         self.netscape = netscape
@@ -890,6 +906,7 @@ class DefaultCookiePolicy(CookiePolicy):
         self.strict_ns_domain = strict_ns_domain
         self.strict_ns_set_initial_dollar = strict_ns_set_initial_dollar
         self.strict_ns_set_path = strict_ns_set_path
+        self.secure_protocols = secure_protocols
 
         if blocked_domains is not None:
             self._blocked_domains = tuple(blocked_domains)
@@ -1116,7 +1133,7 @@ class DefaultCookiePolicy(CookiePolicy):
         return True
 
     def return_ok_secure(self, cookie, request):
-        if cookie.secure and request.type != "https":
+        if cookie.secure and request.type not in self.secure_protocols:
             _debug("   secure cookie with non-secure request")
             return False
         return True
@@ -1772,10 +1789,7 @@ class FileCookieJar(CookieJar):
         """
         CookieJar.__init__(self, policy)
         if filename is not None:
-            try:
-                filename+""
-            except:
-                raise ValueError("filename must be string-like")
+            filename = os.fspath(filename)
         self.filename = filename
         self.delayload = bool(delayload)
 
@@ -1976,7 +1990,7 @@ class MozillaCookieJar(FileCookieJar):
 
     This class differs from CookieJar only in the format it uses to save and
     load cookies to and from a file.  This class uses the Mozilla/Netscape
-    `cookies.txt' format.  lynx uses this file format, too.
+    `cookies.txt' format.  curl and lynx use this file format, too.
 
     Don't expect cookies saved while the browser is running to be noticed by
     the browser (in fact, Mozilla on unix will overwrite your saved cookies if
@@ -1998,19 +2012,11 @@ class MozillaCookieJar(FileCookieJar):
     header by default (Mozilla can cope with that).
 
     """
-    magic_re = re.compile("#( Netscape)? HTTP Cookie File")
-    header = """\
-# Netscape HTTP Cookie File
-# http://curl.haxx.se/rfc/cookie_spec.html
-# This is a generated file!  Do not edit.
-
-"""
 
     def _really_load(self, f, filename, ignore_discard, ignore_expires):
         now = time.time()
 
-        magic = f.readline()
-        if not self.magic_re.search(magic):
+        if not NETSCAPE_MAGIC_RGX.match(f.readline()):
             raise LoadError(
                 "%r does not look like a Netscape format cookies file" %
                 filename)
@@ -2018,7 +2024,16 @@ class MozillaCookieJar(FileCookieJar):
         try:
             while 1:
                 line = f.readline()
+                rest = {}
+
                 if line == "": break
+
+                # httponly is a cookie flag as defined in rfc6265
+                # when encoded in a netscape cookie file,
+                # the line is prepended with "#HttpOnly_"
+                if line.startswith(HTTPONLY_PREFIX):
+                    rest[HTTPONLY_ATTR] = ""
+                    line = line[len(HTTPONLY_PREFIX):]
 
                 # last field may be absent, so keep any trailing tab
                 if line.endswith("\n"): line = line[:-1]
@@ -2057,7 +2072,7 @@ class MozillaCookieJar(FileCookieJar):
                            discard,
                            None,
                            None,
-                           {})
+                           rest)
                 if not ignore_discard and c.discard:
                     continue
                 if not ignore_expires and c.is_expired(now):
@@ -2077,16 +2092,17 @@ class MozillaCookieJar(FileCookieJar):
             else: raise ValueError(MISSING_FILENAME_TEXT)
 
         with open(filename, "w") as f:
-            f.write(self.header)
+            f.write(NETSCAPE_HEADER_TEXT)
             now = time.time()
             for cookie in self:
+                domain = cookie.domain
                 if not ignore_discard and cookie.discard:
                     continue
                 if not ignore_expires and cookie.is_expired(now):
                     continue
                 if cookie.secure: secure = "TRUE"
                 else: secure = "FALSE"
-                if cookie.domain.startswith("."): initial_dot = "TRUE"
+                if domain.startswith("."): initial_dot = "TRUE"
                 else: initial_dot = "FALSE"
                 if cookie.expires is not None:
                     expires = str(cookie.expires)
@@ -2101,7 +2117,9 @@ class MozillaCookieJar(FileCookieJar):
                 else:
                     name = cookie.name
                     value = cookie.value
+                if cookie.has_nonstandard_attr(HTTPONLY_ATTR):
+                    domain = HTTPONLY_PREFIX + domain
                 f.write(
-                    "\t".join([cookie.domain, initial_dot, cookie.path,
+                    "\t".join([domain, initial_dot, cookie.path,
                                secure, expires, name, value])+
                     "\n")

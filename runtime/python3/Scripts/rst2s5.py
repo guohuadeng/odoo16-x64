@@ -1,4 +1,4 @@
-#!d:\odoo13-x64\runtime\python3\python.exe
+#!d:\odoo16-x64\runtime\python3\python.exe
 
 # $Id: rst2s5.py 4564 2006-05-21 20:44:42Z wiemann $
 # Author: Chris Liechti <cliechti@gmx.net>

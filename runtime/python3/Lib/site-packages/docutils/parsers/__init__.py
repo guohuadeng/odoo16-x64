@@ -1,4 +1,4 @@
-# $Id: __init__.py 7646 2013-04-17 14:17:37Z milde $
+# $Id: __init__.py 8239 2018-11-21 21:46:00Z milde $
 # Author: David Goodger <goodger@python.org>
 # Copyright: This module has been placed in the public domain.
 
@@ -10,8 +10,6 @@ __docformat__ = 'reStructuredText'
 
 import sys
 from docutils import Component
-if sys.version_info < (2,5):
-    from docutils._compat import __import__
 
 
 class Parser(Component):

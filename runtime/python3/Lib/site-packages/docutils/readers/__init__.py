@@ -1,4 +1,4 @@
-# $Id: __init__.py 7648 2013-04-18 07:36:22Z milde $
+# $Id: __init__.py 8239 2018-11-21 21:46:00Z milde $
 # Authors: David Goodger <goodger@python.org>; Ueli Schlaepfer
 # Copyright: This module has been placed in the public domain.
 
@@ -12,8 +12,6 @@ import sys
 
 from docutils import utils, parsers, Component
 from docutils.transforms import universal
-if sys.version_info < (2,5):
-    from docutils._compat import __import__
 
 
 class Reader(Component):
@@ -23,8 +21,9 @@ class Reader(Component):
 
     Each reader module or package must export a subclass also called 'Reader'.
 
-    The two steps of a Reader's responsibility are `scan()` and
-    `parse()`.  Call `read()` to process a document.
+    The two steps of a Reader's responsibility are to read data from the
+    source Input object and parse the data with the Parser object.
+    Call `read()` to process a document.
     """
 
     component_type = 'reader'

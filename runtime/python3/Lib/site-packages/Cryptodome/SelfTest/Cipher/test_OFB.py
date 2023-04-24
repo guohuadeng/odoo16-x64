@@ -35,6 +35,7 @@ from Cryptodome.SelfTest.st_common import list_test_cases
 from Cryptodome.Util.py3compat import tobytes
 from Cryptodome.Cipher import AES, DES3, DES
 from Cryptodome.Hash import SHAKE128
+from Cryptodome.SelfTest.loader import load_test_vectors_wycheproof
 
 def get_tag_random(tag, length):
     return SHAKE128.new(data=tobytes(tag)).read(length)
