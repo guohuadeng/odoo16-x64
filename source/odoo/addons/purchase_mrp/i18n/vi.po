@@ -13,7 +13,7 @@ msgstr ""
 "POT-Creation-Date: 2022-09-20 09:02+0000\n"
 "PO-Revision-Date: 2022-09-22 05:54+0000\n"
 "Last-Translator: Thi Huong Nguyen, 2023\n"
-"Language-Team: Vietnamese (https://www.transifex.com/odoo/teams/41243/vi/)\n"
+"Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -54,7 +54,7 @@ msgstr "Chia sẻ chi phí linh kiện phải là số dương hoặc bằng 0."
 #. module: purchase_mrp
 #: model:ir.model.fields,field_description:purchase_mrp.field_mrp_bom_line__cost_share
 msgid "Cost Share (%)"
-msgstr "Chia sẻ chi phí (%)"
+msgstr "Tỷ lệ chi phí (%)"
 
 #. module: purchase_mrp
 #: model:ir.model.fields,field_description:purchase_mrp.field_purchase_order__mrp_production_count

@@ -549,6 +549,29 @@ QUnit.module("Views", (hooks) => {
     );
 
     QUnit.test(
+        "Ensure float fields are formatted properly without using a widget",
+        async (assert) => {
+            await makeView({
+                type: "kanban",
+                resModel: "partner",
+                serverData,
+                arch: `
+                <kanban>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div>
+                                <field name="qux" digits="[0,5]"/>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>`,
+            });
+            // Would display 0.40 if digits attr is not applied
+            assert.strictEqual(target.querySelector(".o_kanban_record").innerText, "0.40000");
+        }
+    );
+
+    QUnit.test(
         "basic grouped rendering with active field and archive enabled (archivable true)",
         async (assert) => {
             // add active field on partner model and make all records active
@@ -6209,6 +6232,7 @@ QUnit.module("Views", (hooks) => {
     QUnit.test("quick create column and examples", async (assert) => {
         serviceRegistry.add("dialog", dialogService, { force: true });
         registry.category("kanban_examples").add("test", {
+            allowedGroupBys: ["product_id"],
             examples: [
                 {
                     name: "A first example",
@@ -6315,6 +6339,7 @@ QUnit.module("Views", (hooks) => {
         serviceRegistry.add("dialog", dialogService, { force: true });
         const applyExamplesText = "Use This For My Test";
         registry.category("kanban_examples").add("test", {
+            allowedGroupBys: ["product_id"],
             applyExamplesText: applyExamplesText,
             examples: [
                 {
@@ -6361,6 +6386,7 @@ QUnit.module("Views", (hooks) => {
         async (assert) => {
             serverData.models.partner.records = [];
             registry.category("kanban_examples").add("test", {
+                allowedGroupBys: ["product_id"],
                 ghostColumns: ["Ghost 1", "Ghost 2", "Ghost 3", "Ghost 4"],
                 examples: [
                     {
@@ -12950,5 +12976,34 @@ QUnit.module("Views", (hooks) => {
             "December 2022"
         );
         assert.containsN(target, ".o_kanban_group .o_kanban_record", 16);
+    });
+
+    QUnit.test("Keep scrollTop when loading records with load more", async (assert) => {
+        await makeView({
+            type: "kanban",
+            resModel: "partner",
+            serverData,
+            arch: `<kanban>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div style="height:1000px;"><field name="id"/></div>
+                    </t>
+                </templates>
+            </kanban>`,
+            groupBy: ["bar"],
+            limit: 1,
+        });
+        target.querySelector(".o_kanban_renderer").style.overflow = "scroll";
+        target.querySelector(".o_kanban_renderer").style.height = "500px";
+        const loadMoreButton = target.querySelector(".o_kanban_load_more button");
+        loadMoreButton.scrollIntoView();
+        const previousScrollTop = target.querySelector(".o_kanban_renderer").scrollTop;
+        await click(loadMoreButton);
+        assert.strictEqual(
+            previousScrollTop,
+            target.querySelector(".o_kanban_renderer").scrollTop,
+            "Should have the same scrollTop value"
+        );
+        assert.notEqual(previousScrollTop, 0, "Should not have the scrollTop value at 0");
     });
 });

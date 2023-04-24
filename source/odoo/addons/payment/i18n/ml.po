@@ -4,15 +4,16 @@
 # 
 # Translators:
 # Niyas Raphy, 2023
+# Nikhil Krishnan, 2023
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:51+0000\n"
+"POT-Creation-Date: 2023-04-14 05:52+0000\n"
 "PO-Revision-Date: 2022-09-22 05:53+0000\n"
-"Last-Translator: Niyas Raphy, 2023\n"
-"Language-Team: Malayalam (https://www.transifex.com/odoo/teams/41243/ml/)\n"
+"Last-Translator: Nikhil Krishnan, 2023\n"
+"Language-Team: Malayalam (https://app.transifex.com/odoo/teams/41243/ml/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -78,13 +79,6 @@ msgstr ""
 msgid ""
 "<span><i class=\"fa fa-arrow-right\"/> How to configure your PayPal "
 "account</span>"
-msgstr ""
-
-#. module: payment
-#: model_terms:ir.ui.view,arch_db:payment.payment_provider_onboarding_wizard_form
-msgid ""
-"<span>Start selling directly without an account; an email will be sent by "
-"Paypal to create your new account and collect your payments.</span>"
 msgstr ""
 
 #. module: payment
@@ -170,7 +164,7 @@ msgstr ""
 #: code:addons/payment/wizards/payment_onboarding_wizard.py:0
 #, python-format
 msgid "Account"
-msgstr ""
+msgstr "അക്കൗണ്ട്"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider_onboarding_wizard__acc_number
@@ -196,7 +190,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__partner_address
 #: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
 msgid "Address"
-msgstr ""
+msgstr "വിലാസം"
 
 #. module: payment
 #: model:payment.provider,name:payment.payment_provider_adyen
@@ -257,7 +251,7 @@ msgstr "അപ്ലൈ"
 #: model_terms:ir.ui.view,arch_db:payment.payment_token_form
 #: model_terms:ir.ui.view,arch_db:payment.payment_token_search
 msgid "Archived"
-msgstr ""
+msgstr "ആർക്കൈവ് ചെയ്തു"
 
 #. module: payment
 #. odoo-javascript
@@ -303,12 +297,12 @@ msgstr "ലഭ്യത"
 #: code:addons/payment/wizards/payment_onboarding_wizard.py:0
 #, python-format
 msgid "Bank"
-msgstr ""
+msgstr "ബാങ്ക്"
 
 #. module: payment
 #: model_terms:payment.provider,pending_msg:payment.payment_provider_transfer
 msgid "Bank Account"
-msgstr ""
+msgstr "ബാങ്ക് അക്കൗണ്ട്"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider_onboarding_wizard__journal_name
@@ -367,7 +361,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #, python-format
-msgid "Cancelled payments"
+msgid "Canceled operations"
 msgstr ""
 
 #. module: payment
@@ -402,10 +396,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__partner_city
 #: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
 msgid "City"
-msgstr ""
+msgstr "സിറ്റി"
 
 #. module: payment
 #. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #, python-format
 msgid "Click here to be redirected to the confirmation page."
@@ -421,7 +417,7 @@ msgstr "അടയ്ക്കുക"
 #: model:ir.model.fields,field_description:payment.field_payment_token__provider_code
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__provider_code
 msgid "Code"
-msgstr ""
+msgstr "കോഡ്"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__color
@@ -436,7 +432,7 @@ msgstr "കമ്മ്യൂണിക്കേഷൻ"
 #. module: payment
 #: model:ir.model,name:payment.model_res_company
 msgid "Companies"
-msgstr ""
+msgstr "കമ്പനികൾ"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_link_wizard__company_id
@@ -469,7 +465,7 @@ msgstr ""
 #. module: payment
 #: model:ir.model,name:payment.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "കോൺടാക്ട് "
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__module_id
@@ -479,7 +475,7 @@ msgstr ""
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__available_country_ids
 msgid "Countries"
-msgstr ""
+msgstr "രാജ്യങ്ങൾ"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__partner_country_id
@@ -525,7 +521,7 @@ msgstr "ഉണ്ടാക്കിയത്"
 #: model:ir.model.fields,field_description:payment.field_payment_token__create_date
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__create_date
 msgid "Created on"
-msgstr ""
+msgstr "സൃഷ്ടിച്ചത്"
 
 #. module: payment
 #. odoo-python
@@ -655,7 +651,7 @@ msgstr ""
 #. module: payment
 #: model:ir.model.fields.selection,name:payment.selection__payment_transaction__state__draft
 msgid "Draft"
-msgstr ""
+msgstr "ഡ്രാഫ്റ്റ്"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_link_wizard__partner_email
@@ -673,7 +669,7 @@ msgstr ""
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_kanban
 msgid "Enterprise"
-msgstr ""
+msgstr "എന്റർപ്രൈസ്"
 
 #. module: payment
 #: model:ir.model.fields.selection,name:payment.selection__payment_transaction__state__error
@@ -681,8 +677,8 @@ msgid "Error"
 msgstr "പിശക്"
 
 #. module: payment
-#. odoo-javascript
 #. odoo-python
+#. odoo-javascript
 #: code:addons/payment/models/payment_transaction.py:0
 #: code:addons/payment/static/src/js/payment_form_mixin.js:0
 #, python-format
@@ -697,6 +693,13 @@ msgstr ""
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__support_express_checkout
 msgid "Express Checkout Supported"
+msgstr ""
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
+msgid "Failed operations"
 msgstr ""
 
 #. module: payment
@@ -791,7 +794,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:payment.field_payment_token__id
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__id
 msgid "ID"
-msgstr ""
+msgstr "ഐഡി"
 
 #. module: payment
 #: model:ir.model.fields,help:payment.field_payment_link_wizard__payment_provider_selection
@@ -824,7 +827,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:payment.field_payment_icon__image
 #: model:ir.model.fields,field_description:payment.field_payment_provider__image_128
 msgid "Image"
-msgstr ""
+msgstr "ചിത്രം"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_icon__image_payment_form
@@ -847,7 +850,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_kanban
 msgid "Install"
-msgstr ""
+msgstr "ഇൻസ്റ്റാൾ"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__module_state
@@ -891,7 +894,7 @@ msgstr ""
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__partner_lang
 msgid "Language"
-msgstr ""
+msgstr "ഭാഷ"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_icon____last_update
@@ -916,7 +919,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:payment.field_payment_token__write_uid
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "അവസാനം അപ്ഡേറ്റ് ചെയ്തത്"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_icon__write_date
@@ -945,7 +948,7 @@ msgstr ""
 #. module: payment
 #: model:ir.model.fields.selection,name:payment.selection__res_company__payment_onboarding_payment_method__manual
 msgid "Manual"
-msgstr ""
+msgstr "മാനുവൽ"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__support_manual_capture
@@ -965,13 +968,13 @@ msgstr ""
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider_onboarding_wizard__paypal_seller_account
 msgid "Merchant Account ID"
-msgstr ""
+msgstr "മർച്ചന്റ് അക്കൗണ്ട് ഐഡി"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__state_message
 #: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
 msgid "Message"
-msgstr ""
+msgstr "സന്ദേശം"
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
@@ -1105,6 +1108,13 @@ msgstr ""
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__operation
 msgid "Operation"
+msgstr "പ്രവർത്തനം"
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
+msgid "Operations in progress"
 msgstr ""
 
 #. module: payment
@@ -1128,7 +1138,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:payment.payment_token_search
 #: model_terms:ir.ui.view,arch_db:payment.payment_transaction_search
 msgid "Partner"
-msgstr ""
+msgstr "പാർട്ണർ"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__partner_name
@@ -1145,7 +1155,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:payment.selection__res_company__payment_onboarding_payment_method__paypal
 #: model:payment.provider,name:payment.payment_provider_paypal
 msgid "PayPal"
-msgstr ""
+msgstr "പേപാൽ"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_token__payment_details
@@ -1176,7 +1186,7 @@ msgstr ""
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider_onboarding_wizard__manual_post_msg
 msgid "Payment Instructions"
-msgstr ""
+msgstr "പേയ്മെന്റ് നിർദ്ദേശങ്ങൾ"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_link_wizard__link
@@ -1191,13 +1201,13 @@ msgstr ""
 #. module: payment
 #: model:ir.model,name:payment.model_payment_provider
 msgid "Payment Provider"
-msgstr ""
+msgstr "പേയ്മെന്റ് ദാതാവ്"
 
 #. module: payment
 #: model:ir.actions.act_window,name:payment.action_payment_provider
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_list
 msgid "Payment Providers"
-msgstr ""
+msgstr "പേയ്മെന്റ് ദാതാക്കൾ"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_link_wizard__available_provider_ids
@@ -1229,12 +1239,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:payment.payment_token_list
 #: model_terms:ir.ui.view,arch_db:payment.payment_token_search
 msgid "Payment Tokens"
-msgstr ""
+msgstr "പേയ്മെന്റ് ടോക്കണുകൾ"
 
 #. module: payment
 #: model:ir.model,name:payment.model_payment_transaction
 msgid "Payment Transaction"
-msgstr ""
+msgstr "പേയ്മെന്റ് ഇടപാട്"
 
 #. module: payment
 #: model:ir.actions.act_window,name:payment.action_payment_transaction
@@ -1242,7 +1252,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
 #: model_terms:ir.ui.view,arch_db:payment.payment_transaction_list
 msgid "Payment Transactions"
-msgstr ""
+msgstr "പേയ്മെന്റ് ഇടപാടുകൾ"
 
 #. module: payment
 #: model:ir.actions.act_window,name:payment.action_payment_transaction_linked_to_token
@@ -1269,21 +1279,7 @@ msgstr ""
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_token_form
 msgid "Payments"
-msgstr ""
-
-#. module: payment
-#. odoo-javascript
-#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
-#, python-format
-msgid "Payments failed"
-msgstr ""
-
-#. module: payment
-#. odoo-javascript
-#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
-#, python-format
-msgid "Payments received"
-msgstr ""
+msgstr "പേയ്മെന്റ്സ്"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider_onboarding_wizard__paypal_user_type
@@ -1355,7 +1351,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:payment.payment_token_search
 #: model_terms:ir.ui.view,arch_db:payment.payment_transaction_search
 msgid "Provider"
-msgstr ""
+msgstr "ദാതാവ്"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_token__provider_ref
@@ -1389,7 +1385,7 @@ msgstr ""
 #: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #, python-format
 msgid "Reason:"
-msgstr ""
+msgstr "കാരണം:"
 
 #. module: payment
 #. odoo-python
@@ -1407,7 +1403,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__reference
 #: model_terms:ir.ui.view,arch_db:payment.confirm
 msgid "Reference"
-msgstr ""
+msgstr "റഫറൻസ്"
 
 #. module: payment
 #: model:ir.model.constraint,message:payment.constraint_payment_transaction_reference_uniq
@@ -1455,6 +1451,13 @@ msgstr ""
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.checkout
 msgid "Save my payment details"
+msgstr ""
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
+msgid "Saving your payment method, please wait..."
 msgstr ""
 
 #. module: payment
@@ -1551,7 +1554,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_search
 #: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
 msgid "State"
-msgstr ""
+msgstr "സ്റ്റേറ്റ്"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_res_company__payment_provider_onboarding_state
@@ -1823,6 +1826,13 @@ msgid ""
 msgstr ""
 
 #. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
+msgid "This payment has been canceled."
+msgstr ""
+
+#. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.verified_token_checkmark
 msgid "This payment method has been verified by our system."
 msgstr ""
@@ -1830,13 +1840,6 @@ msgstr ""
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.verified_token_checkmark
 msgid "This payment method has not been verified by our system."
-msgstr ""
-
-#. module: payment
-#. odoo-javascript
-#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
-#, python-format
-msgid "This transaction has been cancelled."
 msgstr ""
 
 #. module: payment
@@ -1875,7 +1878,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:payment.manage
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_kanban
 msgid "Unpublished"
-msgstr ""
+msgstr "പ്രസിദ്ധീകരിക്കാത്തത്"
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
@@ -1919,7 +1922,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #, python-format
-msgid "Waiting for payment"
+msgid "Waiting for operations to process"
 msgstr ""
 
 #. module: payment
@@ -1934,7 +1937,7 @@ msgstr "താക്കീത്"
 #: code:addons/payment/static/src/js/manage_form.js:0
 #, python-format
 msgid "Warning!"
-msgstr ""
+msgstr "വാണിംഗ്!"
 
 #. module: payment
 #. odoo-javascript
@@ -2004,13 +2007,6 @@ msgid "Wire Transfer"
 msgstr ""
 
 #. module: payment
-#. odoo-javascript
-#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
-#, python-format
-msgid "You can click here to be redirected to the confirmation page."
-msgstr ""
-
-#. module: payment
 #. odoo-python
 #: code:addons/payment/models/payment_provider.py:0
 #, python-format
@@ -2043,20 +2039,6 @@ msgstr ""
 #: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #, python-format
 msgid "You will be notified when the payment is fully confirmed."
-msgstr ""
-
-#. module: payment
-#. odoo-javascript
-#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
-#, python-format
-msgid "Your order has been processed."
-msgstr ""
-
-#. module: payment
-#. odoo-javascript
-#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
-#, python-format
-msgid "Your order is being processed, please wait ..."
 msgstr ""
 
 #. module: payment
@@ -2101,6 +2083,13 @@ msgstr ""
 #: model_terms:payment.provider,cancel_msg:payment.payment_provider_transfer
 #, python-format
 msgid "Your payment has been cancelled."
+msgstr ""
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
+msgid "Your payment has been processed."
 msgstr ""
 
 #. module: payment
@@ -2163,7 +2152,21 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #, python-format
+msgid "Your payment is being processed, please wait..."
+msgstr ""
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
 msgid "Your payment is in pending state."
+msgstr ""
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
+msgid "Your payment method has been saved."
 msgstr ""
 
 #. module: payment
@@ -2216,12 +2219,4 @@ msgstr ""
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.transaction_status
 msgid "warning"
-msgstr ""
-
-#. module: payment
-#: code:addons/payment/models/account_journal.py:0
-#, python-format
-msgid ""
-"You must first deactivate a payment provider before deleting its journal.\n"
-"Linked providers: %s"
 msgstr ""

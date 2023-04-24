@@ -64,9 +64,9 @@ export class WebsitePreview extends Component {
                 // URL (event if it wasn't, it wouldn't be an issue as those are
                 // really considered as the same domain, the user will share the
                 // same session and CORS errors won't be a thing in such a case)
-                window.location.href = `${this.websiteDomain}/web#action=website.website_preview&path=${encodedPath}&website_id=${this.websiteId}`;
+                window.location.href = `${this.websiteDomain}/web#action=website.website_preview&path=${encodedPath}&website_id=${encodeURIComponent(this.websiteId)}`;
             } else {
-                this.initialUrl = `/website/force/${this.websiteId}?path=${encodedPath}`;
+                this.initialUrl = `/website/force/${encodeURIComponent(this.websiteId)}?path=${encodedPath}`;
             }
         });
 
@@ -145,7 +145,7 @@ export class WebsitePreview extends Component {
             // content of the previous URL before reaching the client action,
             // which was lost after being replaced for the frontend's URL.
             const handleBackNavigation = () => {
-                if (!window.location.pathname.startsWith('/@')) {
+                if (window.location.pathname === '/web') {
                     window.dispatchEvent(new HashChangeEvent('hashchange', {
                         newURL: window.location.href.toString()
                     }));
@@ -301,11 +301,9 @@ export class WebsitePreview extends Component {
         if (!this.backendUrl) {
             this.backendUrl = routeToUrl(this.router.current);
         }
-        const currentUrl = new URL(this.iframe.el.contentDocument.location.href);
-        currentUrl.pathname = `/@${currentUrl.pathname}`;
-        this.currentTitle = this.iframe.el.contentDocument.title;
-        history.replaceState({}, this.currentTitle, currentUrl.href);
-        this.title.setParts({ action: this.currentTitle });
+        const currentTitle = this.iframe.el.contentDocument.title;
+        history.replaceState({}, currentTitle, this.iframe.el.contentDocument.location.href);
+        this.title.setParts({ action: currentTitle });
     }
 
     _onPageLoaded() {

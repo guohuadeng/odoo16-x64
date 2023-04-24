@@ -43,7 +43,7 @@ msgstr ""
 "POT-Creation-Date: 2023-02-02 10:33+0000\n"
 "PO-Revision-Date: 2022-09-22 05:57+0000\n"
 "Last-Translator: Tadeusz Karpiński <tadeuszkarpinski@gmail.com>, 2023\n"
-"Language-Team: Polish (https://www.transifex.com/odoo/teams/41243/pl/)\n"
+"Language-Team: Polish (https://app.transifex.com/odoo/teams/41243/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -646,7 +646,7 @@ msgstr "Dodaj do koszyka"
 #: model:ir.model.fields,field_description:website_sale.field_res_config_settings__add_to_cart_action
 #: model:ir.model.fields,field_description:website_sale.field_website__add_to_cart_action
 msgid "Add To Cart Action"
-msgstr ""
+msgstr "Akcja dodaj do koszyka"
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.product_product_view_form_easy_inherit_website_sale
@@ -685,7 +685,7 @@ msgstr "Dodaj link do pobrania dla klientów na końcu podsumowania"
 #: model_terms:ir.ui.view,arch_db:website_sale.product_quantity
 #, python-format
 msgid "Add one"
-msgstr ""
+msgstr "Dodaj jeden"
 
 #. module: website_sale
 #. odoo-javascript
@@ -701,6 +701,11 @@ msgstr ""
 #, python-format
 msgid "Add to Cart"
 msgstr "Dodaj do koszyka"
+
+#. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.snippets
+msgid "Add to Cart Button"
+msgstr "Przycisk dodaj do koszyka"
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.wizard_checkout
@@ -2871,7 +2876,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:website_sale.field_product_ribbon__product_tag_ids
 #: model:ir.ui.menu,name:website_sale.product_catalog_product_tags
 msgid "Product Tags"
-msgstr ""
+msgstr "Tagi produktu"
 
 #. module: website_sale
 #: model:ir.model.fields,field_description:website_sale.field_product_image__product_tmpl_id
@@ -2881,7 +2886,7 @@ msgstr "Szablon produktu"
 #. module: website_sale
 #: model:ir.model,name:website_sale.model_product_template_attribute_line
 msgid "Product Template Attribute Line"
-msgstr ""
+msgstr "Linia atrybutów szablonu produktu"
 
 #. module: website_sale
 #: model:ir.model.fields,field_description:website_sale.field_product_public_category__product_tmpl_ids
@@ -2935,6 +2940,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:website_sale.product_ribbon_form_view
 #: model_terms:ir.ui.view,arch_db:website_sale.product_searchbar_input_snippet_options
 #: model_terms:ir.ui.view,arch_db:website_sale.products_breadcrumb
+#: model_terms:ir.ui.view,arch_db:website_sale.snippets
 #: model_terms:ir.ui.view,arch_db:website_sale.website_sale_visitor_page_view_search
 #: model_terms:ir.ui.view,arch_db:website_sale.website_sale_visitor_view_form
 #: model_terms:ir.ui.view,arch_db:website_sale.website_sale_visitor_view_tree
@@ -3095,7 +3101,7 @@ msgstr "Ilość ocen"
 #: model_terms:ir.ui.view,arch_db:website_sale.snippet_options
 #: model_terms:ir.ui.view,arch_db:website_sale.snippets_options_web_editor
 msgid "Re-order"
-msgstr ""
+msgstr "Zamów ponownie"
 
 #. module: website_sale
 #: model:ir.model.fields,field_description:website_sale.field_res_config_settings__website_sale_enabled_portal_reorder_button
@@ -3845,7 +3851,7 @@ msgstr ""
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.product
 msgid "This product has no valid combination."
-msgstr ""
+msgstr "Ten produkt nie ma poprawnej kombinacji."
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.product

@@ -67,7 +67,8 @@ class HrExpense(models.Model):
     quantity = fields.Float(required=True, states={'done': [('readonly', True)]}, digits='Product Unit of Measure', default=1)
     tax_ids = fields.Many2many('account.tax', 'expense_tax', 'expense_id', 'tax_id',
         compute='_compute_from_product_id_company_id', store=True, readonly=False, precompute=True,
-        domain="[('company_id', '=', company_id), ('type_tax_use', '=', 'purchase')]", string='Included taxes')
+        domain="[('company_id', '=', company_id), ('type_tax_use', '=', 'purchase')]", string='Included taxes',
+        help="Both price-included and price-excluded taxes will behave as price-included taxes for expenses.")
     amount_tax = fields.Monetary(string='Tax amount in Currency', help="Tax amount in currency", compute='_compute_amount_tax', store=True, currency_field='currency_id')
     amount_tax_company = fields.Monetary('Tax amount', help="Tax amount in company currency", compute='_compute_total_amount_company', store=True, currency_field='company_currency_id')
     amount_residual = fields.Monetary(string='Amount Due', compute='_compute_amount_residual')
@@ -576,7 +577,6 @@ Or send your receipts at <a href="mailto:%(email)s?subject=Lunch%%20with%%20cust
             'expense_id': self.id,
             'partner_id': False if self.payment_mode == 'company_account' else self.employee_id.sudo().address_home_id.commercial_partner_id.id,
             'tax_ids': [Command.set(self.tax_ids.ids)],
-            'currency_id': self.company_currency_id.id,
         }
 
     def _get_expense_account_destination(self):
@@ -1070,7 +1070,9 @@ class HrExpenseSheet(models.Model):
         company_account_sheets = self - own_account_sheets
 
         moves = self.env['account.move'].create([sheet._prepare_bill_vals() for sheet in own_account_sheets])
-        payments = self.env['account.payment'].create([sheet._prepare_payment_vals() for sheet in company_account_sheets])
+        payments = self.env['account.payment']\
+            .with_context(default_currency_id=self.company_id.currency_id.id)\
+            .create([sheet._prepare_payment_vals() for sheet in company_account_sheets])
 
         moves |= payments.move_id
         moves.action_post()
@@ -1123,6 +1125,7 @@ class HrExpenseSheet(models.Model):
             'invoice_date': self.accounting_date or fields.Date.context_today(self), # expense payment behave as bills
             'ref': self.name,
             'expense_sheet_id': [Command.set(self.ids)],
+            'currency_id': self.company_id.currency_id.id,
             'line_ids':[
                 Command.create(expense._prepare_move_line_vals())
                 for expense in self.expense_line_ids

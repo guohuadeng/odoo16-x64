@@ -12,7 +12,7 @@ msgstr ""
 "POT-Creation-Date: 2022-09-20 09:02+0000\n"
 "PO-Revision-Date: 2022-09-22 05:54+0000\n"
 "Last-Translator: Niyas Raphy, 2023\n"
-"Language-Team: Malayalam (https://www.transifex.com/odoo/teams/41243/ml/)\n"
+"Language-Team: Malayalam (https://app.transifex.com/odoo/teams/41243/ml/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -49,6 +49,11 @@ msgid "Alert Date Reached"
 msgstr ""
 
 #. module: product_expiry
+#: model_terms:ir.ui.view,arch_db:product_expiry.report_lot_label_expiry
+msgid "B.b."
+msgstr ""
+
+#. module: product_expiry
 #: model:ir.model.fields,field_description:product_expiry.field_product_product__use_time
 #: model:ir.model.fields,field_description:product_expiry.field_product_template__use_time
 msgid "Best Before Date"
@@ -67,7 +72,7 @@ msgstr ""
 #. module: product_expiry
 #: model:ir.model,name:product_expiry.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "കോൺഫിഗറേഷൻ സെറ്റിങ്‌സ്"
 
 #. module: product_expiry
 #: model_terms:ir.ui.view,arch_db:product_expiry.confirm_expiry_view
@@ -94,7 +99,7 @@ msgstr "ഉണ്ടാക്കിയത്"
 #. module: product_expiry
 #: model:ir.model.fields,field_description:product_expiry.field_expiry_picking_confirmation__create_date
 msgid "Created on"
-msgstr ""
+msgstr "സൃഷ്ടിച്ചത്"
 
 #. module: product_expiry
 #: model:ir.model.fields,help:product_expiry.field_stock_lot__alert_date
@@ -130,6 +135,11 @@ msgid "Display Name"
 msgstr "ഡിസ്പ്ലേ നെയിം"
 
 #. module: product_expiry
+#: model_terms:ir.ui.view,arch_db:product_expiry.report_lot_label_expiry
+msgid "Exp."
+msgstr ""
+
+#. module: product_expiry
 #: model_terms:ir.ui.view,arch_db:product_expiry.quant_search_view_inherit_product_expiry
 #: model_terms:ir.ui.view,arch_db:product_expiry.search_product_lot_filter_inherit_product_expiry
 msgid "Expiration Alerts"
@@ -163,7 +173,7 @@ msgstr ""
 #. module: product_expiry
 #: model:ir.model.fields,field_description:product_expiry.field_expiry_picking_confirmation__id
 msgid "ID"
-msgstr ""
+msgstr "ഐഡി"
 
 #. module: product_expiry
 #: model:res.groups,name:product_expiry.group_expiry_date_on_delivery_slip
@@ -178,7 +188,7 @@ msgstr "അവസാനം അപ്ഡേറ്റ് ചെയ്തത്"
 #. module: product_expiry
 #: model:ir.model.fields,field_description:product_expiry.field_expiry_picking_confirmation__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "അവസാനം അപ്ഡേറ്റ് ചെയ്തത്"
 
 #. module: product_expiry
 #: model:ir.model.fields,field_description:product_expiry.field_expiry_picking_confirmation__write_date
@@ -188,12 +198,12 @@ msgstr "അവസാനം അപ്ഡേറ്റ് ചെയ്തത്"
 #. module: product_expiry
 #: model:ir.model.fields,field_description:product_expiry.field_expiry_picking_confirmation__lot_ids
 msgid "Lot"
-msgstr ""
+msgstr "ലോട്ട്"
 
 #. module: product_expiry
 #: model:ir.model,name:product_expiry.model_stock_lot
 msgid "Lot/Serial"
-msgstr ""
+msgstr "ലോട്ടസ് /സീരിയൽ"
 
 #. module: product_expiry
 #: model:ir.model.fields,help:product_expiry.field_product_product__expiration_time
@@ -233,7 +243,7 @@ msgstr ""
 #. module: product_expiry
 #: model:ir.model.fields,field_description:product_expiry.field_expiry_picking_confirmation__picking_ids
 msgid "Picking"
-msgstr ""
+msgstr "പിക്കിങ്"
 
 #. module: product_expiry
 #: model_terms:ir.ui.view,arch_db:product_expiry.confirm_expiry_view
@@ -259,12 +269,12 @@ msgstr ""
 #. module: product_expiry
 #: model:ir.model,name:product_expiry.model_stock_move_line
 msgid "Product Moves (Stock Move Line)"
-msgstr ""
+msgstr "പ്രോഡക്റ്റ് മൂവ്‌സ് (സ്റ്റോക്ക് മൂവ് ലൈൻ)"
 
 #. module: product_expiry
 #: model:ir.model,name:product_expiry.model_product_product
 msgid "Product Variant"
-msgstr ""
+msgstr "പ്രോഡക്റ്റ് വേരിയന്റ്"
 
 #. module: product_expiry
 #: model:ir.model,name:product_expiry.model_stock_quant

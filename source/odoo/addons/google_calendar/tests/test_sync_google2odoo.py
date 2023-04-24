@@ -1369,3 +1369,85 @@ class TestSyncGoogle2Odoo(TestSyncGoogle):
         self.assertEqual(event.partner_ids[0], event.attendee_ids[0].partner_id)
         self.assertEqual('accepted', event.attendee_ids[0].state)
         self.assertGoogleAPINotCalled()
+
+    @patch_api
+    def test_partner_order(self):
+        self.private_partner.email = "internal_user@odoo.com"
+        self.private_partner.type = "contact"
+        user = self.env['res.users'].create({
+            'name': 'Test user Calendar',
+            'login': self.private_partner.email,
+            'partner_id': self.private_partner.id,
+            'type': 'contact'
+        })
+        values = {
+            'id': 'oj44nep1ldf8a3ll02uip0c9aa',
+            'description': 'Small mini desc',
+            'organizer': {'email': 'internal_user@odoo.com'},
+            'summary': 'Pricing new update',
+            'visibility': 'public',
+            'attendees': [{
+                'displayName': 'Mitchell Admin',
+                'email': self.public_partner.email,
+                'responseStatus': 'needsAction'
+            }, {
+                'displayName': 'Attendee',
+                'email': self.private_partner.email,
+                'responseStatus': 'needsAction',
+                'self': True,
+            }, ],
+            'reminders': {'useDefault': True},
+            'start': {
+                'dateTime': '2020-01-13T16:55:00+01:00',
+                'timeZone': 'Europe/Brussels'
+            },
+            'end': {
+                'dateTime': '2020-01-13T19:55:00+01:00',
+                'timeZone': 'Europe/Brussels'
+            },
+        }
+
+        self.env['calendar.event'].with_user(user)._sync_google2odoo(GoogleEvent([values]))
+        event = self.env['calendar.event'].search([('google_id', '=', values.get('id'))])
+        self.assertEqual(2, len(event.partner_ids), "Two attendees and two partners should be associated to the event")
+        self.assertGoogleAPINotCalled()
+
+    @patch_api
+    def test_recurrence_range_start_date_in_other_dst_period(self):
+        """
+            It is possible to create recurring events that are in the same DST period
+            but when calculating the start date for the range, it is possible to change the dst period.
+            This results in a duplication of the basic event.
+        """
+        # DST change: 2023-03-26
+        frequency = "MONTHLY"
+        count = "1" # Just to go into the flow of the recurrence
+        recurrence_id = "9lxiofipomymx2yr1yt0hpep99"
+        google_value = [{
+                "summary": "Start date in DST period",
+                "id": recurrence_id,
+                "creator": {"email": "john.doe@example.com"},
+                "organizer": {"email": "john.doe@example.com"},
+                "created": "2023-03-27T11:45:07.000Z",
+                "start": {"dateTime": "2023-03-27T09:00:00+02:00", "timeZone": "Europe/Brussels"},
+                "end": {"dateTime": "2023-03-27T10:00:00+02:00", "timeZone": "Europe/Brussels"},
+                "recurrence": [f"RRULE:FREQ={frequency};COUNT={count}"],
+                "reminders": {"useDefault": True},
+                "updated": "2023-03-27T11:45:08.547Z",
+            }]
+        google_event = GoogleEvent(google_value)
+        self.env['calendar.recurrence']._sync_google2odoo(google_event)
+        # Get the time slot of the day
+        day_start = datetime.fromisoformat(google_event.start["dateTime"]).astimezone(pytz.utc).replace(tzinfo=None).replace(hour=0)
+        day_end = datetime.fromisoformat(google_event.end["dateTime"]).astimezone(pytz.utc).replace(tzinfo=None).replace(hour=23)
+        # Get created events
+        day_events = self.env["calendar.event"].search(
+            [
+                ("name", "=", google_event.summary),
+                ("start", ">=", day_start),
+                ("stop", "<=", day_end)
+            ]
+        )
+        self.assertGoogleAPINotCalled()
+        # Check for non-duplication
+        self.assertEqual(len(day_events), 1)

@@ -958,16 +958,16 @@ class SaleOrderLine(models.Model):
 
     #=== CRUD METHODS ===#
     def _add_precomputed_values(self, vals_list):
-        """ In the specific case where the discount is provided in the create values
+        """ In case an editable precomputed field is provided in the create values
         without being rounded, we have to 'manually' round it otherwise it won't be,
-        because editable precomputed field values are kept 'as is'.
+        because those field values are kept 'as is'.
 
         This is a temporary fix until the problem is fixed in the ORM.
         """
-        precision = self.env['decimal.precision'].precision_get('Discount')
         for vals in vals_list:
-            if vals.get('discount'):
-                vals['discount'] = float_round(vals['discount'], precision_digits=precision)
+            for fname in ('discount', 'product_uom_qty'):
+                if fname in vals:
+                    vals[fname] = self._fields[fname].convert_to_cache(vals[fname], self)
         return super()._add_precomputed_values(vals_list)
 
     @api.model_create_multi
@@ -1120,6 +1120,7 @@ class SaleOrderLine(models.Model):
         if self.analytic_distribution and not self.display_type:
             res['analytic_distribution'] = self.analytic_distribution
         if analytic_account_id and not self.display_type:
+            analytic_account_id = str(analytic_account_id)
             if 'analytic_distribution' in res:
                 res['analytic_distribution'][analytic_account_id] = res['analytic_distribution'].get(analytic_account_id, 0) + 100
             else:
