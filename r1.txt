@@ -1,0 +1,24 @@
+pip3 install phonenumbers
+pip3 install num2words
+pip3 install scss
+pip3 install python-Levenshtein
+pip3 install python-barcode
+pip3 install pycrypto
+pip3 install pyldap
+pip3 install rsa
+pip3 install zxcvbn
+pip3 install jieba
+pip3 install zeep
+pip3 install wechatpy
+pip3 install python-alipay-sdk
+pip3 install pycryptodome
+pip3 install itsdangerous==0.24
+pip3 install xmltodict==0.11.0
+export CRYPTOGRAPHY_DONT_BUILD_RUST=1
+pip3 install cryptography
+pip3 install  cffi
+pip3 install  rust
+pip3 install paramiko
+pip3 install oauthlib
+pip3 install pdfminer
+pip3 install openai
