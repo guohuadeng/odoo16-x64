@@ -1,0 +1,92 @@
+
+/* /web/static/src/legacy/js/promise_extension.js */
+(function(){var _catch=Promise.prototype.catch;Promise.prototype.guardedCatch=function(onRejected){return _catch.call(this,function(reason){const error=(reason instanceof Error&&"cause"in reason)?reason.cause:reason;if(!error||!(error instanceof Error)){if(onRejected){onRejected.call(this,reason);}}
+return Promise.reject(reason);});};})();;
+
+/* /web/static/src/boot.js */
+(function(){"use strict";var jobUID=Date.now();var jobs=[];var factories=Object.create(null);var jobDeps=[];var jobPromises=[];var services=Object.create({});var commentRegExp=/(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/gm;var cjsRequireRegExp=/[^.]\s*require\s*\(\s*["']([^'"\s]+)["']\s*\)/g;if(!globalThis.odoo){globalThis.odoo={};}
+var odoo=globalThis.odoo;var debug=odoo.debug;var didLogInfoResolve;var didLogInfoPromise=new Promise(function(resolve){didLogInfoResolve=resolve;});odoo.remainingJobs=jobs;odoo.__DEBUG__={didLogInfo:didLogInfoPromise,getDependencies:function(name,transitive){var deps=name instanceof Array?name:[name];var changed;do{changed=false;jobDeps.forEach(function(dep){if(deps.indexOf(dep.to)>=0&&deps.indexOf(dep.from)<0){deps.push(dep.from);changed=true;}});}while(changed&&transitive);return deps;},getDependents:function(name){return jobDeps.filter(function(dep){return dep.from===name;}).map(function(dep){return dep.to;});},getWaitedJobs:function(){return jobs.map(function(job){return job.name;}).filter(function(item,index,self){return self.indexOf(item)===index;});},getMissingJobs:function(){var self=this;var waited=this.getWaitedJobs();var missing=[];waited.forEach(function(job){self.getDependencies(job).forEach(function(job){if(!(job in self.services)){missing.push(job);}});});return missing.filter(function(item,index,self){return self.indexOf(item)===index;}).filter(function(item){return waited.indexOf(item)<0;}).filter(function(job){return!job.error;});},getFailedJobs:function(){return jobs.filter(function(job){return!!job.error;});},processJobs:function(){var job;function processJob(job){var require=makeRequire(job);var jobExec;function onError(e){job.error=e;console.error(`Error while loading ${job.name}: ${e.message}`,e);Promise.reject(e);}
+var def=new Promise(function(resolve){try{jobExec=job.factory.call(null,require);jobs.splice(jobs.indexOf(job),1);}catch(e){onError(e);}
+if(!job.error){Promise.resolve(jobExec).then(function(data){services[job.name]=data;resolve();odoo.__DEBUG__.processJobs();}).guardedCatch(function(e){job.rejected=e||true;jobs.push(job);}).catch(function(e){if(e instanceof Error){onError(e);}
+resolve();});}else{resolve();}});jobPromises.push(def);def.then(job.resolve);}
+function isReady(job){return(!job.error&&!job.rejected&&job.factory.deps.every(function(name){return name in services;}));}
+function makeRequire(job){var deps={};Object.keys(services).filter(function(item){return job.deps.indexOf(item)>=0;}).forEach(function(key){deps[key]=services[key];});return function require(name){if(!(name in deps)){console.error("Undefined dependency: ",name);}
+return deps[name];};}
+while(jobs.length){job=undefined;for(var i=0;i<jobs.length;i++){if(isReady(jobs[i])){job=jobs[i];break;}}
+if(!job){break;}
+processJob(job);}
+return services;},factories:factories,services:services,};odoo.define=function(){var args=Array.prototype.slice.call(arguments);var name=typeof args[0]==="string"?args.shift():"__odoo_job"+jobUID++;var factory=args[args.length-1];var deps;if(args[0]instanceof Array){deps=args[0];}else{deps=[];factory.toString().replace(commentRegExp,"").replace(cjsRequireRegExp,function(match,dep){deps.push(dep);});}
+if(!(deps instanceof Array)){throw new Error("Dependencies should be defined by an array",deps);}
+if(typeof factory!=="function"){throw new Error("Factory should be defined by a function",factory);}
+if(typeof name!=="string"){throw new Error("Invalid name definition (should be a string",name);}
+if(name in factories){throw new Error("Service "+name+" already defined");}
+factory.deps=deps;factories[name]=factory;let promiseResolve;const promise=new Promise((resolve)=>{promiseResolve=resolve;});jobs.push({name:name,factory:factory,deps:deps,resolve:promiseResolve,promise:promise,});deps.forEach(function(dep){jobDeps.push({from:dep,to:name});});odoo.__DEBUG__.processJobs();};odoo.log=function(){var missing=[];var failed=[];var cycle=null;if(jobs.length){var debugJobs={};var rejected=[];var rejectedLinked=[];var job;var jobdep;for(var k=0;k<jobs.length;k++){debugJobs[jobs[k].name]=job={dependencies:jobs[k].deps,dependents:odoo.__DEBUG__.getDependents(jobs[k].name),name:jobs[k].name,};if(jobs[k].error){job.error=jobs[k].error;}
+if(jobs[k].rejected){job.rejected=jobs[k].rejected;rejected.push(job.name);}
+var deps=odoo.__DEBUG__.getDependencies(job.name);for(var i=0;i<deps.length;i++){if(job.name!==deps[i]&&!(deps[i]in services)){jobdep=debugJobs[deps[i]];if(!jobdep&&deps[i]in factories){for(var j=0;j<jobs.length;j++){if(jobs[j].name===deps[i]){jobdep=jobs[j];break;}}}
+if(jobdep&&jobdep.rejected){if(!job.rejected){job.rejected=[];rejectedLinked.push(job.name);}
+job.rejected.push(deps[i]);}else{if(!job.missing){job.missing=[];}
+job.missing.push(deps[i]);}}}}
+missing=odoo.__DEBUG__.getMissingJobs();failed=odoo.__DEBUG__.getFailedJobs();var unloaded=Object.keys(debugJobs).map(function(key){return debugJobs[key];}).filter(function(job){return job.missing;});if(debug||failed.length||unloaded.length){var log=globalThis.console[!failed.length||!unloaded.length?"info":"error"].bind(globalThis.console);log((failed.length?"error":unloaded.length?"warning":"info")+": Some modules could not be started");if(missing.length){log("Missing dependencies:    ",missing);}
+if(failed.length){log("Failed modules:          ",failed.map(function(fail){return fail.name;}));}
+if(rejected.length){log("Rejected modules:        ",rejected);}
+if(rejectedLinked.length){log("Rejected linked modules: ",rejectedLinked);}
+if(unloaded.length){cycle=findCycle(unloaded);if(cycle){console.error("Cyclic dependencies: "+cycle);}
+log("Non loaded modules:      ",unloaded.map(function(unload){return unload.name;}));}
+if(debug&&Object.keys(debugJobs).length){log("Debug:                   ",debugJobs);}}}
+odoo.__DEBUG__.jsModules={missing:missing,failed:failed.map((mod)=>mod.name),unloaded:unloaded?unloaded.map((mod)=>mod.name):[],cycle,};didLogInfoResolve(true);};odoo.ready=async function(serviceName){function match(name){return typeof serviceName==="string"?name===serviceName:serviceName.test(name);}
+await Promise.all(jobs.filter((job)=>match(job.name)).map((job)=>job.promise));return Object.keys(factories).filter(match).length;};odoo.runtimeImport=function(moduleName){if(!(moduleName in services)){throw new Error(`Service "${moduleName} is not defined or isn't finished loading."`);}
+return services[moduleName];};globalThis.addEventListener("load",function logWhenLoaded(){const len=jobPromises.length;Promise.all(jobPromises).then(function(){if(len===jobPromises.length){odoo.log();}else{logWhenLoaded();}});});function findCycle(jobs){const dependencyGraph=new Map();for(const job of jobs){dependencyGraph.set(job.name,job.dependencies);}
+function visitJobs(jobs,visited=new Set()){for(const job of jobs){const result=visitJob(job,visited);if(result){return result;}}
+return null;}
+function visitJob(job,visited){if(visited.has(job)){const jobs=Array.from(visited).concat([job]);const index=jobs.indexOf(job);return jobs.slice(index).map((j)=>`"${j}"`).join(" => ");}
+const deps=dependencyGraph.get(job);return deps?visitJobs(deps,new Set(visited).add(job)):null;}
+return visitJobs(jobs.map((j)=>j.name));}})();;
+
+/* /bus/static/src/workers/websocket_worker.js */
+odoo.define('@bus/workers/websocket_worker',async function(require){'use strict';let __exports={};const{debounce}=require('@bus/workers/websocket_worker_utils');const WEBSOCKET_CLOSE_CODES=__exports.WEBSOCKET_CLOSE_CODES=Object.freeze({CLEAN:1000,GOING_AWAY:1001,PROTOCOL_ERROR:1002,INCORRECT_DATA:1003,ABNORMAL_CLOSURE:1006,INCONSISTENT_DATA:1007,MESSAGE_VIOLATING_POLICY:1008,MESSAGE_TOO_BIG:1009,EXTENSION_NEGOTIATION_FAILED:1010,SERVER_ERROR:1011,RESTART:1012,TRY_LATER:1013,BAD_GATEWAY:1014,SESSION_EXPIRED:4001,KEEP_ALIVE_TIMEOUT:4002,RECONNECTING:4003,});const WORKER_VERSION=__exports.WORKER_VERSION='1.0.5';const INITIAL_RECONNECT_DELAY=1000;const MAXIMUM_RECONNECT_DELAY=60000;const WebsocketWorker=__exports.WebsocketWorker=class WebsocketWorker{constructor(){this.newestStartTs=undefined;this.websocketURL="";this.currentUID=null;this.isWaitingForNewUID=true;this.channelsByClient=new Map();this.connectRetryDelay=INITIAL_RECONNECT_DELAY;this.connectTimeout=null;this.debugModeByClient=new Map();this.isDebug=false;this.isReconnecting=false;this.lastChannelSubscription=null;this.lastNotificationId=0;this.messageWaitQueue=[];this._forceUpdateChannels=debounce(this._forceUpdateChannels,300,true);this._onWebsocketClose=this._onWebsocketClose.bind(this);this._onWebsocketError=this._onWebsocketError.bind(this);this._onWebsocketMessage=this._onWebsocketMessage.bind(this);this._onWebsocketOpen=this._onWebsocketOpen.bind(this);}
+broadcast(type,data){for(const client of this.channelsByClient.keys()){client.postMessage({type,data});}}
+registerClient(messagePort){messagePort.onmessage=ev=>{this._onClientMessage(messagePort,ev.data);};this.channelsByClient.set(messagePort,[]);}
+sendToClient(client,type,data){client.postMessage({type,data});}
+_onClientMessage(client,{action,data}){switch(action){case'send':return this._sendToServer(data);case'start':return this._start();case'stop':return this._stop();case'leave':return this._unregisterClient(client);case'add_channel':return this._addChannel(client,data);case'delete_channel':return this._deleteChannel(client,data);case'force_update_channels':return this._forceUpdateChannels();case'initialize_connection':return this._initializeConnection(client,data);}}
+_addChannel(client,channel){const clientChannels=this.channelsByClient.get(client);if(!clientChannels.includes(channel)){clientChannels.push(channel);this.channelsByClient.set(client,clientChannels);this._updateChannels();}}
+_deleteChannel(client,channel){const clientChannels=this.channelsByClient.get(client);if(!clientChannels){return;}
+const channelIndex=clientChannels.indexOf(channel);if(channelIndex!==-1){clientChannels.splice(channelIndex,1);this._updateChannels();}}
+_forceUpdateChannels(){this._updateChannels({force:true});}
+_unregisterClient(client){this.channelsByClient.delete(client);this.debugModeByClient.delete(client);this.isDebug=Object.values(this.debugModeByClient).some(debugValue=>debugValue!=='');this._updateChannels();}
+_initializeConnection(client,{debug,lastNotificationId,uid,websocketURL,startTs}){if(this.newestStartTs&&this.newestStartTs>startTs){this.debugModeByClient[client]=debug;this.isDebug=Object.values(this.debugModeByClient).some(debugValue=>debugValue!=='');this.sendToClient(client,"initialized");return;}
+this.newestStartTs=startTs;this.websocketURL=websocketURL;this.lastNotificationId=lastNotificationId;this.debugModeByClient[client]=debug;this.isDebug=Object.values(this.debugModeByClient).some(debugValue=>debugValue!=='');const isCurrentUserKnown=uid!==undefined;if(this.isWaitingForNewUID&&isCurrentUserKnown){this.isWaitingForNewUID=false;this.currentUID=uid;}
+if(this.currentUID!==uid&&isCurrentUserKnown){this.currentUID=uid;if(this.websocket){this.websocket.close(WEBSOCKET_CLOSE_CODES.CLEAN);}
+this.channelsByClient.forEach((_,key)=>this.channelsByClient.set(key,[]));}
+this.sendToClient(client,'initialized');}
+_isWebsocketConnected(){return this.websocket&&this.websocket.readyState===1;}
+_isWebsocketConnecting(){return this.websocket&&this.websocket.readyState===0;}
+_isWebsocketClosing(){return this.websocket&&this.websocket.readyState===2;}
+_onWebsocketClose({code,reason}){if(this.isDebug){console.debug(`%c${new Date().toLocaleString()} - [onClose]`,'color: #c6e; font-weight: bold;',code,reason);}
+this.lastChannelSubscription=null;if(this.isReconnecting){return;}
+this.broadcast('disconnect',{code,reason});if(code===WEBSOCKET_CLOSE_CODES.CLEAN){return;}
+this.broadcast('reconnecting',{closeCode:code});this.isReconnecting=true;if(code===WEBSOCKET_CLOSE_CODES.KEEP_ALIVE_TIMEOUT){this.connectRetryDelay=0;}
+if(code===WEBSOCKET_CLOSE_CODES.SESSION_EXPIRED){this.isWaitingForNewUID=true;}
+this._retryConnectionWithDelay();}
+_onWebsocketError(){if(this.isDebug){console.debug(`%c${new Date().toLocaleString()} - [onError]`,'color: #c6e; font-weight: bold;');}
+this._retryConnectionWithDelay();}
+_onWebsocketMessage(messageEv){const notifications=JSON.parse(messageEv.data);if(this.isDebug){console.debug(`%c${new Date().toLocaleString()} - [onMessage]`,'color: #c6e; font-weight: bold;',notifications);}
+this.lastNotificationId=notifications[notifications.length-1].id;this.broadcast('notification',notifications);}
+_onWebsocketOpen(){if(this.isDebug){console.debug(`%c${new Date().toLocaleString()} - [onOpen]`,'color: #c6e; font-weight: bold;');}
+this._updateChannels();this.messageWaitQueue.forEach(msg=>this.websocket.send(msg));this.messageWaitQueue=[];this.broadcast(this.isReconnecting?'reconnect':'connect');this.connectRetryDelay=INITIAL_RECONNECT_DELAY;this.connectTimeout=null;this.isReconnecting=false;}
+_retryConnectionWithDelay(){this.connectRetryDelay=Math.min(this.connectRetryDelay*1.5,MAXIMUM_RECONNECT_DELAY)+1000*Math.random();this.connectTimeout=setTimeout(this._start.bind(this),this.connectRetryDelay);}
+_sendToServer(message){const payload=JSON.stringify(message);if(!this._isWebsocketConnected()){this.messageWaitQueue.push(payload);}else{this.websocket.send(payload);}}
+_start(){if(this._isWebsocketConnected()||this._isWebsocketConnecting()){return;}
+if(this.websocket){this.websocket.removeEventListener('open',this._onWebsocketOpen);this.websocket.removeEventListener('message',this._onWebsocketMessage);this.websocket.removeEventListener('error',this._onWebsocketError);this.websocket.removeEventListener('close',this._onWebsocketClose);}
+if(this._isWebsocketClosing()){this.lastChannelSubscription=null;this.broadcast("disconnect",{code:WEBSOCKET_CLOSE_CODES.ABNORMAL_CLOSURE});}
+this.websocket=new WebSocket(this.websocketURL);this.websocket.addEventListener('open',this._onWebsocketOpen);this.websocket.addEventListener('error',this._onWebsocketError);this.websocket.addEventListener('message',this._onWebsocketMessage);this.websocket.addEventListener('close',this._onWebsocketClose);}
+_stop(){clearTimeout(this.connectTimeout);this.connectRetryDelay=INITIAL_RECONNECT_DELAY;this.isReconnecting=false;this.lastChannelSubscription=null;if(this.websocket){this.websocket.close();}}
+_updateChannels({force=false}={}){const allTabsChannels=[...new Set([].concat.apply([],[...this.channelsByClient.values()]))].sort();const allTabsChannelsString=JSON.stringify(allTabsChannels);const shouldUpdateChannelSubscription=allTabsChannelsString!==this.lastChannelSubscription;if(force||shouldUpdateChannelSubscription){this.lastChannelSubscription=allTabsChannelsString;this._sendToServer({event_name:'subscribe',data:{channels:allTabsChannels,last:this.lastNotificationId}});}}}
+return __exports;});;
+
+/* /bus/static/src/workers/websocket_worker_script.js */
+odoo.define('@bus/workers/websocket_worker_script',async function(require){'use strict';let __exports={};const{WebsocketWorker}=require("@bus/workers/websocket_worker");(function(){const websocketWorker=new WebsocketWorker();if(self.name.includes('shared')){onconnect=function(ev){const currentClient=ev.ports[0];websocketWorker.registerClient(currentClient);};}else{websocketWorker.registerClient(self);}})();return __exports;});;
+
+/* /bus/static/src/workers/websocket_worker_utils.js */
+odoo.define('@bus/workers/websocket_worker_utils',async function(require){'use strict';let __exports={};__exports.debounce=debounce;function debounce(func,wait,immediate){let timeout;return function(){const context=this;const args=arguments;function later(){timeout=null;if(!immediate){func.apply(context,args);}}
+const callNow=immediate&&!timeout;clearTimeout(timeout);timeout=setTimeout(later,wait);if(callNow){func.apply(context,args);}};}
+return __exports;});

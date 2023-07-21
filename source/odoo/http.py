@@ -327,7 +327,17 @@ def db_filter(dbs, host=None):
         if host.startswith('www.'):
             host = host[4:]
         domain = host.partition('.')[0]
-
+        
+        # 注意，在 o16 已变更，  www.odooapp.cn 对应数据库为  odooapp.cn
+        # begin dbmap：  如果h在 dbmap中有配置，则按dbmap，否则按原生顺序
+        # dbmap = {'gd.erpapp.cn':'gd.erpapp.cn', 'fs.erpapp.cn':'gd.erpapp.cn', 'zs.erpapp.cn':'gd.erpapp.cn'}
+        if odoo.tools.config.get('dbmap', False):
+            mp = json.loads(odoo.tools.config.get('dbmap', False).replace("\'", "\""))
+            if mp.get(host, False):
+                dbs = [mp.get(host, False)]
+                return dbs
+        # end dbmap
+        
         dbfilter_re = re.compile(
             config["dbfilter"].replace("%h", re.escape(host))
                               .replace("%d", re.escape(domain)))
