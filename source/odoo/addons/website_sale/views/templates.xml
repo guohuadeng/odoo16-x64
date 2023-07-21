@@ -757,7 +757,7 @@
                 <div class="accordion-header d-flex mb-1">
                     <t t-call="website_sale.categorie_link"/>
                     <button t-attf-id="o_wsale_cat_accordion_title_{{c.id}}"
-                            t-attf-class="accordion-button p-0 ms-3 {{not isOpen and 'collapsed'}}"
+                            t-attf-class="accordion-button p-0 ms-3 {{not isOpen and 'collapsed'}} w-auto flex-grow-1"
                             t-attf-data-bs-target="#o_wsale_cat_accordion_{{c.id}}"
                             t-att-aria-expanded="isOpen and 'true' or 'false'"
                             t-attf-aria-controls="o_wsale_cat_accordion_{{c.id}}"
@@ -1161,12 +1161,14 @@
                 />
                 <t t-if="is_view_active('website_sale.tax_indication')" t-call="website_sale.tax_indication"/>
                 <del t-if="product.compare_list_price">
+                    <bdi dir="inherit">
                     <span t-field="product.compare_list_price"
                         groups="website_sale.group_product_price_comparison"
                         t-options='{
                            "widget": "monetary",
                            "display_currency": product.currency_id,
                        }'/>
+                    </bdi>
                 </del>
             </h3>
             <h3 class="css_non_editable_mode_hidden decimal_precision" t-att-data-precision="str(website.currency_id.decimal_places)">
@@ -1177,12 +1179,14 @@
                 }'/>
                 <t t-if="is_view_active('website_sale.tax_indication')" t-call="website_sale.tax_indication"/>
                 <del t-if="product.compare_list_price">
+                    <bdi dir="inherit">
                     <span t-field="product.compare_list_price"
                         groups="website_sale.group_product_price_comparison"
                         t-options='{
                             "widget": "monetary",
                             "display_currency": product.currency_id,
                         }'/>
+                    </bdi>
                 </del>
             </h3>
         </div>
@@ -1998,7 +2002,7 @@
                                 </a>
                             </div>
                             <div class="js_payment mt-3" t-if="not website_sale_order.amount_total" id="payment_method" name="o_website_sale_free_cart">
-                                <form target="_self" action="/shop/payment/validate" method="post">
+                                <form name="o_wsale_confirm_order" target="_self" action="/shop/payment/validate" method="post">
                                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" t-nocache="The csrf token must always be up to date."/>
                                     <t t-call="website_sale.payment_footer">
                                         <t t-set="submit_button_label">Confirm Order</t>
@@ -2172,7 +2176,7 @@
                                     <tbody>
                                         <tr>
                                             <td colspan="2">
-                                                <t t-esc="payment_tx_id.provider_id.sudo().name" />
+                                                <t t-esc="payment_tx_id.provider_id.display_as or payment_tx_id.provider_id.name" />
                                             </td>
                                             <td class="text-end" width="100">
                                                 <strong>Total:</strong>

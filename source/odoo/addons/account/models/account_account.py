@@ -2,6 +2,7 @@
 from odoo import api, fields, models, _, tools
 from odoo.osv import expression
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools.float_utils import float_is_zero
 from bisect import bisect_left
 from collections import defaultdict
 import re
@@ -93,7 +94,7 @@ class AccountAccount(models.Model):
     note = fields.Text('Internal Notes', tracking=True)
     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True,
         default=lambda self: self.env.company)
-    tag_ids = fields.Many2many('account.account.tag', 'account_account_account_tag', string='Tags', help="Optional tags you may want to assign for custom reporting")
+    tag_ids = fields.Many2many('account.account.tag', 'account_account_account_tag', string='Tags', help="Optional tags you may want to assign for custom reporting", ondelete='restrict')
     group_id = fields.Many2one('account.group', compute='_compute_account_group', store=True, readonly=True,
                                help="Account prefixes can determine account groups.")
     root_id = fields.Many2one('account.root', compute='_compute_account_root', store=True)
@@ -459,6 +460,11 @@ class AccountAccount(models.Model):
         either 'debit' or 'credit', depending on which one of these two fields
         got assigned.
         """
+        # only set the opening debit/credit if the amount is not zero,
+        # otherwise return early
+        if float_is_zero(amount, precision_digits=2):
+            return
+
         self.company_id.create_op_move_if_non_existant()
         opening_move = self.company_id.account_opening_move_id
 

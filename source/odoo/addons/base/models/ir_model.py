@@ -305,6 +305,11 @@ class IrModel(models.Model):
         # delete fields whose comodel is being removed
         self.env['ir.model.fields'].search([('relation', 'in', self.mapped('model'))]).unlink()
 
+        # delete ir_crons created by user
+        crons = self.env['ir.cron'].with_context(active_test=False).search([('model_id', 'in', self.ids)])
+        if crons:
+            crons.unlink()
+
         self._drop_table()
         res = super(IrModel, self).unlink()
 
@@ -649,6 +654,8 @@ class IrModelFields(models.Model):
                 names = seq.strip().split(".")
                 last = len(names) - 1
                 for index, name in enumerate(names):
+                    if name == 'id':
+                        raise UserError(_("Compute method cannot depend on field 'id'"))
                     field = model._fields.get(name)
                     if field is None:
                         raise UserError(_("Unknown field %r in dependency %r") % (name, seq.strip()))
@@ -784,7 +791,8 @@ class IrModelFields(models.Model):
                     if inverse.manual and inverse.type == 'one2many':
                         failed_dependencies.append((field, inverse))
 
-        if not self._context.get(MODULE_UNINSTALL_FLAG) and failed_dependencies:
+        uninstalling = self._context.get(MODULE_UNINSTALL_FLAG)
+        if not uninstalling and failed_dependencies:
             msg = _("The field '%s' cannot be removed because the field '%s' depends on it.")
             raise UserError(msg % failed_dependencies[0])
         elif failed_dependencies:
@@ -800,8 +808,10 @@ class IrModelFields(models.Model):
         # DLE P16: if there are pending updates of the field we currently try to unlink, pop them out from the cache
         # test `test_unlink_with_dependant`
         for record in self:
-            field = self.pool[record.model]._fields[record.name]
-            self.env.cache.clear_dirty_field(field)
+            model = self.env.get(record.model)
+            field = model and model._fields.get(record.name)
+            if field:
+                self.env.cache.clear_dirty_field(field)
         # remove fields from registry, and check that views are not broken
         fields = [self.env[record.model]._pop_field(record.name) for record in self]
         domain = expression.OR([('arch_db', 'like', record.name)] for record in self)
@@ -810,7 +820,7 @@ class IrModelFields(models.Model):
             for view in views:
                 view._check_xml()
         except Exception:
-            if not self._context.get(MODULE_UNINSTALL_FLAG):
+            if not uninstalling:
                 raise UserError("\n".join([
                     _("Cannot rename/delete fields that are still present in views:"),
                     _("Fields: %s") % ", ".join(str(f) for f in fields),
@@ -822,8 +832,9 @@ class IrModelFields(models.Model):
                         + ", ".join(str(f) for f in fields)
                         + " the following view might be broken %s" % view.name)
         finally:
-            # the registry has been modified, restore it
-            self.pool.setup_models(self._cr)
+            if not uninstalling:
+                # the registry has been modified, restore it
+                self.pool.setup_models(self._cr)
 
     @api.ondelete(at_uninstall=False)
     def _unlink_if_manual(self):
@@ -914,13 +925,9 @@ class IrModelFields(models.Model):
 
         # names of the models to patch
         patched_models = set()
-
-        # write callable(self._fields[fname].translate) means changing content
-        translate_only = self.env.lang not in (None, 'en_US') and all(self._fields[fname].translate is True for fname in vals)
-
         if vals and self:
             for item in self:
-                if item.state != 'manual' and not translate_only:
+                if item.state != 'manual':
                     raise UserError(_('Properties of base fields cannot be altered in this manner! '
                                       'Please modify them through Python code, '
                                       'preferably through a custom addon!'))
@@ -987,6 +994,12 @@ class IrModelFields(models.Model):
             models = self.pool.descendants(patched_models, '_inherits')
             self.pool.init_models(self._cr, models, dict(self._context, update_custom_fields=True))
 
+        return res
+
+    def update_field_translations(self, field_name, translations):
+        res = super().update_field_translations(field_name, translations)
+        if res:
+            self.clear_caches()
         return res
 
     def name_get(self):
@@ -1299,8 +1312,8 @@ class IrModelSelection(models.Model):
         for field in fields:
             model = self.env[field.model_name]
             for value, modules in field._selection_modules(model).items():
-                if module in modules:
-                    xml_id = selection_xmlid(module, field.model_name, field.name, value)
+                for m in modules:
+                    xml_id = selection_xmlid(m, field.model_name, field.name, value)
                     record = self.browse(selection_ids[field.model_name, field.name, value])
                     data_list.append({'xml_id': xml_id, 'record': record})
         self.env['ir.model.data']._update_xmlids(data_list)
@@ -1570,18 +1583,22 @@ class IrModelConstraint(models.Model):
                     self._cr.execute(
                         sql.SQL('ALTER TABLE {} DROP CONSTRAINT {}').format(
                             sql.Identifier(table),
-                            sql.Identifier(name)
+                            sql.Identifier(name[:63])
                         ))
                     _logger.info('Dropped FK CONSTRAINT %s@%s', name, data.model.model)
 
             if typ == 'u':
                 # test if constraint exists
+                # Since type='u' means any "other" constraint, to avoid issues we limit to
+                # 'c' -> check, 'u' -> unique, 'x' -> exclude constraints, effective leaving
+                # out 'p' -> primary key and 'f' -> foreign key, constraints.
+                # See: https://www.postgresql.org/docs/9.5/catalog-pg-constraint.html
                 self._cr.execute("""SELECT 1 from pg_constraint cs JOIN pg_class cl ON (cs.conrelid = cl.oid)
-                                    WHERE cs.contype=%s and cs.conname=%s and cl.relname=%s""",
-                                 ('u', name, table))
+                                    WHERE cs.contype in ('c', 'u', 'x') and cs.conname=%s and cl.relname=%s""",
+                                 (name[:63], table))
                 if self._cr.fetchone():
                     self._cr.execute(sql.SQL('ALTER TABLE {} DROP CONSTRAINT {}').format(
-                        sql.Identifier(table), sql.Identifier(name)))
+                        sql.Identifier(table), sql.Identifier(name[:63])))
                     _logger.info('Dropped CONSTRAINT %s@%s', name, data.model.model)
 
         self.unlink()
@@ -2236,9 +2253,9 @@ class IrModelData(models.Model):
         modules._remove_copied_views()
 
         # remove constraints
-        delete(self.env['ir.model.constraint'].browse(unique(constraint_ids)))
         constraints = self.env['ir.model.constraint'].search([('module', 'in', modules.ids)])
         constraints._module_data_uninstall()
+        delete(self.env['ir.model.constraint'].browse(unique(constraint_ids)))
 
         # If we delete a selection field, and some of its values have ondelete='cascade',
         # we expect the records with that value to be deleted. If we delete the field first,

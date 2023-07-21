@@ -615,12 +615,13 @@ class WebsiteSlides(WebsiteProfile):
         }
 
         if not request.env.user._is_public():
+            subtype_comment_id = request.env['ir.model.data']._xmlid_to_res_id('mail.mt_comment')
             last_message = request.env['mail.message'].search([
                 ('model', '=', channel._name),
                 ('res_id', '=', channel.id),
                 ('author_id', '=', request.env.user.partner_id.id),
                 ('message_type', '=', 'comment'),
-                ('is_internal', '=', False)
+                ('subtype_id', '=', subtype_comment_id)
             ], order='write_date DESC', limit=1)
 
             if last_message:
@@ -757,7 +758,7 @@ class WebsiteSlides(WebsiteProfile):
             return request.redirect(slide.channel_id.website_url)
 
         if slide.can_self_mark_completed and not slide.user_has_completed \
-           and slide.channel_id.channel_type == 'training':
+           and slide.channel_id.channel_type == 'training' and slide.slide_category != 'video':
             self._slide_mark_completed(slide)
         else:
             self._set_viewed_slide(slide)
@@ -1305,7 +1306,7 @@ class WebsiteSlides(WebsiteProfile):
 
         try:
             slide = request.env['slide.slide'].browse(slide_id)
-            if not slide.exists():
+            if not slide.exists() or not slide.sudo().active:
                 raise werkzeug.exceptions.NotFound()
 
             referer_url = request.httprequest.headers.get('Referer', '')

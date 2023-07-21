@@ -54,7 +54,7 @@
                     <field name="last_activity_time" invisible="1"/>
                     <field name="last_activity" invisible="1"/>
                     <header>
-                        <button name="%(plan_wizard_action)d" string="Launch Plan" type="action" groups="hr.group_hr_user"/>
+                        <button name="%(plan_wizard_action)d" string="Launch Plan" type="action" groups="hr.group_hr_user" attrs="{'invisible': [('active', '=', False)]}"/>
                     </header>
                     <sheet>
                         <div name="button_box" class="oe_button_box">
@@ -138,7 +138,7 @@
                                                 'form_view_ref': 'base.res_partner_view_form_private'}"
                                             options='{"always_reload": True, "highlight_first_line": True}'/>
                                         <field name="private_email" string="Email"/>
-                                        <field name="phone" class="o_force_ltr" string="Phone" readonly="True"/>
+                                        <field name="phone" string="Phone" readonly="True"/>
                                         <field name="bank_account_id" context="{'default_partner_id': address_home_id}"/>
                                         <field name="lang" string="Language"/>
                                         <label for="km_home_work"/>
@@ -225,7 +225,7 @@
                         class="oe_stat_button"
                         icon="fa-address-card-o"
                         type="object"
-                        attrs="{'invisible': [('related_contacts_count', '=', 0)]}">
+                        attrs="{'invisible': ['|', ('id', '=', False), ('related_contacts_count', '=', 0)]}">
                         <div class="o_field_widget o_stat_info">
                             <span class="o_stat_value"><field name="related_contacts_count"/></span>
                             <span class="o_stat_text">Contacts</span>

@@ -14,7 +14,7 @@ https://nightly.odoo.com/16.0/nightly/src/odoo_16.0.latest.zip
 1. python 3.10.10, 64位
 2. postgresql 13.4 ,64位
 3. Nginx 1.15.5， 64位
-4. Odoo 16社区版，20230424版
+4. Odoo 16社区版，20230721版
 5. 增加 sphinx 及 tx_client，用于文档及翻译
 6. 本地执行 gi.bat，会将原始odoo的最新版clone到本地 .\source_git，执行 gu.bat 更新
 7. 对断点调试的处理， 如果更新了新版odoo，将 .\fixed 目录内容覆盖 .\source 内容

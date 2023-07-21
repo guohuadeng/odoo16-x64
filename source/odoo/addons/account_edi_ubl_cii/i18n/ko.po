@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-14 05:51+0000\n"
+"POT-Creation-Date: 2023-05-23 08:22+0000\n"
 "PO-Revision-Date: 2022-09-22 05:44+0000\n"
 "Last-Translator: Sarah Park, 2023\n"
 "Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
@@ -45,6 +45,13 @@ msgstr "<strong>청구서 가져오기에서 사용되는 양식: %s</strong>"
 msgid ""
 "<strong>Format used to import the invoice: %s</strong> <p><li> %s </li></p>"
 msgstr "<strong>청구서 가져오기에서 사용되는 양식: %s</strong> <p><li> %s </li></p>"
+
+#. module: account_edi_ubl_cii
+#. odoo-python
+#: code:addons/account_edi_ubl_cii/models/account_edi_common.py:0
+#, python-format
+msgid "A payment of %s was detected."
+msgstr "%s 결제가 확인되었습니다."
 
 #. module: account_edi_ubl_cii
 #: model:ir.model,name:account_edi_ubl_cii.model_account_edi_xml_ubl_a_nz
@@ -212,8 +219,9 @@ msgstr "%s에 대한 전자주소체계 (EAS, Electronic Address Scheme)를 찾�
 #. odoo-python
 #: code:addons/account_edi_ubl_cii/models/account_edi_common.py:0
 #, python-format
-msgid "No gross price nor net price found for line in xml"
-msgstr "xml 항목에서 총 금액 또는 순 금액을 찾을 수 없습니다"
+msgid ""
+"No gross price, net price nor line subtotal amount found for line in xml"
+msgstr ""
 
 #. module: account_edi_ubl_cii
 #: model_terms:ir.ui.view,arch_db:account_edi_ubl_cii.account_invoice_pdfa_3_facturx_metadata
@@ -239,7 +247,7 @@ msgstr "매출 VAT, 감면 요율, 중간"
 #: code:addons/account_edi_ubl_cii/models/account_edi_common.py:0
 #, python-format
 msgid "Output VAT, reduced rate, raw fish"
-msgstr ""
+msgstr "매출 VAT, 감면 요율, 생선회"
 
 #. module: account_edi_ubl_cii
 #. odoo-python
@@ -256,7 +264,7 @@ msgstr "보고서 작업"
 #. module: account_edi_ubl_cii
 #: model:ir.model,name:account_edi_ubl_cii.model_account_edi_xml_ubl_sg
 msgid "SG BIS Billing 3.0"
-msgstr ""
+msgstr "SG BIS Billing 3.0"
 
 #. module: account_edi_ubl_cii
 #: model:ir.model,name:account_edi_ubl_cii.model_account_edi_xml_ubl_nl
@@ -268,7 +276,7 @@ msgstr "SI-UBL 2.0 (NLCIUS)"
 #: code:addons/account_edi_ubl_cii/models/account_edi_common.py:0
 #, python-format
 msgid "Tax '%s' is invalid: %s"
-msgstr ""
+msgstr "세금 '%s' 이(가) 유효하지 않습니다: %s"
 
 #. module: account_edi_ubl_cii
 #. odoo-python

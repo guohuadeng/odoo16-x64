@@ -146,7 +146,7 @@ class TestPointOfSaleFlow(TestPointOfSaleCommon):
                     [0, 0, {'lot_name': '1002'}],
                 ]
             })],
-            'pricelist_id': 1,
+            'pricelist_id': self.pos_config.pricelist_id.id,
             'amount_paid': 12.0,
             'amount_total': 12.0,
             'amount_tax': 0.0,
@@ -1463,7 +1463,7 @@ class TestPointOfSaleFlow(TestPointOfSaleCommon):
                     [0, 0, {'lot_name': '1001'}],
                 ]
             })],
-            'pricelist_id': 1,
+            'pricelist_id': self.pos_config.pricelist_id.id,
             'amount_paid': 6.0,
             'amount_total': 6.0,
             'amount_tax': 0.0,
@@ -1479,3 +1479,135 @@ class TestPointOfSaleFlow(TestPointOfSaleCommon):
         order_payment.with_context(**payment_context).check()
         current_session.action_pos_session_closing_control()
         self.assertEqual(current_session.picking_ids.move_line_ids.owner_id.id, self.partner1.id)
+
+    def test_order_refund_with_invoice(self):
+        """This test make sure that credit notes of pos orders are correctly
+           linked to the original invoice."""
+        self.pos_config.open_ui()
+        current_session = self.pos_config.current_session_id
+
+        order_data = {'data':
+          {'amount_paid': 450,
+           'amount_tax': 0,
+           'amount_return': 0,
+           'amount_total': 450,
+           'creation_date': fields.Datetime.to_string(fields.Datetime.now()),
+           'fiscal_position_id': False,
+           'pricelist_id': self.pos_config.available_pricelist_ids[0].id,
+           'lines': [[0, 0, {
+               'discount': 0,
+               'pack_lot_ids': [],
+               'price_unit': 450.0,
+               'product_id': self.product3.id,
+               'price_subtotal': 450.0,
+               'price_subtotal_incl': 450.0,
+               'tax_ids': [[6, False, []]],
+               'qty': 1,
+           }]],
+           'name': 'Order 12345-123-1234',
+           'partner_id': self.partner1.id,
+           'pos_session_id': current_session.id,
+           'sequence_number': 2,
+           'statement_ids': [[0, 0, {
+               'amount': 450,
+               'name': fields.Datetime.now(),
+               'payment_method_id': self.cash_payment_method.id
+           }]],
+           'uid': '12345-123-1234',
+           'user_id': self.env.uid,
+           'to_invoice': True, }
+        }
+        order = self.PosOrder.create_from_ui([order_data])
+        order = self.PosOrder.browse(order[0]['id'])
+
+        refund_id = order.refund()['res_id']
+        refund = self.PosOrder.browse(refund_id)
+        context_payment = {"active_ids": refund.ids, "active_id": refund.id}
+        refund_payment = self.PosMakePayment.with_context(**context_payment).create({
+            'amount': refund.amount_total,
+            'payment_method_id': self.cash_payment_method.id
+        })
+        refund_payment.with_context(**context_payment).check()
+        refund.action_pos_order_invoice()
+        #get last invoice created
+        current_session.action_pos_session_closing_control()
+        invoices = self.env['account.move'].search([('move_type', '=', 'out_invoice')], order='id desc', limit=1)
+        credit_notes = self.env['account.move'].search([('move_type', '=', 'out_refund')], order='id desc', limit=1)
+        self.assertEqual(credit_notes.ref, "Reversal of: "+invoices.name)
+        self.assertEqual(credit_notes.reversed_entry_id.id, invoices.id)
+
+    def test_invoicing_after_closing_session(self):
+        """ Test that an invoice can be created after the session is closed """
+        #create customer account payment method
+        self.customer_account_payment_method = self.env['pos.payment.method'].create({
+            'name': 'Customer Account',
+            'split_transactions': True,
+        })
+
+        self.product1 = self.env['product.product'].create({
+            'name': 'Product A',
+            'type': 'product',
+            'categ_id': self.env.ref('product.product_category_all').id,
+        })
+
+        #add customer account payment method to pos config
+        self.pos_config.write({
+            'payment_method_ids': [(4, self.customer_account_payment_method.id, 0)],
+        })
+        self.pos_config.open_ui()
+        current_session = self.pos_config.current_session_id
+
+        # create pos order
+        order = self.PosOrder.create({
+            'company_id': self.env.company.id,
+            'session_id': current_session.id,
+            'partner_id': self.partner1.id,
+            'lines': [(0, 0, {
+                'name': "OL/0001",
+                'product_id': self.product1.id,
+                'price_unit': 6,
+                'discount': 0,
+                'qty': 1,
+                'tax_ids': [[6, False, []]],
+                'price_subtotal': 6,
+                'price_subtotal_incl': 6,
+            })],
+            'pricelist_id': self.pos_config.pricelist_id.id,
+            'amount_paid': 6.0,
+            'amount_total': 6.0,
+            'amount_tax': 0.0,
+            'amount_return': 0.0,
+            'to_invoice': True,
+            })
+
+        #pay for the order with customer account
+        payment_context = {"active_ids": order.ids, "active_id": order.id}
+        order_payment = self.PosMakePayment.with_context(**payment_context).create({
+            'amount': 2.0,
+            'payment_method_id': self.cash_payment_method.id
+        })
+        order_payment.with_context(**payment_context).check()
+
+        payment_context = {"active_ids": order.ids, "active_id": order.id}
+        order_payment = self.PosMakePayment.with_context(**payment_context).create({
+            'amount': 4.0,
+            'payment_method_id': self.customer_account_payment_method.id
+        })
+        order_payment.with_context(**payment_context).check()
+
+        # close session
+        current_session.action_pos_session_closing_control()
+
+        # create invoice
+        order.action_pos_order_invoice()
+        #get journal entry that does the reverse payment, it the ref must contains Reversal
+        reverse_payment = self.env['account.move'].search([('ref', 'ilike', "Reversal")])
+        original_payment = self.env['account.move'].search([('ref', '=', current_session.display_name)])
+        original_customer_payment_entry = original_payment.line_ids.filtered(lambda l: l.account_id.account_type == 'asset_receivable')
+        reverser_customer_payment_entry = reverse_payment.line_ids.filtered(lambda l: l.account_id.account_type == 'asset_receivable')
+        #check that both use the same account
+        self.assertEqual(len(reverser_customer_payment_entry), 2)
+        self.assertEqual(reverser_customer_payment_entry[0].balance, -2.0)
+        self.assertEqual(reverser_customer_payment_entry[1].balance, -4.0)
+        self.assertEqual(original_customer_payment_entry.account_id.id, reverser_customer_payment_entry.account_id.id)
+        self.assertEqual(reverser_customer_payment_entry.partner_id, original_customer_payment_entry.partner_id)

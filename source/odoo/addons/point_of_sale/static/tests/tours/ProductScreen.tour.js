@@ -2,6 +2,8 @@ odoo.define('point_of_sale.tour.ProductScreen', function (require) {
     'use strict';
 
     const { ProductScreen } = require('point_of_sale.tour.ProductScreenTourMethods');
+    const { PaymentScreen } = require('point_of_sale.tour.PaymentScreenTourMethods');
+    const { ReceiptScreen } = require('point_of_sale.tour.ReceiptScreenTourMethods');
     const { TextAreaPopup } = require('point_of_sale.tour.TextAreaPopupTourMethods');
     const { getSteps, startSteps } = require('point_of_sale.tour.utils');
     var Tour = require('web_tour.tour');
@@ -141,6 +143,12 @@ odoo.define('point_of_sale.tour.ProductScreen', function (require) {
     ProductScreen.do.changeFiscalPosition('No Tax');
     ProductScreen.check.noDiscountApplied("100.00");
     ProductScreen.check.totalAmountIs('86.96');
+    ProductScreen.do.clickPayButton();
+    PaymentScreen.do.clickPaymentMethod('Bank');
+    PaymentScreen.check.remainingIs('0.00');
+    PaymentScreen.do.clickValidate();
+    ReceiptScreen.check.isShown();
+    ReceiptScreen.check.noOrderlineContainsDiscount();
 
     Tour.register('FiscalPositionNoTax', { test: true, url: '/pos/ui' }, getSteps());
 });
@@ -187,4 +195,21 @@ odoo.define('point_of_sale.tour.OpenCloseCashCount', function (require) {
     ProductScreen.check.checkSecondCashClosingDetailsLineAmount('10.00', '-');
 
     Tour.register('CashClosingDetails', { test: true, url: '/pos/ui' }, getSteps());
+});
+
+odoo.define('point_of_sale.tour.RoundGloballyTax', function (require) {
+    'use strict';
+
+    const { ProductScreen } = require('point_of_sale.tour.ProductScreenTourMethods');
+    const { getSteps, startSteps } = require('point_of_sale.tour.utils');
+    var Tour = require('web_tour.tour');
+
+    startSteps();
+
+    ProductScreen.do.confirmOpeningPopup();
+    ProductScreen.do.clickHomeCategory();
+    ProductScreen.do.clickDisplayedProduct('Test Product');
+    ProductScreen.check.totalAmountIs('115.00');
+
+    Tour.register('RoundGloballyAmoundTour', { test: true, url: '/pos/ui' }, getSteps());
 });

@@ -530,6 +530,7 @@ export class X2ManyFieldDialog extends Component {
         if (await this.record.checkValidity()) {
             this.record = (await this.props.save(this.record, { saveAndNew })) || this.record;
         } else {
+            this.record.openInvalidFieldsNotification();
             return false;
         }
         if (!saveAndNew) {
@@ -563,6 +564,7 @@ X2ManyFieldDialog.props = {
     save: Function,
     title: String,
     delete: { optional: true },
+    deleteButtonLabel: {optional: true},
     config: Object,
 };
 X2ManyFieldDialog.template = "web.X2ManyFieldDialog";
@@ -638,6 +640,7 @@ export function useOpenX2ManyRecord({
         const form = await getFormViewInfo({ list, activeField, viewService, userService, env });
 
         let deleteRecord;
+        let deleteButtonLabel = undefined;
         const isDuplicate = !!record;
 
         if (record) {
@@ -649,7 +652,8 @@ export function useOpenX2ManyRecord({
                 views: { form },
             });
             const { delete: canDelete, onDelete } = activeActions;
-            deleteRecord = viewMode === "kanban" && canDelete ? () => onDelete(_record) : null;
+            deleteRecord = viewMode === "kanban" && canDelete ? () => onDelete(_record) : null;            
+            deleteButtonLabel = activeActions.type === 'one2many' ? env._t('Delete') : env._t('Remove');
         } else {
             const recordParams = {
                 context: makeContext([list.context, context]),
@@ -693,6 +697,7 @@ export function useOpenX2ManyRecord({
                 },
                 title,
                 delete: deleteRecord,
+                deleteButtonLabel: deleteButtonLabel,
             },
             { onClose }
         );
@@ -703,13 +708,16 @@ export function useOpenX2ManyRecord({
 export function useX2ManyCrud(getList, isMany2Many) {
     let saveRecord;
     if (isMany2Many) {
-        saveRecord = (object) => {
+        saveRecord = async (object) => {
             const list = getList();
             const currentIds = list.currentIds;
             let resIds;
             if (Array.isArray(object)) {
                 resIds = [...currentIds, ...object];
             } else if (object.resId) {
+                if (object.isDirty) {
+                   await object.save();
+                }
                 resIds = [...currentIds, object.resId];
             } else {
                 return list.add(object, { isM2M: isMany2Many });

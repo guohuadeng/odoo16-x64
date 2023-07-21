@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.addons.website_slides.tests import common as slides_common
+from odoo.exceptions import UserError
 from odoo.tests.common import users
 
 
@@ -132,6 +133,36 @@ class TestSlidesManagement(slides_common.SlidesCase):
         self.assertEqual(
             slide_created_mails.mapped('subject'),
             ['Congratulations! You completed %s' % self.channel.name, 'ATestSubject']
+        )
+
+    @users('user_officer')
+    def test_share_without_template(self):
+        channel_without_template = self.env['slide.channel'].create({
+            'name': 'Course Without Template',
+            'slide_ids': [(0, 0, {
+                'name': 'Test Slide'
+            })],
+            'share_channel_template_id': False,
+            'share_slide_template_id': False,
+        })
+        all_channels = self.channel | channel_without_template
+
+        # try sharing the course
+        with self.assertRaises(UserError) as user_error:
+            all_channels._send_share_email("test@test.com")
+
+        self.assertEqual(
+            user_error.exception.args[0],
+            f'Impossible to send emails. Select a "Channel Share Template" for courses {channel_without_template.name} first'
+        )
+
+        # try sharing slides
+        with self.assertRaises(UserError) as user_error:
+            all_channels.slide_ids._send_share_email("test@test.com", False)
+
+        self.assertEqual(
+            user_error.exception.args[0],
+            f'Impossible to send emails. Select a "Share Template" for courses {channel_without_template.name} first'
         )
 
     def test_unlink_slide_channel(self):

@@ -95,6 +95,7 @@ class AccountBankStatementLine(models.Model):
         help="The optional other currency if it is a multi-currency entry.",
     )
     amount_currency = fields.Monetary(
+        compute='_compute_amount_currency', store=True, readonly=False,
         string="Amount in Currency",
         currency_field='foreign_currency_id',
         help="The amount expressed in an optional other currency if it is a multi-currency entry.",
@@ -144,6 +145,20 @@ class AccountBankStatementLine(models.Model):
     # -------------------------------------------------------------------------
     # COMPUTE METHODS
     # -------------------------------------------------------------------------
+
+    @api.depends('foreign_currency_id', 'date', 'amount', 'company_id')
+    def _compute_amount_currency(self):
+        for st_line in self:
+            if not st_line.foreign_currency_id:
+                st_line.amount_currency = False
+            elif st_line.date and not st_line.amount_currency:
+                # only convert if it hasn't been set already
+                st_line.amount_currency = st_line.currency_id._convert(
+                    from_amount=st_line.amount,
+                    to_currency=st_line.foreign_currency_id,
+                    company=st_line.company_id,
+                    date=st_line.date,
+                )
 
     @api.depends('journal_id.currency_id')
     def _compute_currency_id(self):
@@ -420,6 +435,7 @@ class AccountBankStatementLine(models.Model):
             bank_account = self.env['res.partner.bank'].create({
                 'acc_number': self.account_number,
                 'partner_id': self.partner_id.id,
+                'journal_id': None,
             })
         return bank_account
 
@@ -677,6 +693,9 @@ class AccountBankStatementLine(models.Model):
                 suspense_lines += line
             else:
                 other_lines += line
+        if not liquidity_lines:
+            liquidity_lines = self.move_id.line_ids.filtered(lambda l: l.account_id.account_type == 'asset_cash')
+            other_lines -= liquidity_lines
         return liquidity_lines, suspense_lines, other_lines
 
     # SYNCHRONIZATION account.bank.statement.line <-> account.move
@@ -724,8 +743,12 @@ class AccountBankStatementLine(models.Model):
                         'amount': liquidity_lines.balance,
                     })
 
-                if len(suspense_lines) == 1:
-
+                if len(suspense_lines) > 1:
+                    raise UserError(_(
+                        "%s reached an invalid state regarding its related statement line.\n"
+                        "To be consistent, the journal entry must always have exactly one suspense line.", st_line.move_id.display_name
+                    ))
+                elif len(suspense_lines) == 1:
                     if journal_currency and suspense_lines.currency_id == journal_currency:
 
                         # The suspense line is expressed in the journal's currency meaning the foreign currency

@@ -9,6 +9,7 @@ odoo.define('point_of_sale.ProductScreen', function(require) {
     const { useBarcodeReader } = require('point_of_sale.custom_hooks');
     const { isConnectionError } = require('point_of_sale.utils');
     const { parse } = require('web.field_utils');
+    const { _lt } = require('@web/core/l10n/translation');
 
     const { onMounted, useState } = owl;
 
@@ -23,11 +24,13 @@ odoo.define('point_of_sale.ProductScreen', function(require) {
             useListener('click-pay', this._onClickPay);
             useBarcodeReader({
                 product: this._barcodeProductAction,
+                quantity: this._barcodeProductAction,
                 weight: this._barcodeProductAction,
                 price: this._barcodeProductAction,
                 client: this._barcodePartnerAction,
                 discount: this._barcodeDiscountAction,
                 error: this._barcodeErrorAction,
+                gs1: this._barcodeGS1Action,
             });
             NumberBuffer.use({
                 nonKeyboardInputEvent: 'numpad-click-input',
@@ -60,7 +63,7 @@ odoo.define('point_of_sale.ProductScreen', function(require) {
         get currentOrder() {
             return this.env.pos.get_order();
         }
-        async _getAddProductOptions(product, base_code) {
+        async _getAddProductOptions(product, code) {
             let price_extra = 0.0;
             let draftPackLotLines, weight, description, packLotLinesToEdit;
 
@@ -96,24 +99,36 @@ odoo.define('point_of_sale.ProductScreen', function(require) {
                         packLotLinesToEdit = [];
                     }
                 }
-                const { confirmed, payload } = await this.showPopup('EditListPopup', {
-                    title: this.env._t('Lot/Serial Number(s) Required'),
-                    isSingleItem: isAllowOnlyOneLot,
-                    array: packLotLinesToEdit,
-                });
-                if (confirmed) {
-                    // Segregate the old and new packlot lines
+                // if the lot information exists in the barcode, we don't need to ask it from the user.
+                if (code && code.type === 'lot') {
+                    // consider the old and new packlot lines
                     const modifiedPackLotLines = Object.fromEntries(
-                        payload.newArray.filter(item => item.id).map(item => [item.id, item.text])
+                        packLotLinesToEdit.filter(item => item.id).map(item => [item.id, item.text])
                     );
-                    const newPackLotLines = payload.newArray
-                        .filter(item => !item.id)
-                        .map(item => ({ lot_name: item.text }));
-
+                    const newPackLotLines = [
+                        { lot_name: code.code },
+                    ];
                     draftPackLotLines = { modifiedPackLotLines, newPackLotLines };
                 } else {
-                    // We don't proceed on adding product.
-                    return;
+                    const { confirmed, payload } = await this.showPopup('EditListPopup', {
+                        title: this.env._t('Lot/Serial Number(s) Required'),
+                        isSingleItem: isAllowOnlyOneLot,
+                        array: packLotLinesToEdit,
+                    });
+                    if (confirmed) {
+                        // Segregate the old and new packlot lines
+                        const modifiedPackLotLines = Object.fromEntries(
+                            payload.newArray.filter(item => item.id).map(item => [item.id, item.text])
+                        );
+                        const newPackLotLines = payload.newArray
+                            .filter(item => !item.id)
+                            .map(item => ({ lot_name: item.text }));
+
+                        draftPackLotLines = { modifiedPackLotLines, newPackLotLines };
+                    } else {
+                        // We don't proceed on adding product.
+                        return;
+                    }
                 }
             }
 
@@ -135,8 +150,8 @@ odoo.define('point_of_sale.ProductScreen', function(require) {
                 }
             }
 
-            if (base_code && this.env.pos.db.product_packaging_by_barcode[base_code.code]) {
-                weight = this.env.pos.db.product_packaging_by_barcode[base_code.code].qty;
+            if (code && this.env.pos.db.product_packaging_by_barcode[code.code]) {
+                weight = this.env.pos.db.product_packaging_by_barcode[code.code].qty;
             }
 
             return { draftPackLotLines, quantity: weight, description, price_extra };
@@ -213,7 +228,7 @@ odoo.define('point_of_sale.ProductScreen', function(require) {
                 }
             }
         }
-        async _barcodeProductAction(code) {
+        async _getProductByBarcode(code) {
             let product = this.env.pos.db.get_product_by_barcode(code.base_code);
             if (!product) {
                 // find the barcode in the backend
@@ -222,7 +237,7 @@ odoo.define('point_of_sale.ProductScreen', function(require) {
                     foundProductIds = await this.rpc({
                         model: 'product.product',
                         method: 'search',
-                        args: [[['barcode', '=', code.base_code]]],
+                        args: [[['barcode', '=', code.base_code], ['sale_ok', '=', true]]],
                         context: this.env.session.user_context,
                     });
                 } catch (error) {
@@ -243,6 +258,13 @@ odoo.define('point_of_sale.ProductScreen', function(require) {
                     return this._barcodeErrorAction(code);
                 }
             }
+            return product
+        }
+        async _barcodeProductAction(code) {
+            const product = await this._getProductByBarcode(code);
+            if (!product) {
+                return;
+            }
             const options = await this._getAddProductOptions(product, code);
             // Do not proceed on adding the product when no options is returned.
             // This is consistent with _clickProduct.
@@ -256,7 +278,7 @@ odoo.define('point_of_sale.ProductScreen', function(require) {
                         price_manually_set: true,
                     },
                 });
-            } else if (code.type === 'weight') {
+            } else if (code.type === 'weight' || code.type === 'quantity') {
                 Object.assign(options, {
                     quantity: code.value,
                     merge: false,
@@ -287,6 +309,26 @@ odoo.define('point_of_sale.ProductScreen', function(require) {
             if (last_orderline) {
                 last_orderline.set_discount(code.value);
             }
+        }
+        async _parseElementsFromGS1(parsed_results) {
+            const productBarcode = parsed_results.find(element => element.type === 'product');
+            const lotBarcode = parsed_results.find(element => element.type === 'lot');
+            const product = await this._getProductByBarcode(productBarcode);
+            return { product, lotBarcode, customProductOptions: {} }
+        }
+        /**
+         * Add a product to the current order using the product identifier and lot number from parsed results.
+         * This function retrieves the product identifier and lot number from the `parsed_results` parameter.
+         * It then uses these values to retrieve the product and add it to the current order.
+         */
+        async _barcodeGS1Action(parsed_results) {
+            const { product, lotBarcode, customProductOptions } = await this._parseElementsFromGS1(parsed_results)
+            if (!product) {
+                return;
+            }
+            const options = await this._getAddProductOptions(product, lotBarcode);
+            await this.currentOrder.add_product(product, { ...options, ...customProductOptions });
+            NumberBuffer.reset();
         }
         // IMPROVEMENT: The following two methods should be in PosScreenComponent?
         // Why? Because once we start declaring barcode actions in different
@@ -379,6 +421,7 @@ odoo.define('point_of_sale.ProductScreen', function(require) {
         }
     }
     ProductScreen.template = 'ProductScreen';
+    ProductScreen.numpadActionName = _lt('Payment');
 
     Registries.Component.add(ProductScreen);
 

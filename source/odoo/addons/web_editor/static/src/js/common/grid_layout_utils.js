@@ -2,6 +2,7 @@
 'use strict';
 
 import {qweb} from 'web.core';
+import {descendants, preserveCursor} from "@web_editor/js/editor/odoo-editor/src/utils/utils";
 const rowSize = 50; // 50px.
 // Maximum number of rows that can be added when dragging a grid item.
 export const additionalRowLimit = 10;
@@ -83,17 +84,28 @@ export function _gridCleanUp(rowEl, columnEl) {
  * @param {Element} containerEl element with the class "container"
  */
 export function _toggleGridMode(containerEl) {
-    let rowEl = containerEl.querySelector('.row');
-    // For the snippets having text outside of the row (and therefore not in a
-    // column), create a column and put the text in it so it can also be placed
-    // in the grid.
-    const textEls = [...containerEl.children].filter(el => el.nodeName !== 'DIV');
-    if (rowEl && textEls.length > 0) {
+    let rowEl = containerEl.querySelector(':scope > .row');
+    const outOfRowEls = [...containerEl.children].filter(el => !el.classList.contains('row'));
+    // Avoid an unwanted rollback that prevents from deleting the text.
+    const avoidRollback = (el) => {
+        for (const node of descendants(el)) {
+            node.ouid = undefined;
+        }
+    };
+    // Keep the text selection.
+    const restoreCursor = !rowEl || outOfRowEls.length > 0 ?
+        preserveCursor(containerEl.ownerDocument) : () => {};
+
+    // For the snippets having elements outside of the row (and therefore not in
+    // a column), create a column and put these elements in it so they can also
+    // be placed in the grid.
+    if (rowEl && outOfRowEls.length > 0) {
         const columnEl = document.createElement('div');
         columnEl.classList.add('col-lg-12');
-        for (let i = textEls.length - 1; i >= 0; i--) {
-            columnEl.prepend(textEls[i]);
+        for (let i = outOfRowEls.length - 1; i >= 0; i--) {
+            columnEl.prepend(outOfRowEls[i]);
         }
+        avoidRollback(columnEl);
         rowEl.prepend(columnEl);
     }
 
@@ -111,9 +123,11 @@ export function _toggleGridMode(containerEl) {
         for (let i = containerChildren.length - 1; i >= 0; i--) {
             columnEl.prepend(containerChildren[i]);
         }
+        avoidRollback(columnEl);
         rowEl.appendChild(columnEl);
         containerEl.appendChild(rowEl);
     }
+    restoreCursor();
 
     // Converting the columns to grid and getting back the number of rows.
     const columnEls = rowEl.children;

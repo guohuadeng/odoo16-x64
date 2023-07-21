@@ -134,10 +134,6 @@ class AccountMove(models.Model):
                     tax_dict['rounding'] = base_amount - (tax_amount * 100 / tax_rate)
                     tax_dict['base_amount'] = base_amount - tax_dict['rounding']
 
-            if not reverse_charge_refund:
-                tax_dict['base_amount'] = abs(tax_dict['base_amount'])
-                tax_dict['tax_amount'] = abs(tax_dict['tax_amount'])
-
             tax_line_dict = {
                 'tax': tax,
                 'rounding': tax_dict.get('rounding', False),
@@ -255,7 +251,7 @@ class AccountMove(models.Model):
 
         # Reduce downpayment views to a single recordset
         downpayment_moves = [l.get('downpayment_moves', self.env['account.move']) for l in invoice_lines]
-        downpayment_moves = reduce(lambda x, y: x | y, downpayment_moves)
+        downpayment_moves = self.browse(move.id for moves in downpayment_moves for move in moves)
 
         # Create file content.
         template_values = {

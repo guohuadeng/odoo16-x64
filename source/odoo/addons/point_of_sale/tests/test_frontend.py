@@ -89,6 +89,7 @@ class TestPointOfSaleHttpCommon(AccountTestInvoicingHttpCommon):
             'available_in_pos': True,
             'list_price': 1.98,
             'taxes_id': False,
+            'barcode': '2100002000003',
         })
         cls.small_shelf = env['product.product'].create({
             'name': 'Small Shelf',
@@ -101,12 +102,14 @@ class TestPointOfSaleHttpCommon(AccountTestInvoicingHttpCommon):
             'available_in_pos': True,
             'list_price': 1.98,
             'taxes_id': False,
+            'barcode': '2301000000006',
         })
         cls.monitor_stand = env['product.product'].create({
             'name': 'Monitor Stand',
             'available_in_pos': True,
             'list_price': 3.19,
             'taxes_id': False,
+            'barcode': '0123456789',  # No pattern in barcode nomenclature
         })
         cls.desk_pad = env['product.product'].create({
             'name': 'Desk Pad',
@@ -127,6 +130,7 @@ class TestPointOfSaleHttpCommon(AccountTestInvoicingHttpCommon):
             'available_in_pos': True,
             'list_price': 5.10,
             'taxes_id': False,
+            'barcode': '2300001000008',
         })
         configurable_chair = env['product.product'].create({
             'name': 'Configurable Chair',
@@ -668,6 +672,49 @@ class TestUi(TestPointOfSaleHttpCommon):
         self.main_pos_config.open_ui()
         self.start_tour("/pos/ui?config_id=%d" % self.main_pos_config.id, 'PaymentScreenRoundingHalfUp', login="accountman")
 
+    def test_rounding_half_up_cash_and_bank(self):
+        company = self.main_pos_config.company_id
+        rouding_method = self.env['account.cash.rounding'].create({
+            'name': 'Rounding HALF-UP',
+            'rounding': 5,
+            'rounding_method': 'HALF-UP',
+            'strategy': 'add_invoice_line',
+            'profit_account_id': company['default_cash_difference_income_account_id'].id,
+            'loss_account_id': company['default_cash_difference_expense_account_id'].id,
+        })
+
+        self.env['product.product'].create({
+            'name': 'Product Test 40',
+            'available_in_pos': True,
+            'list_price': 40,
+            'taxes_id': False,
+        })
+
+        self.env['product.product'].create({
+            'name': 'Product Test 41',
+            'available_in_pos': True,
+            'list_price': 41,
+            'taxes_id': False,
+        })
+
+        self.main_pos_config.write({
+            'rounding_method': rouding_method.id,
+            'cash_rounding': True,
+            'only_round_cash_method': True
+        })
+
+        self.main_pos_config.open_ui()
+        self.start_tour("/pos/ui?config_id=%d" % self.main_pos_config.id, 'PaymentScreenRoundingHalfUpCashAndBank', login="accountman")
+
+        invoiced_orders = self.env['pos.order'].search([('state', '=', 'invoiced')])
+        self.assertEqual(len(invoiced_orders), 2, 'There should be 2 invoiced orders.')
+
+        for order in invoiced_orders:
+            rounding_line = order.account_move.line_ids.filtered(lambda line: line.display_type == 'rounding')
+            self.assertEqual(len(rounding_line), 1, 'There should be 1 rounding line.')
+            rounding_applied = order.amount_total - order.amount_paid
+            self.assertEqual(rounding_line.balance, rounding_applied, 'Rounding amount is incorrect!')
+
     def test_pos_closing_cash_details(self):
         """Test if the cash closing details correctly show the cash difference
            if there is a difference at the opening of the PoS session. This also test if the accounting
@@ -770,3 +817,36 @@ class TestUi(TestPointOfSaleHttpCommon):
 
         self.main_pos_config.open_ui()
         self.start_tour("/pos/ui?config_id=%d" % self.main_pos_config.id, 'ReceiptScreenDiscountWithPricelistTour', login="accountman")
+
+    def test_07_pos_barcodes_scan(self):
+        barcode_rule = self.env.ref("point_of_sale.barcode_rule_client")
+        barcode_rule.pattern = barcode_rule.pattern + "|234"
+        # should in theory be changed in the JS code to `|^234`
+        # If not, it will fail as it will mistakenly match with the product barcode "0123456789"
+
+        self.main_pos_config.open_ui()
+        self.start_tour("/pos/ui?debug=1&config_id=%d" % self.main_pos_config.id, 'BarcodeScanningTour', login="accountman")
+
+    def test_amount_with_round_globally(self):
+        #create a tax of 15%
+        tax = self.env['account.tax'].create({
+            'name': 'Tax 15%',
+            'amount': 15,
+            'amount_type': 'percent',
+            'type_tax_use': 'sale',
+        })
+
+        #create a product with the tax
+        self.product = self.env['product.product'].create({
+            'name': 'Test Product',
+            'taxes_id': [(6, 0, [tax.id])],
+            'list_price': 100,
+            'available_in_pos': True,
+        })
+
+        self.main_pos_config.company_id.write({
+            'tax_calculation_rounding_method': 'round_globally',
+        })
+
+        self.main_pos_config.open_ui()
+        self.start_tour("/pos/ui?debug=1&config_id=%d" % self.main_pos_config.id, 'RoundGloballyAmoundTour', login="accountman")

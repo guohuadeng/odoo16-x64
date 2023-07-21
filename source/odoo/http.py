@@ -261,9 +261,10 @@ if parse_version(werkzeug.__version__) >= parse_version('2.0.2'):
     # let's add the websocket key only when appropriate.
     ROUTING_KEYS.add('websocket')
 
-# The duration of a user session before it is considered expired,
-# three months.
-SESSION_LIFETIME = 60 * 60 * 24 * 90
+# The default duration of a user session cookie. Inactive sessions are reaped
+# server-side as well with a threshold that can be set via an optional
+# config parameter `sessions.max_inactivity_seconds` (default: SESSION_LIFETIME)
+SESSION_LIFETIME = 60 * 60 * 24 * 7
 
 # The cache duration for static content from the filesystem, one week.
 STATIC_CACHE = 60 * 60 * 24 * 7
@@ -326,17 +327,7 @@ def db_filter(dbs, host=None):
         if host.startswith('www.'):
             host = host[4:]
         domain = host.partition('.')[0]
-        
-        # 注意，在 o16 已变更，  www.odooapp.cn 对应数据库为  odooapp.cn
-        # begin dbmap：  如果h在 dbmap中有配置，则按dbmap，否则按原生顺序
-        # dbmap = {'gd.erpapp.cn':'gd.erpapp.cn', 'fs.erpapp.cn':'gd.erpapp.cn', 'zs.erpapp.cn':'gd.erpapp.cn'}
-        if odoo.tools.config.get('dbmap', False):
-            mp = json.loads(odoo.tools.config.get('dbmap', False).replace("\'", "\""))
-            if mp.get(host, False):
-                dbs = [mp.get(host, False)]
-                return dbs
-        # end dbmap
-        
+
         dbfilter_re = re.compile(
             config["dbfilter"].replace("%h", re.escape(host))
                               .replace("%d", re.escape(domain)))
@@ -868,8 +859,8 @@ class FilesystemSessionStore(sessions.FilesystemSessionStore):
         session.should_rotate = False
         self.save(session)
 
-    def vacuum(self):
-        threshold = time.time() - SESSION_LIFETIME
+    def vacuum(self, max_lifetime=SESSION_LIFETIME):
+        threshold = time.time() - max_lifetime
         for fname in glob.iglob(os.path.join(root.session_store.path, '*', '*')):
             path = os.path.join(root.session_store.path, fname)
             with contextlib.suppress(OSError):
@@ -1618,7 +1609,8 @@ class Request:
         ir_http._authenticate(rule.endpoint)
         ir_http._pre_dispatch(rule, args)
         response = self.dispatcher.dispatch(rule.endpoint, args)
-        ir_http._post_dispatch(response)
+        # the registry can have been reniewed by dispatch
+        self.registry['ir.http']._post_dispatch(response)
         return response
 
 
@@ -1768,6 +1760,7 @@ class JsonRPCDispatcher(Dispatcher):
     def __init__(self, request):
         super().__init__(request)
         self.jsonrequest = {}
+        self.request_id = None
 
     @classmethod
     def is_compatible_with(cls, request):
@@ -1805,8 +1798,13 @@ class JsonRPCDispatcher(Dispatcher):
         """
         try:
             self.jsonrequest = self.request.get_json_data()
+            self.request_id = self.jsonrequest.get('id')
         except ValueError as exc:
-            raise BadRequest("Invalid JSON data") from exc
+            # must use abort+Response to bypass handle_error
+            werkzeug.exceptions.abort(Response("Invalid JSON data", status=400))
+        except AttributeError as exc:
+            # must use abort+Response to bypass handle_error
+            werkzeug.exceptions.abort(Response("Invalid JSON-RPC data", status=400))
 
         self.request.params = dict(self.jsonrequest.get('params', {}), **args)
         ctx = self.request.params.pop('context', None)
@@ -1847,8 +1845,7 @@ class JsonRPCDispatcher(Dispatcher):
         return self._response(error=error)
 
     def _response(self, result=None, error=None):
-        request_id = self.jsonrequest.get('id')
-        response = {'jsonrpc': '2.0', 'id': request_id}
+        response = {'jsonrpc': '2.0', 'id': self.request_id}
         if error is not None:
             response['error'] = error
         if result is not None:
@@ -1970,6 +1967,10 @@ class Application:
         current_thread.query_count = 0
         current_thread.query_time = 0
         current_thread.perf_t0 = time.time()
+        if hasattr(current_thread, 'dbname'):
+            del current_thread.dbname
+        if hasattr(current_thread, 'uid'):
+            del current_thread.uid
 
         if odoo.tools.config['proxy_mode'] and environ.get("HTTP_X_FORWARDED_HOST"):
             # The ProxyFix middleware has a side effect of updating the

@@ -3,7 +3,6 @@ import {
     BasicEditor,
     click,
     deleteBackward,
-    deleteBackwardMobile,
     insertText,
     insertParagraphBreak,
     insertLineBreak,
@@ -521,6 +520,15 @@ describe('Link', () => {
                     contentAfter: '<p>a]bc[<a href="exist">de</a>f</p>',
                 });
             });
+            it('should not unlink selected non-editable links', async () => {
+                await testEditor(BasicEditor, {
+                    contentBefore: '<p><a href="exist">[ab</a><a contenteditable="false" href="exist">cd</a>ef]</p>',
+                    stepFunction: async editor => {
+                        await unlink(editor);
+                    },
+                    contentAfter: '<p>[ab<a contenteditable="false" href="exist">cd</a>ef]</p>',
+                });
+            });
         });
     });
     describe('isolated link', () => {
@@ -555,27 +563,13 @@ describe('Link', () => {
                 }
             });
         });
-        it('should keep isolated link after a keyboard delete', async () => {
+        it('should keep isolated link after a delete', async () => {
             await testEditor(BasicEditor, {
                 contentBefore: '<p>a<a href="#/">b[]</a>c</p>',
                 stepFunction: async editor => {
                     const a = await clickOnLink(editor);
                     console.log(a.closest('.odoo-editor-editable').outerHTML);
                     await deleteBackward(editor);
-                    console.log(a.closest('.odoo-editor-editable').outerHTML);
-                    window.chai.expect(a.parentElement.isContentEditable).to.be.equal(false);
-                },
-                contentAfterEdit: '<p>a<a href="#/" contenteditable="true" data-oe-zws-empty-inline="">[]\u200B</a>c</p>',
-                contentAfter: '<p>a[]c</p>',
-            });
-        });
-        it('should keep isolated link after a mobile delete', async () => {
-            await testEditor(BasicEditor, {
-                contentBefore: '<p>a<a href="#/">b[]</a>c</p>',
-                stepFunction: async editor => {
-                    const a = await clickOnLink(editor);
-                    console.log(a.closest('.odoo-editor-editable').outerHTML);
-                    await deleteBackwardMobile(editor);
                     console.log(a.closest('.odoo-editor-editable').outerHTML);
                     window.chai.expect(a.parentElement.isContentEditable).to.be.equal(false);
                 },
@@ -601,22 +595,21 @@ describe('Link', () => {
                 contentAfter: '<p>a<a href="#/">123[]</a>c</p>',
             });
         });
-        it('should keep isolated link after a mobile delete and typing', async () => {
+        it('should delete the content from the link when popover is active', async () => {
             await testEditor(BasicEditor, {
-                contentBefore: '<p>a<a href="#/">b[]</a>c</p>',
+                contentBefore: '<p><a href="#/">abc[]abc</a></p>',
                 stepFunction: async editor => {
                     const a = await clickOnLink(editor);
                     window.chai.expect(a.parentElement.isContentEditable).to.be.equal(false);
-                    await deleteBackwardMobile(editor);
+                    await deleteBackward(editor);
                     window.chai.expect(a.parentElement.isContentEditable).to.be.equal(false);
-                    await insertText(editor, '1');
+                    await deleteBackward(editor);
                     window.chai.expect(a.parentElement.isContentEditable).to.be.equal(false);
-                    await insertText(editor, '2');
+                    await deleteBackward(editor);
                     window.chai.expect(a.parentElement.isContentEditable).to.be.equal(false);
-                    await insertText(editor, '3');
-                    window.chai.expect(a.parentElement.isContentEditable).to.be.equal(false);
+                    await deleteBackward(editor);
                 },
-                contentAfter: '<p>a<a href="#/">123[]</a>c</p>',
+                contentAfter: '<p><a href="#/">[]abc</a></p>',
             });
         });
     });

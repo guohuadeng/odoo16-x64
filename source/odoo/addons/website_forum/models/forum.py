@@ -45,7 +45,7 @@ class Forum(models.Model):
     authorized_group_id = fields.Many2one('res.groups', 'Authorized Group')
     menu_id = fields.Many2one('website.menu', 'Menu', copy=False)
     active = fields.Boolean(default=True)
-    faq = fields.Html('Guidelines', translate=html_translate, sanitize=False)
+    faq = fields.Html('Guidelines', translate=html_translate, sanitize=True, sanitize_overridable=True)
     description = fields.Text('Description', translate=True)
     teaser = fields.Text('Teaser', compute='_compute_teaser', store=True)
     welcome_message = fields.Html(
@@ -254,7 +254,7 @@ class Forum(models.Model):
 
     def go_to_website(self):
         self.ensure_one()
-        website_url = self._compute_website_url
+        website_url = self._compute_website_url()
         if not website_url:
             return False
         return self.env['website'].get_client_action(website_url)
@@ -798,22 +798,19 @@ class Post(models.Model):
         return False
 
     def vote(self, upvote=True):
+        self.ensure_one()
         Vote = self.env['forum.post.vote']
-        vote_ids = Vote.search([('post_id', 'in', self._ids), ('user_id', '=', self._uid)])
-        new_vote = '1' if upvote else '-1'
-        voted_forum_ids = set()
-        if vote_ids:
-            for vote in vote_ids:
-                if upvote:
-                    new_vote = '0' if vote.vote == '-1' else '1'
-                else:
-                    new_vote = '0' if vote.vote == '1' else '-1'
-                vote.vote = new_vote
-                voted_forum_ids.add(vote.post_id.id)
-        for post_id in set(self._ids) - voted_forum_ids:
-            for post_id in self._ids:
-                Vote.create({'post_id': post_id, 'vote': new_vote})
-        return {'vote_count': self.vote_count, 'user_vote': new_vote}
+        existing_vote = Vote.search([('post_id', '=', self.id), ('user_id', '=', self._uid)])
+        new_vote_value = '1' if upvote else '-1'
+        if existing_vote:
+            if upvote:
+                new_vote_value = '0' if existing_vote.vote == '-1' else '1'
+            else:
+                new_vote_value = '0' if existing_vote.vote == '1' else '-1'
+            existing_vote.vote = new_vote_value
+        else:
+            Vote.create({'post_id': self.id, 'vote': new_vote_value})
+        return {'vote_count': self.vote_count, 'user_vote': new_vote_value}
 
     def convert_answer_to_comment(self):
         """ Tools to convert an answer (forum.post) to a comment (mail.message).
@@ -1167,10 +1164,10 @@ class Tags(models.Model):
         ('name_uniq', 'unique (name, forum_id)', "Tag name already exists !"),
     ]
 
-    @api.depends("post_ids.tag_ids", "post_ids.state")
+    @api.depends("post_ids", "post_ids.tag_ids", "post_ids.state", "post_ids.active")
     def _get_posts_count(self):
         for tag in self:
-            tag.posts_count = len(tag.post_ids)
+            tag.posts_count = len(tag.post_ids)  # state filter is in field domain
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -23,7 +23,7 @@ class SaleOrder(models.Model):
     def _compute_amount_total_without_delivery(self):
         self.ensure_one()
         delivery_cost = sum([l.price_total for l in self.order_line if l.is_delivery])
-        return self.env['delivery.carrier']._compute_currency(self, self.amount_total - delivery_cost, 'pricelist_to_company')
+        return self.amount_total - delivery_cost
 
     @api.depends('order_line')
     def _compute_delivery_state(self):
@@ -59,6 +59,10 @@ class SaleOrder(models.Model):
         self._remove_delivery_line()
         for order in self:
             order.carrier_id = carrier.id
+            if order.state in ('sale', 'done'):
+                pending_deliveries = order.picking_ids.filtered(
+                    lambda p: p.state not in ('done', 'cancel') and not any(m.origin_returned_move_id for m in p.move_ids))
+                pending_deliveries.carrier_id = carrier.id
             order._create_delivery_line(carrier, amount)
         return True
 

@@ -1844,7 +1844,7 @@ class Orderline extends PosModel {
             discount:           this.get_discount(),
             product_name:       this.get_product().display_name,
             product_name_wrapped: this.generate_wrapped_product_name(),
-            price_lst:          this.get_lst_price(),
+            price_lst:          this.get_taxed_lst_unit_price(),
             fixed_lst_price:    this.get_fixed_lst_price(),
             price_manually_set: this.price_manually_set,
             price_automatically_set: this.price_automatically_set,
@@ -1855,6 +1855,7 @@ class Orderline extends PosModel {
             price_without_tax:  this.get_price_without_tax(),
             price_with_tax_before_discount:  this.get_price_with_tax_before_discount(),
             tax:                this.get_tax(),
+            tax_percentages:    this.get_tax_percentages(),
             product_description:      this.get_product().description,
             product_description_sale: this.get_product().description_sale,
             pack_lot_lines:      this.get_lot_lines(),
@@ -1945,7 +1946,8 @@ class Orderline extends PosModel {
             var product_taxes = this.pos.get_taxes_after_fp(taxes_ids);
             return this.compute_all(product_taxes, lst_price, 1, this.pos.currency.rounding).total_included;
         }
-        return lst_price;
+        var digits = this.pos.dp['Product Price'];
+        return lst_price.toFixed(digits)
     }
     get_price_without_tax(){
         return this.get_all_prices().priceWithoutTax;
@@ -1958,6 +1960,9 @@ class Orderline extends PosModel {
     }
     get_tax(){
         return this.get_all_prices().tax;
+    }
+    get_tax_percentages() {
+        return this.get_all_prices().tax_percentages;
     }
     get_applicable_taxes(){
         var i;
@@ -1994,9 +1999,11 @@ class Orderline extends PosModel {
      * @returns {Number} the total amount of price included taxes
      */
     get_total_taxes_included_in_price() {
-        return this.get_taxes()
+        const productTaxes = this._getProductTaxesAfterFiscalPosition();
+        const taxDetails = this.get_tax_details();
+        return productTaxes
             .filter(tax => tax.price_include)
-            .reduce((sum, tax) => sum + this.get_tax_details()[tax.id],
+            .reduce((sum, tax) => sum + taxDetails[tax.id].amount,
             0
         );
     }
@@ -2019,6 +2026,17 @@ class Orderline extends PosModel {
     compute_all(taxes, price_unit, quantity, currency_rounding, handle_price_include=true) {
         return this.pos.compute_all(taxes, price_unit, quantity, currency_rounding, handle_price_include);
     }
+    /**
+     * Calculates the taxes for a product, and converts the taxes based on the fiscal position of the order.
+     *
+     * @returns {Object} The calculated product taxes after filtering and fiscal position conversion.
+     */
+    _getProductTaxesAfterFiscalPosition() {
+        const product = this.get_product();
+        let taxesIds = this.tax_ids || product.taxes_id;
+        taxesIds = _.filter(taxesIds, t => t in this.pos.taxes_by_id);
+        return this.pos.get_taxes_after_fp(taxesIds, this.order.fiscal_position);
+    }
     get_all_prices(qty = this.get_quantity()){
         var price_unit = this.get_unit_price() * (1.0 - (this.get_discount() / 100.0));
         var taxtotal = 0;
@@ -2033,7 +2051,10 @@ class Orderline extends PosModel {
         var all_taxes_before_discount = this.compute_all(product_taxes, this.get_unit_price(), qty, this.pos.currency.rounding);
         _(all_taxes.taxes).each(function(tax) {
             taxtotal += tax.amount;
-            taxdetail[tax.id] = tax.amount;
+            taxdetail[tax.id] = {
+                amount: tax.amount,
+                base: tax.base,
+            };
         });
 
         return {
@@ -2042,6 +2063,7 @@ class Orderline extends PosModel {
             "priceWithTaxBeforeDiscount": all_taxes_before_discount.total_included,
             "tax": taxtotal,
             "taxDetails": taxdetail,
+            "tax_percentages": product_taxes.map((tax) => tax.amount),
         };
     }
     display_discount_policy(){
@@ -2639,7 +2661,7 @@ class Order extends PosModel {
     }
     _get_tax_group_key(line) {
         return line
-            .get_taxes()
+            ._getProductTaxesAfterFiscalPosition()
             .map(tax => tax.id)
             .join(',');
     }
@@ -2746,7 +2768,9 @@ class Order extends PosModel {
     }
 
     add_product(product, options){
-        if(this.pos.doNotAllowRefundAndSales() && this.orderlines[0] && this.orderlines[0].refunded_orderline_id) {
+        if(this.pos.doNotAllowRefundAndSales() &&
+        this._isRefundAndSaleOrder() &&
+        (!options.quantity || options.quantity > 0)) {
             Gui.showPopup('ErrorPopup', {
                 title: _t('Refund and Sales not allowed'),
                 body: _t('It is not allowed to mix refunds and sales')
@@ -2962,6 +2986,13 @@ class Order extends PosModel {
     _get_ignored_product_ids_total_discount() {
         return [];
     }
+    _reduce_total_discount_callback(sum, orderLine) {
+        sum += (orderLine.get_unit_price() * (orderLine.get_discount()/100) * orderLine.get_quantity());
+        if (orderLine.display_discount_policy() === 'without_discount'){
+            sum += ((orderLine.get_taxed_lst_unit_price() - orderLine.get_unit_price()) * orderLine.get_quantity());
+        }
+        return sum;
+    }
     get_total_discount() {
         const ignored_product_ids = this._get_ignored_product_ids_total_discount()
         return round_pr(this.orderlines.reduce((sum, orderLine) => {
@@ -2989,7 +3020,7 @@ class Order extends PosModel {
                     if (!(taxId in groupTaxes)) {
                         groupTaxes[taxId] = 0;
                     }
-                    groupTaxes[taxId] += taxDetails[taxId];
+                    groupTaxes[taxId] += taxDetails[taxId].amount;
                 }
             });
 
@@ -3022,14 +3053,19 @@ class Order extends PosModel {
             var ldetails = line.get_tax_details();
             for(var id in ldetails){
                 if(ldetails.hasOwnProperty(id)){
-                    details[id] = (details[id] || 0) + ldetails[id];
+                    let amount = (details[id] && details[id].amount) ? details[id].amount : 0;
+                    let base = (details[id] && details[id].base) ? details[id].base : 0;
+                    details[id] = {
+                        amount: amount + ldetails[id].amount,
+                        base: base + ldetails[id].base,
+                    };
                 }
             }
         });
 
         for(var id in details){
             if(details.hasOwnProperty(id)){
-                fulldetails.push({amount: details[id], tax: this.pos.taxes_by_id[id], name: this.pos.taxes_by_id[id].name});
+                fulldetails.push({amount: details[id].amount, base: details[id].base, tax: this.pos.taxes_by_id[id], name: this.pos.taxes_by_id[id].name});
             }
         }
 

@@ -49,7 +49,7 @@ msgstr "Kontakt"
 #. module: base_vat
 #: model:ir.model,name:base_vat.model_account_fiscal_position
 msgid "Fiscal Position"
-msgstr "Steuerzuordnung"
+msgstr "Steuerposition"
 
 #. module: base_vat
 #: model_terms:ir.ui.view,arch_db:base_vat.res_config_settings_view_form
@@ -67,6 +67,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:base_vat.field_res_users__vies_failed_message
 msgid "Technical field display a message to the user if the VIES check fails."
 msgstr ""
+"Das technische Feld zeigt dem Benutzer eine Meldung an, wenn die MIAS-"
+"Prüfung fehlschlägt."
 
 #. module: base_vat
 #. odoo-python
@@ -95,7 +97,7 @@ msgstr ""
 #: code:addons/base_vat/models/res_partner.py:0
 #, python-format
 msgid "The VAT number %s failed the VIES VAT validation check."
-msgstr ""
+msgstr "Die MwSt.-Nummer %s hat die MIAS-Validierungsprüfung nicht bestanden."
 
 #. module: base_vat
 #. odoo-python
@@ -113,29 +115,29 @@ msgstr ""
 #: code:addons/base_vat/models/res_partner.py:0
 #, python-format
 msgid "VAT"
-msgstr "USt."
+msgstr "MwSt."
 
 #. module: base_vat
 #: model:ir.model.fields,field_description:base_vat.field_res_company__vat_check_vies
 #: model:ir.model.fields,field_description:base_vat.field_res_config_settings__vat_check_vies
 msgid "Verify VAT Numbers"
-msgstr "MwSt-Identifikationsnr. überprüfen"
+msgstr "MwSt-IdNr. überprüfen"
 
 #. module: base_vat
 #: model_terms:ir.ui.view,arch_db:base_vat.res_config_settings_view_form
 msgid "Verify VAT numbers using the European VIES service"
-msgstr "MwSt-Identifikationsnr. mit dem europäischen VIES-Service überprüfen"
+msgstr "MwSt-IdNr. mit dem europäischen MIAS-Service überprüfen"
 
 #. module: base_vat
 #. odoo-python
 #: code:addons/base_vat/models/account_fiscal_position.py:0
 #, python-format
 msgid "fiscal position [%s]"
-msgstr "Steuerzuordnung [%s]"
+msgstr "Steuerposition [%s]"
 
 #. module: base_vat
 #. odoo-python
 #: code:addons/base_vat/models/res_partner.py:0
 #, python-format
 msgid "partner [%s]"
-msgstr "Kontakt [%s]"
+msgstr "Partner [%s]"

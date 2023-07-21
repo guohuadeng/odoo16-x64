@@ -2330,7 +2330,7 @@ msgstr "كمية المنتجات المحتواة في التعبئة. "
 #. module: product
 #: model:ir.model.fields.selection,name:product.selection__product_attribute__display_type__radio
 msgid "Radio"
-msgstr "اختيار "
+msgstr "راديو "
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_product__code
@@ -2712,6 +2712,13 @@ msgstr ""
 "الكمية لشرائها من هذا المورد للاستفادة من السعر، معبر عنها بوحدة قياس منتَج "
 "المورّد، وإذا لم تكن هناك وحدة قياس أخرى، تُستخدم وحدة القياس الافتراضية "
 "للمنتج. "
+
+#. module: product
+#. odoo-python
+#: code:addons/product/models/product_pricelist_item.py:0
+#, python-format
+msgid "The rounding method must be strictly positive."
+msgstr "يجب أن تكون طريقة التقريب إلى قيمة موجبة فقط لا غير. "
 
 #. module: product
 #: model:ir.model.fields,help:product.field_product_product__lst_price
@@ -3250,10 +3257,9 @@ msgstr ""
 #, python-format
 msgid ""
 "You cannot delete the value %s because it is used on the following products:\n"
-"%s"
+"%s\n"
+" If the value has been associated to a product in the past, you will not be able to delete it."
 msgstr ""
-"لا يمكنك حذف القيمة %s لأنها مستخدَمة في المنتجات التالية: \n"
-"%s "
 
 #. module: product
 #. odoo-python
@@ -3277,6 +3283,13 @@ msgstr ""
 "(%s)\n"
 "إنها مستخدمة في قائمة (قوائم) أسعار أخرى:\n"
 "%s "
+
+#. module: product
+#. odoo-python
+#: code:addons/product/models/product_attribute.py:0
+#, python-format
+msgid "You cannot delete value %s because it was used in some products."
+msgstr "لا يمكنك حذف القيمة %s لأنها مستخدَمة في بعض المنتجات. "
 
 #. module: product
 #. odoo-python

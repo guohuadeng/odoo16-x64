@@ -6,7 +6,7 @@ from ast import literal_eval
 from odoo import api, fields, models, _
 from odoo.addons.phone_validation.tools import phone_validation
 from odoo.exceptions import UserError
-from odoo.tools import html2plaintext
+from odoo.tools import html2plaintext, plaintext2html
 
 
 class SendSMS(models.TransientModel):
@@ -210,7 +210,7 @@ class SendSMS(models.TransientModel):
         # on the numbers in the database.
         records = records if records is not None else self._get_records()
         records.ensure_one()
-        if not self.number_field_name:
+        if not self.number_field_name or self.number_field_name not in records:
             self.numbers = self.recipient_single_number_itf or self.recipient_single_number
         elif self.recipient_single_number_itf and self.recipient_single_number_itf != self.recipient_single_number:
             records.write({self.number_field_name: self.recipient_single_number_itf})
@@ -329,7 +329,7 @@ class SendSMS(models.TransientModel):
     def _prepare_log_body_values(self, sms_records_values):
         result = {}
         for record_id, sms_values in sms_records_values.items():
-            result[record_id] = html2plaintext(sms_values['body'])
+            result[record_id] = plaintext2html(html2plaintext(sms_values['body']))
         return result
 
     def _prepare_mass_log_values(self, records, sms_records_values):
