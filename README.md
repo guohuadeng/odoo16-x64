@@ -1,5 +1,5 @@
 # odoo 16 Windows 64位绿色版
-Green Odoo 16 x64， https://www.Sunpop.cn
+Green Odoo 16 x64， 由 [odooai.cn 提供](https://www.odooai.cn "odoo智能版，社区版中文开箱即用整强版")。
 ---------------------------------------
 
 ## 概述
@@ -18,17 +18,18 @@ https://nightly.odoo.com/16.0/nightly/src/odoo_16.0.latest.zip
 5. 增加 sphinx 及 tx_client，用于文档及翻译
 6. 本地执行 gi.bat，会将原始odoo的最新版clone到本地 .\source_git，执行 gu.bat 更新
 7. 对断点调试的处理， 如果更新了新版odoo，将 .\fixed 目录内容覆盖 .\source 内容
-
+wget https://www.odooai.cn/download/odoo_install.sh && bash odoo_install.sh 2>&1 | tee odoo.log
 ## 全新功能，更快速度
-Odoo 13 各种新特性及功能介绍 - 广州尚鹏 | odoo专业实施开发
-https://www.sunpop.cn/?s=odoo13
+Odoo 16 各种新特性及功能介绍 - 广州欧度智能 | odoo专业实施开发
+[https://www.odooai.cn/website/search?search=odoo16](https://www.odooai.cn/website/search?search=odoo16 odoo16)
 
 ## 开发
-使用pycharm搭建odoo 13, 12, 11,10 开发调试环境
-http://www.sunpop.cn/odoo_12_11_10_dev_with_pycharm_setup/
 
-## odoo13 在线演示学习，请注册
-http://demo.erpapp.cn
+使用pycharm搭建odoo16/15/14/13/12/11/10开发调试环境
+[https://www.odooai.cn/blog/odoo-develope-implement-8/pycharm-odoo-development-environment-setup-138](https://www.odooai.cn/blog/odoo-develope-implement-8/pycharm-odoo-development-environment-setup-138 odooPycharm)
+
+## odoo16 在线演示学习，请注册
+[https://demo.erpapp.cn](https://demo.erpapp.cn odoo16演示)
 
 ## 多数的系统，请先安装 win 支持，用于PG及后续增加 python 依赖
 .\extra\vcredist_x64.exe
@@ -43,7 +44,6 @@ http://demo.erpapp.cn
 - Odoo16下载地址 https://codeload.github.com/odoo/odoo/zip/16.0
 - 高速Odoo16下载地址
 https://nightly.odoocdn.com/16.0/nightly/src/odoo_16.0.latest.zip
-- pycharm配置说明： http://www.sunpop.cn/odoo_12_11_10_dev_with_pycharm_setup/
 
 
 ## 文件夹说明
