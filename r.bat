@@ -15,3 +15,6 @@ ping -n 1 127.0.0.1>nul
 %CD%\runtime\pgsql\bin\pg_ctl -D %CD%\runtime\pgsql\data -l %CD%\runtime\pgsql\logfile start
 ping -n 1 127.0.0.1>nul
 %CD%\runtime\python3\python3 %CD%\source\odoo-bin -c %CD%\odoo.conf --update=""
+rem if you want to use push notify via web socket, un comment follow
+::%CD%\runtime\python3\python3 %CD%\source\odoo-bin gevent -c %CD%\odoo.conf --update=""
+
