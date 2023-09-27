@@ -14,7 +14,7 @@ msgstr ""
 "POT-Creation-Date: 2022-10-04 09:26+0000\n"
 "PO-Revision-Date: 2022-09-22 05:55+0000\n"
 "Last-Translator: Jeffery CHEN <jeffery9@gmail.com>, 2022\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Language-Team: Chinese (China) (https://www.transifex.com/odoo/teams/41243/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -106,7 +106,7 @@ msgstr "营销标签"
 #: model:ir.ui.menu,name:utm.menu_utm_campaign_act
 #: model_terms:ir.ui.view,arch_db:utm.view_utm_campaign_view_search
 msgid "Campaigns"
-msgstr "营销"
+msgstr "营销活动"
 
 #. module: utm
 #: model_terms:ir.actions.act_window,help:utm.utm_campaign_action
@@ -338,7 +338,7 @@ msgstr "稍后"
 #. module: utm
 #: model:ir.ui.menu,name:utm.menu_link_tracker_root
 msgid "Link Tracker"
-msgstr "跟踪链"
+msgstr "流量分析"
 
 #. module: utm
 #. openerp-web
@@ -368,7 +368,7 @@ msgstr "媒介名称"
 #: model:ir.ui.menu,name:utm.menu_utm_medium
 #: model_terms:ir.ui.view,arch_db:utm.utm_medium_view_tree
 msgid "Mediums"
-msgstr "媒介"
+msgstr "投放媒介"
 
 #. module: utm
 #: model:ir.model.fields,field_description:utm.field_utm_source_mixin__name
@@ -451,7 +451,7 @@ msgstr "安排"
 #. module: utm
 #: model_terms:ir.ui.view,arch_db:utm.utm_medium_view_search
 msgid "Search UTM Medium"
-msgstr "搜索UTM媒介"
+msgstr "搜索UTM投放媒介"
 
 #. module: utm
 #. openerp-web
@@ -506,7 +506,7 @@ msgstr "来源名称"
 #: model:ir.actions.act_window,name:utm.utm_source_action
 #: model:ir.ui.menu,name:utm.menu_utm_source
 msgid "Sources"
-msgstr "来源"
+msgstr "流量来源"
 
 #. module: utm
 #: model:ir.model.fields,field_description:utm.field_utm_campaign__stage_id
@@ -623,19 +623,19 @@ msgstr "UTM营销"
 #. module: utm
 #: model:ir.model,name:utm.model_utm_medium
 msgid "UTM Medium"
-msgstr "UTM媒介"
+msgstr "UTM投放媒介"
 
 #. module: utm
 #: model_terms:ir.actions.act_window,help:utm.utm_medium_action
 msgid ""
 "UTM Mediums track the mean that was used to attract traffic (e.g. "
 "\"Website\", \"Twitter\", ...)."
-msgstr "UTM媒介跟踪用于吸引流量的手段（如 \"网站\"、\"Twitter\"...）。"
+msgstr "UTM投放媒介跟踪用于吸引流量的手段（如 \"网站\"、\"Twitter\"...）。"
 
 #. module: utm
 #: model:ir.model,name:utm.model_utm_mixin
 msgid "UTM Mixin"
-msgstr "UTM混合"
+msgstr "UTM框架Mixin"
 
 #. module: utm
 #: model:ir.model,name:utm.model_utm_source
@@ -667,7 +667,7 @@ msgstr "UTM标签"
 #. module: utm
 #: model:ir.ui.menu,name:utm.marketing_utm
 msgid "UTMs"
-msgstr "UTMs"
+msgstr "UTM设置"
 
 #. module: utm
 #. openerp-web

@@ -5,18 +5,18 @@
 # Translators:
 # Raymond Yu <cl_yu@hotmail.com>, 2022
 # digitalliuzg8888, 2022
-# Jeffery CHEN <jeffery9@gmail.com>, 2022
+# Martin Trigaux, 2022
+# Jeffery CHEN Fan <jeffery9@gmail.com>, 2022
 # Emily Jia <eji@odoo.com>, 2023
-# Martin Trigaux, 2023
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0\n"
+"Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-14 05:53+0000\n"
+"POT-Creation-Date: 2022-12-15 12:45+0000\n"
 "PO-Revision-Date: 2022-09-22 05:55+0000\n"
-"Last-Translator: Martin Trigaux, 2023\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Last-Translator: Emily Jia <eji@odoo.com>, 2023\n"
+"Language-Team: Chinese (China) (https://www.transifex.com/odoo/teams/41243/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -1045,6 +1045,14 @@ msgstr "不建议通过这个编辑器编辑内置文件，因为这将阻止它
 #. module: web_editor
 #. odoo-javascript
 #: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
+#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
+#, python-format
+msgid "Embed"
+msgstr "嵌入"
+
+#. module: web_editor
+#. odoo-javascript
+#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
 #, python-format
 msgid "Embed Image"
 msgstr "嵌入图像"
@@ -1069,13 +1077,6 @@ msgstr "在文档中嵌入图像."
 #, python-format
 msgid "Embed the youtube video in the document."
 msgstr "在文档中嵌入油管视频."
-
-#. module: web_editor
-#. odoo-javascript
-#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
-#, python-format
-msgid "Empty quote"
-msgstr ""
 
 #. module: web_editor
 #. odoo-javascript
@@ -1141,7 +1142,7 @@ msgstr "填充颜色"
 #: model_terms:ir.ui.view,arch_db:web_editor.snippet_options_image_optimization_widgets
 #, python-format
 msgid "Filter"
-msgstr "筛选"
+msgstr "筛选与排序"
 
 #. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippets
@@ -1300,14 +1301,12 @@ msgstr "标题6"
 #. module: web_editor
 #. odoo-javascript
 #: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
-#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
 #, python-format
 msgid "Heading 1"
 msgstr "标题 1"
 
 #. module: web_editor
 #. odoo-javascript
-#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
 #: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
 #, python-format
 msgid "Heading 2"
@@ -1316,31 +1315,9 @@ msgstr "标题 2"
 #. module: web_editor
 #. odoo-javascript
 #: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
-#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
 #, python-format
 msgid "Heading 3"
 msgstr "标题 3"
-
-#. module: web_editor
-#. odoo-javascript
-#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
-#, python-format
-msgid "Heading 4"
-msgstr ""
-
-#. module: web_editor
-#. odoo-javascript
-#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
-#, python-format
-msgid "Heading 5"
-msgstr ""
-
-#. module: web_editor
-#. odoo-javascript
-#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
-#, python-format
-msgid "Heading 6"
-msgstr ""
 
 #. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippet_options_background_options
@@ -1754,14 +1731,6 @@ msgstr "连接到"
 
 #. module: web_editor
 #. odoo-javascript
-#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
-#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
-#, python-format
-msgid "List"
-msgstr "列表"
-
-#. module: web_editor
-#. odoo-javascript
 #: code:addons/web_editor/static/src/components/media_dialog/file_selector.xml:0
 #, python-format
 msgid "Load more..."
@@ -1809,7 +1778,7 @@ msgstr "媒体"
 #: code:addons/web_editor/static/src/xml/wysiwyg.xml:0
 #, python-format
 msgid "Medium"
-msgstr "媒介"
+msgstr "中等"
 
 #. module: web_editor
 #. odoo-javascript
@@ -2047,9 +2016,24 @@ msgstr "段落构造块。"
 #. module: web_editor
 #. odoo-javascript
 #: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
+#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
+#, python-format
+msgid "Paste"
+msgstr "粘贴"
+
+#. module: web_editor
+#. odoo-javascript
+#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
 #, python-format
 msgid "Paste as URL"
 msgstr "粘贴为网址"
+
+#. module: web_editor
+#. odoo-javascript
+#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
+#, python-format
+msgid "Paste as text"
+msgstr "粘贴为文本"
 
 #. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippet_options
@@ -2515,7 +2499,6 @@ msgstr "选择媒体"
 #. odoo-javascript
 #: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
 #: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
-#: model_terms:ir.ui.view,arch_db:web_editor.snippets
 #, python-format
 msgid "Separator"
 msgstr "分隔符"
@@ -2586,6 +2569,13 @@ msgstr "显示优化的图像"
 #, python-format
 msgid "Signature"
 msgstr "签名"
+
+#. module: web_editor
+#. odoo-javascript
+#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
+#, python-format
+msgid "Simple text paste."
+msgstr "简单的文本粘贴."
 
 #. module: web_editor
 #. odoo-javascript
@@ -2794,15 +2784,6 @@ msgid "The datetime %s does not match the format %s"
 msgstr "日期时间 %s 格式不匹配 %s"
 
 #. module: web_editor
-#. odoo-python
-#: code:addons/web_editor/controllers/main.py:0
-#, python-format
-msgid ""
-"The document was already saved from someone with a different history for "
-"model %r, field %r with id %r."
-msgstr ""
-
-#. module: web_editor
 #. odoo-javascript
 #: code:addons/web_editor/static/src/components/media_dialog/video_selector.js:0
 #, python-format
@@ -2912,7 +2893,7 @@ msgstr "这种类型的图像不支持裁剪。<br/>如果您想裁剪，请先�
 #: code:addons/web_editor/static/src/xml/snippets.xml:0
 #, python-format
 msgid "Title"
-msgstr "称谓"
+msgstr "标题"
 
 #. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippet_options
@@ -2936,13 +2917,6 @@ msgid ""
 "To save a snippet, we need to save all your previous modifications and "
 "reload the page."
 msgstr "要保存一个片段，我们需要保存您之前的所有修改并重新加载页面。"
-
-#. module: web_editor
-#. odoo-javascript
-#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
-#, python-format
-msgid "To-do"
-msgstr ""
 
 #. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippet_options_image_optimization_widgets
@@ -3260,7 +3234,7 @@ msgstr "是"
 msgid ""
 "You can upload documents with the button located in the top left of the "
 "screen."
-msgstr "您可以使用屏幕左上方的按钮上传文档。"
+msgstr "您可以使用屏幕右上方的按钮上传文档。"
 
 #. module: web_editor
 #. odoo-javascript
@@ -3268,7 +3242,7 @@ msgstr "您可以使用屏幕左上方的按钮上传文档。"
 #, python-format
 msgid ""
 "You can upload images with the button located in the top left of the screen."
-msgstr "您可以使用屏幕左上方的按钮上传图像。"
+msgstr "您可以使用屏幕右上方的按钮上传图像。"
 
 #. module: web_editor
 #. odoo-python
@@ -3290,7 +3264,7 @@ msgstr "Youku"
 #: model_terms:ir.ui.view,arch_db:web_editor.snippet_options
 #, python-format
 msgid "Your URL"
-msgstr "您的網址"
+msgstr "网址URL"
 
 #. module: web_editor
 #. odoo-javascript

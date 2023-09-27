@@ -6,17 +6,17 @@
 # Martin Trigaux, 2022
 # digitalliuzg8888, 2022
 # Raymond Yu <cl_yu@hotmail.com>, 2022
-# Jeffery CHEN <jeffery9@gmail.com>, 2022
+# Jeffery CHEN Fan <jeffery9@gmail.com>, 2022
 # Emily Jia <eji@odoo.com>, 2023
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0\n"
+"Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-14 05:51+0000\n"
+"POT-Creation-Date: 2022-12-15 12:49+0000\n"
 "PO-Revision-Date: 2022-09-22 05:54+0000\n"
 "Last-Translator: Emily Jia <eji@odoo.com>, 2023\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Language-Team: Chinese (China) (https://www.transifex.com/odoo/teams/41243/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -252,13 +252,6 @@ msgid "CANCELLED"
 msgstr "已取消"
 
 #. module: pos_restaurant
-#. odoo-python
-#: code:addons/pos_restaurant/models/pos_config.py:0
-#, python-format
-msgid "Cash Bar"
-msgstr "现金酒吧"
-
-#. module: pos_restaurant
 #: model:product.template,name:pos_restaurant.pos_food_cheeseburger_product_template
 msgid "Cheese Burger"
 msgstr "奶酪汉堡包"
@@ -368,7 +361,7 @@ msgid ""
 "                its categories."
 msgstr ""
 "每个订单打印机都有一个IP地址，定义了物联网盒子/硬件\n"
-"         可以找到打印机的代理，以及产品类别的列表。\n"
+"         可以找到打印机的代理，以及产品品类的列表。\n"
 "         订单打印机只打印属于其类别的产品的更新。"
 
 #. module: pos_restaurant
@@ -847,7 +840,7 @@ msgstr "打印厨房、酒吧等的订单"
 #. module: pos_restaurant
 #: model:ir.model.fields,field_description:pos_restaurant.field_restaurant_printer__product_categories_ids
 msgid "Printed Product Categories"
-msgstr "打印产品类别"
+msgstr "打印产品品类"
 
 #. module: pos_restaurant
 #: model:ir.model.fields,field_description:pos_restaurant.field_restaurant_printer__name
@@ -1433,3 +1426,9 @@ msgstr "编辑工具栏的按钮来创建新表。"
 #, python-format
 msgid "discount"
 msgstr "折扣"
+
+#. module: pos_restaurant
+#: code:addons/pos_restaurant/models/pos_config.py:0
+#, python-format
+msgid "Cash Bar"
+msgstr "现金酒吧"

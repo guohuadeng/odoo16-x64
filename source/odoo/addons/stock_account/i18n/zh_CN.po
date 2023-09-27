@@ -15,7 +15,7 @@ msgstr ""
 "POT-Creation-Date: 2022-12-15 12:49+0000\n"
 "PO-Revision-Date: 2022-09-22 05:55+0000\n"
 "Last-Translator: Jeffery CHEN <jeffery9@gmail.com>, 2022\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Language-Team: Chinese (China) (https://www.transifex.com/odoo/teams/41243/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -176,7 +176,7 @@ msgstr "取消"
 msgid ""
 "Cannot find a stock input account for the product %s. You must define one on"
 " the product category, or on the location, before processing this operation."
-msgstr "找不到产品%s的库存入库科目。 在处理此作业之前，您必须在产品类别或产品上进行一个定义。"
+msgstr "找不到产品%s的库存入库科目。 在处理此作业之前，您必须在产品品类或产品上进行一个定义。"
 
 #. module: stock_account
 #. odoo-python
@@ -186,7 +186,7 @@ msgid ""
 "Cannot find a stock output account for the product %s. You must define one "
 "on the product category, or on the location, before processing this "
 "operation."
-msgstr "找不到产品%s的库存出库库科目。 在处理此作业之前，您必须在产品类别或产品上进行定义。"
+msgstr "找不到产品%s的库存出库库科目。 在处理此作业之前，您必须在产品品类或产品上进行定义。"
 
 #. module: stock_account
 #. odoo-python
@@ -235,7 +235,7 @@ msgstr "成本方法"
 #: code:addons/stock_account/models/product.py:0
 #, python-format
 msgid "Costing method change for product category %s: from %s to %s."
-msgstr "产品类别%s的成本定价核算方法更改：从%s 到%s。"
+msgstr "产品品类%s的成本定价核算方法更改：从%s 到%s。"
 
 #. module: stock_account
 #: model:ir.model.fields,field_description:stock_account.field_stock_valuation_layer_revaluation__account_id
@@ -248,7 +248,7 @@ msgid ""
 "Counterpart journal items for all incoming stock moves will be posted in this account, unless there is a specific valuation account\n"
 "                set on the source location. This is the default value for all products in this category. It can also directly be set on each product."
 msgstr ""
-"所有进货库存移动的对应会计分录将过帐在此帐户中，除非有特定的计价科目\n"
+"所有进货库存移动的对应会计分录将过帐在此账户中，除非有特定的计价科目\n"
 "                设置在源库位。这是此类别中所有产品的默认值。也可以直接设置每个产品。"
 
 #. module: stock_account
@@ -338,7 +338,7 @@ msgid ""
 "Due to a change of product category (from %s to %s), the costing method"
 "                                has changed for product template %s: from %s"
 " to %s."
-msgstr "由于产品类别的变更（从 %s 至%s ），成本定价方法已更改为产品模板 %s：从 %s 至%s 。"
+msgstr "由于产品品类的变更（从 %s 至%s ），成本定价方法已更改为产品模板 %s：从 %s 至%s 。"
 
 #. module: stock_account
 #: model:ir.model.fields.selection,name:stock_account.selection__product_category__property_cost_method__fifo
@@ -518,7 +518,7 @@ msgstr "产品"
 #: model:ir.model,name:stock_account.model_product_category
 #: model:ir.model.fields,field_description:stock_account.field_stock_valuation_layer__categ_id
 msgid "Product Category"
-msgstr "产品类别"
+msgstr "产品品类"
 
 #. module: stock_account
 #: model:ir.model,name:stock_account.model_stock_move_line
@@ -899,7 +899,7 @@ msgstr "指定日期的计价"
 #: code:addons/stock_account/models/product.py:0
 #, python-format
 msgid "Valuation method change for product category %s: from %s to %s."
-msgstr "产品类别的计价方法更改 %s: 从 %s 到 %s."
+msgstr "产品品类的计价方法更改 %s: 从 %s 到 %s."
 
 #. module: stock_account
 #: model:ir.model.fields,field_description:stock_account.field_stock_quant__value
@@ -939,8 +939,8 @@ msgid ""
 "                unless there is a specific valuation account set on the destination location. This is the default value for all products in this category.\n"
 "                It can also directly be set on each product."
 msgstr ""
-"在进行自动库存计价时，所有出货库存凭证的对应会计分录将在此帐户中过帐，\n"
-"               除非在目的地设置了特定的计价帐户。 这是此类别中所有产品的默认值。\n"
+"在进行自动库存计价时，所有出货库存凭证的对应会计分录将在此账户中过帐，\n"
+"               除非在目的地设置了特定的计价账户。 这是此类别中所有产品的默认值。\n"
 "                它也可以直接在每个产品上设置。"
 
 #. module: stock_account
@@ -986,7 +986,7 @@ msgstr "您不能在自动估价中更新产品的成本，因为这将导致创
 msgid ""
 "You don't have any input valuation account defined on your product category."
 " You must define one before processing this operation."
-msgstr "您没有在产品类别中定义任何输入计价账户。您必须在处理此作业之前定义一个。"
+msgstr "您没有在产品品类中定义任何输入计价账户。您必须在处理此作业之前定义一个。"
 
 #. module: stock_account
 #. odoo-python
@@ -995,7 +995,7 @@ msgstr "您没有在产品类别中定义任何输入计价账户。您必须在
 msgid ""
 "You don't have any stock input account defined on your product category. You"
 " must define one before processing this operation."
-msgstr "您的产品类别上没有定义任何库存输入账户。您必须在处理这个作业之前定义一个。"
+msgstr "您的产品品类上没有定义任何库存输入账户。您必须在处理这个作业之前定义一个。"
 
 #. module: stock_account
 #. odoo-python
@@ -1004,7 +1004,7 @@ msgstr "您的产品类别上没有定义任何库存输入账户。您必须在
 msgid ""
 "You don't have any stock journal defined on your product category, check if "
 "you have installed a chart of accounts."
-msgstr "没有在产品类别中设置库存日记账，检查是否安装科目表."
+msgstr "没有在产品品类中设置库存日记账，检查是否安装科目表."
 
 #. module: stock_account
 #. odoo-python
@@ -1016,14 +1016,14 @@ msgstr "没有在产品类别中设置库存日记账，检查是否安装科目
 msgid ""
 "You don't have any stock valuation account defined on your product category."
 " You must define one before processing this operation."
-msgstr "您没有在您的产品类别中定义任何库存计价账户。 处理此作业之前，您必须定义一个。"
+msgstr "您没有在您的产品品类中定义任何库存计价账户。 处理此作业之前，您必须定义一个。"
 
 #. module: stock_account
 #. odoo-python
 #: code:addons/stock_account/models/product.py:0
 #, python-format
 msgid "You must set a counterpart account on your product category."
-msgstr "您必须在您的产品类别上设置一个对应的账户。"
+msgstr "您必须在您的产品品类上设置一个对应的账户。"
 
 #. module: stock_account
 #: model_terms:ir.ui.view,arch_db:stock_account.stock_valuation_layer_revaluation_form_view

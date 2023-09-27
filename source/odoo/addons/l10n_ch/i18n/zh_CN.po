@@ -706,7 +706,7 @@ msgstr ""
 #. module: l10n_ch
 #: model:ir.model,name:l10n_ch.model_res_partner_bank
 msgid "Bank Accounts"
-msgstr "银行帐户"
+msgstr "银行账户"
 
 #. module: l10n_ch
 #: model:account.account,name:l10n_ch.5_ch_coa_2100 model:account.account.template,name:l10n_ch.ch_coa_2100

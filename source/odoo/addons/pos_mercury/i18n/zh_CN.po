@@ -13,7 +13,7 @@ msgstr ""
 "POT-Creation-Date: 2022-09-23 08:02+0000\n"
 "PO-Revision-Date: 2022-09-22 05:54+0000\n"
 "Last-Translator: Jeffery CHEN <jeffery9@gmail.com>, 2022\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Language-Team: Chinese (China) (https://www.transifex.com/odoo/teams/41243/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -34,7 +34,7 @@ msgid ""
 "                                (eg. Visa, MasterCard, Discovery, American Express, ...). After setting up this\n"
 "                                configuration you should associate it with a Point Of Sale payment method."
 msgstr ""
-"<i>Vantiv 配置</i>定义了在以下情况下将使用的 Vantiv 帐户\n"
+"<i>Vantiv 配置</i>定义了在以下情况下将使用的 Vantiv 账户\n"
 "                                 在营业点处理信用卡交易。 设置 Vantiv\n"
 "                                 配置将使您能够允许使用各种信用卡付款\n"
 "                                 (例如 Visa、MasterCard、Discovery、美国运通...)。 设置好之后\n"
@@ -176,7 +176,7 @@ msgstr "授权给商家ID以便能在支付供应商的服务器上支付"
 msgid ""
 "If you don't already have a Vantiv account, contact Vantiv at +1 (800) 846-4472\n"
 "                                to create one."
-msgstr "如果您还没有 Vantiv 帐户，请致电 +1 (800) 846-4472 联系 Vantiv 创造一个."
+msgstr "如果您还没有 Vantiv 账户，请致电 +1 (800) 846-4472 联系 Vantiv 创造一个."
 
 #. module: pos_mercury
 #: model:ir.model.fields,help:pos_mercury.field_pos_payment__mercury_invoice_no
@@ -304,7 +304,7 @@ msgstr "Vantiv Pay 的支付参考号"
 #: code:addons/pos_mercury/static/src/js/PaymentScreen.js:0
 #, python-format
 msgid "Please setup your Vantiv merchant account."
-msgstr "请设置您的 Vantiv 商家帐户."
+msgstr "请设置您的 Vantiv 商家账户."
 
 #. module: pos_mercury
 #: model:ir.model,name:pos_mercury.model_pos_order

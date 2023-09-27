@@ -1425,7 +1425,7 @@ msgstr ""
 #: model_terms:theme.ir.ui.view,arch:theme_common.s_news_carousel
 #: model_terms:theme.ir.ui.view,arch:theme_common.s_products_carousel
 msgid "Next"
-msgstr "下一页"
+msgstr ">"
 
 #. module: theme_common
 #: model_terms:theme.ir.ui.view,arch:theme_common.s_discount

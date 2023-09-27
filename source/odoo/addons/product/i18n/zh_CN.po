@@ -1,23 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* product
-# 
+#
 # Translators:
 # Ryan Zhang <so_happy_boy@hotmail.com>, 2022
 # inspur qiuguodong <qiuguodong@inspur.com>, 2022
 # 山西清水欧度(QQ:54773801) <54773801@qq.com>, 2022
 # Martin Trigaux, 2022
 # Raymond Yu <cl_yu@hotmail.com>, 2022
-# Jeffery CHEN <jeffery9@gmail.com>, 2022
-# 
+# Jeffery CHEN Fan <jeffery9@gmail.com>, 2022
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-15 12:51+0000\n"
 "PO-Revision-Date: 2022-09-22 05:54+0000\n"
-"Last-Translator: Jeffery CHEN <jeffery9@gmail.com>, 2022\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Last-Translator: Jeffery CHEN Fan <jeffery9@gmail.com>, 2022\n"
+"Language-Team: Chinese (China) (https://www.transifex.com/odoo/teams/41243/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -248,7 +248,7 @@ msgid ""
 "A price is a set of sales prices or rules to compute the price of sales order lines based on products, product categories, dates and ordered quantities.\n"
 "            This is the perfect tool to handle several pricings, seasonal discounts, etc."
 msgstr ""
-"价格是一组销售价格或规则，用于根据产品、产品类别、日期和订购计数计算销售订单明细行的价格。\n"
+"价格是一组销售价格或规则，用于根据产品、产品品类、日期和订购计数计算销售订单明细行的价格。\n"
 "            这是处理几个价格，季节性折扣等的完美工具。"
 
 #. module: product
@@ -567,19 +567,19 @@ msgstr "可销售"
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_category_form_view
 msgid "Category"
-msgstr "类别"
+msgstr "品类"
 
 #. module: product
 #. odoo-python
 #: code:addons/product/models/product_pricelist_item.py:0
 #, python-format
 msgid "Category: %s"
-msgstr "类别：%s"
+msgstr "品类：%s"
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_category__child_id
 msgid "Child Categories"
-msgstr "下级类别"
+msgstr "下级品类"
 
 #. module: product
 #: model:ir.actions.act_window,name:product.action_open_label_layout
@@ -598,6 +598,7 @@ msgstr "代码"
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_attribute_value__html_color
+#: model:ir.model.fields,field_description:product.field_product_product__color
 #: model:ir.model.fields,field_description:product.field_product_tag__color
 #: model:ir.model.fields,field_description:product.field_product_template_attribute_value__color
 #: model:ir.model.fields.selection,name:product.selection__product_attribute__display_type__color
@@ -1382,7 +1383,7 @@ msgstr "内部说明"
 #: model:ir.model.fields,field_description:product.field_product_product__default_code
 #: model:ir.model.fields,field_description:product.field_product_template__default_code
 msgid "Internal Reference"
-msgstr "内部参考"
+msgstr "编码"
 
 #. module: product
 #: model:ir.model.fields,help:product.field_product_product__barcode
@@ -1711,7 +1712,7 @@ msgstr "错误数"
 #. module: product
 #: model:ir.model.fields,help:product.field_product_product__message_needaction_counter
 #: model:ir.model.fields,help:product.field_product_template__message_needaction_counter
-msgid "Number of messages which requires an action"
+msgid "Number of messages requiring action"
 msgstr "需要作业消息数量"
 
 #. module: product
@@ -2038,7 +2039,7 @@ msgstr "产品属性"
 #: model_terms:ir.ui.view,arch_db:product.product_category_list_view
 #: model_terms:ir.ui.view,arch_db:product.product_category_search_view
 msgid "Product Categories"
-msgstr "产品类别"
+msgstr "产品品类"
 
 #. module: product
 #: model:ir.model,name:product.model_product_category
@@ -2050,7 +2051,7 @@ msgstr "产品类别"
 #: model_terms:ir.ui.view,arch_db:product.product_template_form_view
 #: model_terms:ir.ui.view,arch_db:product.product_template_search_view
 msgid "Product Category"
-msgstr "产品类别"
+msgstr "产品品类"
 
 #. module: product
 #: model:ir.actions.report,name:product.report_product_template_label
@@ -2105,7 +2106,7 @@ msgstr "产品产品"
 #: model:ir.model,name:product.model_product_tag
 #: model_terms:ir.ui.view,arch_db:product.product_tag_form_view
 msgid "Product Tag"
-msgstr "产品标记"
+msgstr "产品标签"
 
 #. module: product
 #: model:ir.actions.act_window,name:product.product_tag_action
@@ -2454,7 +2455,7 @@ msgstr "给客户显示公开的价格和折扣"
 msgid ""
 "Specify a product category if this rule only applies to products belonging "
 "to this category or its children categories. Keep empty otherwise."
-msgstr "指定一个产品类别 ，规则只被应用在与这个类别以及它的下级类一致的产品上。其它情况留空"
+msgstr "指定一个产品品类 ，规则只被应用在与这个品类以及它的下级类一致的产品上。其它情况留空"
 
 #. module: product
 #: model:ir.model.fields,help:product.field_product_pricelist_item__product_id
@@ -2632,7 +2633,7 @@ msgstr "最小保证金应低于最大保证金。"
 msgid ""
 "The number of products under this category (Does not consider the children "
 "categories)"
-msgstr "此类别下的产品数量（不考虑子类别）"
+msgstr "此品类下的产品数量（不考虑子品类）"
 
 #. module: product
 #. odoo-python
@@ -2664,6 +2665,13 @@ msgid ""
 "expressed in the vendor Product Unit of Measure if not any, in the default "
 "unit of measure of the product otherwise."
 msgstr "供应商要求的最小采购数量。如果不设定单位，将会使用默认采购单位。"
+
+#. module: product
+#. odoo-python
+#: code:addons/product/models/product_pricelist_item.py:0
+#, python-format
+msgid "The rounding method must be strictly positive."
+msgstr "进位方法必须为正数"
 
 #. module: product
 #: model:ir.model.fields,help:product.field_product_product__lst_price
@@ -3029,25 +3037,6 @@ msgid "Warnings"
 msgstr "警告"
 
 #. module: product
-#: model_terms:product.template,website_description:product.product_product_4_product_template
-msgid ""
-"We pay special attention to detail, which is why our desks are of a superior"
-" quality."
-msgstr "我们特别注重细节，这就是我们的办公桌质量上乘的原因。"
-
-#. module: product
-#: model:ir.model.fields,field_description:product.field_product_product__website_message_ids
-#: model:ir.model.fields,field_description:product.field_product_template__website_message_ids
-msgid "Website Messages"
-msgstr "网站消息"
-
-#. module: product
-#: model:ir.model.fields,help:product.field_product_product__website_message_ids
-#: model:ir.model.fields,help:product.field_product_template__website_message_ids
-msgid "Website communication history"
-msgstr "网站沟通记录"
-
-#. module: product
 #: model:ir.model.fields,field_description:product.field_product_product__weight
 #: model:ir.model.fields,field_description:product.field_product_template__weight
 #: model_terms:ir.ui.view,arch_db:product.res_config_settings_view_form
@@ -3147,7 +3136,7 @@ msgstr "不可变更该属性值 %s ，该值已被用于产品 %s."
 #: code:addons/product/models/product_category.py:0
 #, python-format
 msgid "You cannot create recursive categories."
-msgstr "不能创建递归的类别."
+msgstr "不能创建递归的品类."
 
 #. module: product
 #: model:ir.model.constraint,message:product.constraint_product_attribute_value_value_company_uniq
@@ -3169,7 +3158,7 @@ msgstr "您不能将“账户”的小数精度定义为大于公司主要货币
 #: code:addons/product/models/product_category.py:0
 #, python-format
 msgid "You cannot delete the %s product category."
-msgstr "您不能删除%s产品类别."
+msgstr "您不能删除%s产品品类."
 
 #. module: product
 #. odoo-python
@@ -3191,6 +3180,8 @@ msgid ""
 "%s\n"
 " If the value has been associated to a product in the past, you will not be able to delete it."
 msgstr ""
+"不能删除值 %s ，因为该值已经用于以下产品:\n"
+"%s"
 
 #. module: product
 #. odoo-python
@@ -3198,7 +3189,7 @@ msgstr ""
 #, python-format
 msgid ""
 "You cannot delete this product category, it is the default generic category."
-msgstr "您不能删除此产品类别，它是默认的常规类别。"
+msgstr "您不能删除此产品品类，它是默认的常规品类。"
 
 #. module: product
 #. odoo-python
@@ -3220,7 +3211,7 @@ msgstr ""
 #: code:addons/product/models/product_attribute.py:0
 #, python-format
 msgid "You cannot delete value %s because it was used in some products."
-msgstr ""
+msgstr "您不能删除此属性值 %s，因为有产品正在使用。"
 
 #. module: product
 #. odoo-python

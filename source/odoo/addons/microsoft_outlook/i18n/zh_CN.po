@@ -15,7 +15,7 @@ msgstr ""
 "POT-Creation-Date: 2022-09-20 09:02+0000\n"
 "PO-Revision-Date: 2022-09-22 05:53+0000\n"
 "Last-Translator: Raymond Yu <cl_yu@hotmail.com>, 2022\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Language-Team: Chinese (China) (https://www.transifex.com/odoo/teams/41243/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -199,7 +199,7 @@ msgstr "请配置您的 Outlook 凭据。"
 #: code:addons/microsoft_outlook/models/microsoft_outlook_mixin.py:0
 #, python-format
 msgid "Please connect with your Outlook account before using it."
-msgstr "请在使用前连接您的Outlook帐户"
+msgstr "请在使用前连接您的Outlook账户"
 
 #. module: microsoft_outlook
 #: code:addons/microsoft_outlook/models/ir_mail_server.py:0
@@ -241,7 +241,7 @@ msgstr "服务器类型"
 msgid ""
 "Setup your Outlook API credentials in the general settings to link a Outlook"
 " account."
-msgstr "在常规设置中设置 Outlook API 凭据以链接 Outlook 帐户。"
+msgstr "在常规设置中设置 Outlook API 凭据以链接 Outlook 账户。"
 
 #. module: microsoft_outlook
 #: model:ir.model.fields,help:microsoft_outlook.field_fetchmail_server__microsoft_outlook_uri
